@@ -6,8 +6,6 @@ import (
 	"github.com/ssh-connection-manager/time"
 )
 
-var connects json.Connections
-
 func Change(
 	oldAlias string,
 	alias, address, login, password string) {
