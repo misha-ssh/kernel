@@ -4,12 +4,6 @@ go 1.22.10
 
 require (
 	github.com/spf13/viper v1.19.0
-	github.com/ssh-connection-manager/connect v1.1.1
-	github.com/ssh-connection-manager/crypt v1.1.3
-	github.com/ssh-connection-manager/file v1.3.1
-	github.com/ssh-connection-manager/json v1.1.5
-	github.com/ssh-connection-manager/output v1.0.0
-	github.com/ssh-connection-manager/time v1.0.0
 )
 
 require (
