@@ -2,11 +2,12 @@ package inits
 
 import (
 	"github.com/spf13/viper"
-	"github.com/ssh-connection-manager/crypt"
-	"github.com/ssh-connection-manager/file"
-	"github.com/ssh-connection-manager/json"
+
 	"github.com/ssh-connection-manager/kernel/config"
-	"github.com/ssh-connection-manager/output"
+	"github.com/ssh-connection-manager/kernel/pkg/crypt"
+	"github.com/ssh-connection-manager/kernel/pkg/file"
+	"github.com/ssh-connection-manager/kernel/pkg/json"
+	"github.com/ssh-connection-manager/kernel/pkg/output"
 )
 
 func generateConfigFile() {
