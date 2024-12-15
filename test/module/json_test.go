@@ -3,8 +3,10 @@
 package module
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/inits"
 	fl "github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
+	"github.com/ssh-connection-manager/kernel/v2/test"
 	"testing"
 )
 

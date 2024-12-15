@@ -3,6 +3,7 @@ package inits
 import (
 	"github.com/spf13/viper"
 
+	"github.com/ssh-connection-manager/kernel/v2/config"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/crypt"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
