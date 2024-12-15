@@ -3,7 +3,7 @@ package json
 import (
 	"errors"
 
-	"github.com/ssh-connection-manager/kernel/pkg/file"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 )
 
 func CreateBaseJsonDataToFile(fl file.File) error {

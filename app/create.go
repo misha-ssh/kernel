@@ -1,9 +1,9 @@
 package app
 
 import (
-	"github.com/ssh-connection-manager/kernel/pkg/json"
-	"github.com/ssh-connection-manager/kernel/pkg/output"
-	"github.com/ssh-connection-manager/kernel/pkg/time"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/time"
 )
 
 func Create(alias, address, login, password string) {

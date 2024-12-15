@@ -4,8 +4,8 @@ import (
 	"os/user"
 
 	"github.com/spf13/viper"
-	"github.com/ssh-connection-manager/kernel/pkg/file"
-	"github.com/ssh-connection-manager/kernel/pkg/output"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 )
 
 func getHomeDir() string {

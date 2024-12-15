@@ -3,8 +3,7 @@
 package module
 
 import (
-	fl "github.com/ssh-connection-manager/kernel/pkg/file"
-	"github.com/ssh-connection-manager/kernel/test"
+	fl "github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"testing"
 )
 
