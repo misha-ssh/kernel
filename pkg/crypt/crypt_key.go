@@ -4,7 +4,7 @@ import (
 	"crypto/rand"
 	"errors"
 
-	"github.com/ssh-connection-manager/file"
+	"github.com/ssh-connection-manager/kernel/pkg/file"
 )
 
 func GetKey() ([]byte, error) {

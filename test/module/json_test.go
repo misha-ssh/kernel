@@ -1,20 +1,20 @@
 //go:build module
 
-package modules
+package module
 
 import (
-	fl "github.com/ssh-connection-manager/file"
-	"github.com/ssh-connection-manager/file/tests"
-	"github.com/ssh-connection-manager/json"
 	"github.com/ssh-connection-manager/kernel/inits"
+	fl "github.com/ssh-connection-manager/kernel/pkg/file"
+	"github.com/ssh-connection-manager/kernel/pkg/json"
+	"github.com/ssh-connection-manager/kernel/test"
 	"testing"
 )
 
 func TestWriteToJsonFile(t *testing.T) {
 	inits.SetDependencies()
 
-	path := tests.GetDirForTests()
-	fileName := tests.RandomString(5) + ".json"
+	path := test.GetDirForTests()
+	fileName := test.RandomString(5) + ".json"
 
 	file := fl.File{Name: fileName, Path: path}
 
@@ -24,12 +24,12 @@ func TestWriteToJsonFile(t *testing.T) {
 	}
 
 	connect := json.Connect{
-		Alias:     tests.RandomString(5),
-		Login:     tests.RandomString(5),
-		Address:   tests.RandomString(5),
-		Password:  tests.RandomString(5),
-		CreatedAt: tests.RandomString(5),
-		UpdatedAt: tests.RandomString(5),
+		Alias:     test.RandomString(5),
+		Login:     test.RandomString(5),
+		Address:   test.RandomString(5),
+		Password:  test.RandomString(5),
+		CreatedAt: test.RandomString(5),
+		UpdatedAt: test.RandomString(5),
 	}
 
 	connection := json.Connections{Connects: make([]json.Connect, 1)}
@@ -45,12 +45,12 @@ func TestWriteToJsonFile(t *testing.T) {
 	}
 
 	connectTwin := json.Connect{
-		Alias:     tests.RandomString(5),
-		Login:     tests.RandomString(5),
-		Address:   tests.RandomString(5),
-		Password:  tests.RandomString(5),
-		CreatedAt: tests.RandomString(5),
-		UpdatedAt: tests.RandomString(5),
+		Alias:     test.RandomString(5),
+		Login:     test.RandomString(5),
+		Address:   test.RandomString(5),
+		Password:  test.RandomString(5),
+		CreatedAt: test.RandomString(5),
+		UpdatedAt: test.RandomString(5),
 	}
 
 	err = connection.WriteConnectToJson(connectTwin)

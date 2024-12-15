@@ -3,7 +3,7 @@ package json
 import (
 	"errors"
 
-	"github.com/ssh-connection-manager/crypt"
+	"github.com/ssh-connection-manager/kernel/pkg/crypt"
 )
 
 func SetCryptData(c Connect) (Connect, error) {

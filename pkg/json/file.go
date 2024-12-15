@@ -3,7 +3,7 @@ package json
 import (
 	"errors"
 
-	"github.com/ssh-connection-manager/file"
+	"github.com/ssh-connection-manager/kernel/pkg/file"
 )
 
 var fl file.File

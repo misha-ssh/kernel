@@ -6,8 +6,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/ssh-connection-manager/file"
-	"github.com/ssh-connection-manager/json"
+	"github.com/ssh-connection-manager/kernel/pkg/file"
+	"github.com/ssh-connection-manager/kernel/pkg/json"
 )
 
 func Ssh(c *json.Connections, alias string, fl file.File) error {

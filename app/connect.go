@@ -2,10 +2,10 @@ package app
 
 import (
 	"github.com/spf13/viper"
-	"github.com/ssh-connection-manager/connect"
-	"github.com/ssh-connection-manager/file"
-	"github.com/ssh-connection-manager/json"
-	"github.com/ssh-connection-manager/output"
+	"github.com/ssh-connection-manager/kernel/pkg/connect"
+	"github.com/ssh-connection-manager/kernel/pkg/file"
+	"github.com/ssh-connection-manager/kernel/pkg/json"
+	"github.com/ssh-connection-manager/kernel/pkg/output"
 )
 
 func Connect(alias string) {

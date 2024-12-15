@@ -1,6 +1,6 @@
 package crypt
 
-import "github.com/ssh-connection-manager/file"
+import "github.com/ssh-connection-manager/kernel/pkg/file"
 
 var fl file.File
 

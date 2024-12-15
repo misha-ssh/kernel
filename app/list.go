@@ -1,8 +1,8 @@
 package app
 
 import (
-	"github.com/ssh-connection-manager/json"
-	"github.com/ssh-connection-manager/output"
+	"github.com/ssh-connection-manager/kernel/pkg/json"
+	"github.com/ssh-connection-manager/kernel/pkg/output"
 )
 
 func List() [][]string {
