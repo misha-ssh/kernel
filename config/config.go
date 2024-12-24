@@ -35,6 +35,7 @@ func existOrCreateConfig(fl file.File) {
 func setConfigVariable() {
 	viper.Set("NameFileConnects", NameFileConnects)
 	viper.Set("NameFileCryptKey", NameFileCryptKey)
+	viper.Set("NameFileLogger", NameFileLogger)
 	viper.Set("FullPathConfig", getHomeDir())
 	viper.Set("Separator", Separator)
 	viper.Set("Space", Space)
