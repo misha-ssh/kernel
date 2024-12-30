@@ -3,18 +3,20 @@
 package module
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/inits"
+	"testing"
+
 	fl "github.com/ssh-connection-manager/kernel/v2/pkg/file"
+
+	"github.com/ssh-connection-manager/kernel/v2/inits"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
 	"github.com/ssh-connection-manager/kernel/v2/test"
-	"testing"
 )
 
 func TestWriteToJsonFile(t *testing.T) {
 	inits.SetDependencies()
 
 	path := test.GetDirForTests()
-	fileName := test.RandomString(5) + ".json"
+	fileName := test.RandomString() + ".json"
 
 	file := fl.File{Name: fileName, Path: path}
 
@@ -24,12 +26,12 @@ func TestWriteToJsonFile(t *testing.T) {
 	}
 
 	connect := json.Connect{
-		Alias:     test.RandomString(5),
-		Login:     test.RandomString(5),
-		Address:   test.RandomString(5),
-		Password:  test.RandomString(5),
-		CreatedAt: test.RandomString(5),
-		UpdatedAt: test.RandomString(5),
+		Alias:     test.RandomString(),
+		Login:     test.RandomString(),
+		Address:   test.RandomString(),
+		Password:  test.RandomString(),
+		CreatedAt: test.RandomString(),
+		UpdatedAt: test.RandomString(),
 	}
 
 	connection := json.Connections{Connects: make([]json.Connect, 1)}
@@ -45,12 +47,12 @@ func TestWriteToJsonFile(t *testing.T) {
 	}
 
 	connectTwin := json.Connect{
-		Alias:     test.RandomString(5),
-		Login:     test.RandomString(5),
-		Address:   test.RandomString(5),
-		Password:  test.RandomString(5),
-		CreatedAt: test.RandomString(5),
-		UpdatedAt: test.RandomString(5),
+		Alias:     test.RandomString(),
+		Login:     test.RandomString(),
+		Address:   test.RandomString(),
+		Password:  test.RandomString(),
+		CreatedAt: test.RandomString(),
+		UpdatedAt: test.RandomString(),
 	}
 
 	err = connection.WriteConnectToJson(connectTwin)

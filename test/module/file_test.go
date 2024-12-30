@@ -3,14 +3,17 @@
 package module
 
 import (
-	fl "github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"testing"
+
+	fl "github.com/ssh-connection-manager/kernel/v2/pkg/file"
+
+	"github.com/ssh-connection-manager/kernel/v2/test"
 )
 
 func TestCreateFile(t *testing.T) {
 	testDir := test.GetDirForTests()
 
-	randomStr := test.RandomString(5)
+	randomStr := test.RandomString()
 
 	file := fl.File{Name: randomStr, Path: testDir}
 	err := file.CreateFile()
@@ -26,7 +29,7 @@ func TestCreateFile(t *testing.T) {
 func TestWriteToFile(t *testing.T) {
 	testDir := test.GetDirForTests()
 
-	randomStr := test.RandomString(5) + ".txt"
+	randomStr := test.RandomString() + ".txt"
 
 	file := fl.File{Name: randomStr, Path: testDir}
 
@@ -39,7 +42,7 @@ func TestWriteToFile(t *testing.T) {
 		t.Fatal("File dont created")
 	}
 
-	randomText := test.RandomString(100)
+	randomText := test.RandomString()
 	err = file.WriteFile([]byte(randomText))
 	if err != nil {
 		t.Fatal("Error write to file")
@@ -57,13 +60,13 @@ func TestWriteToFile(t *testing.T) {
 
 func TestReadFile(t *testing.T) {
 	files := [7]fl.File{
-		{Name: test.RandomString(5) + ".json", Path: test.GetDirForTests()},
-		{Name: test.RandomString(5) + ".txt", Path: test.GetDirForTests()},
-		{Name: test.RandomString(5) + ".PNG", Path: test.GetDirForTests()},
-		{Name: test.RandomString(5) + ".PDF", Path: test.GetDirForTests()},
-		{Name: test.RandomString(5) + ".PDF", Path: test.GetDirForTests()},
-		{Name: test.RandomString(5) + ".DOC", Path: test.GetDirForTests()},
-		{Name: test.RandomString(5), Path: test.GetDirForTests()},
+		{Name: test.RandomString() + ".json", Path: test.GetDirForTests()},
+		{Name: test.RandomString() + ".txt", Path: test.GetDirForTests()},
+		{Name: test.RandomString() + ".PNG", Path: test.GetDirForTests()},
+		{Name: test.RandomString() + ".PDF", Path: test.GetDirForTests()},
+		{Name: test.RandomString() + ".PDF", Path: test.GetDirForTests()},
+		{Name: test.RandomString() + ".DOC", Path: test.GetDirForTests()},
+		{Name: test.RandomString(), Path: test.GetDirForTests()},
 	}
 
 	for _, file := range files {
@@ -76,7 +79,7 @@ func TestReadFile(t *testing.T) {
 			t.Fatal("File dont created")
 		}
 
-		randomText := test.RandomString(100)
+		randomText := test.RandomString()
 
 		err = file.WriteFile([]byte(randomText))
 		if err != nil {
@@ -98,8 +101,8 @@ func TestReadFile(t *testing.T) {
 func TestIsExistFile(t *testing.T) {
 	testDir := test.GetDirForTests()
 
-	randomStr := test.RandomString(5)
-	randomStr2 := test.RandomString(5)
+	randomStr := test.RandomString()
+	randomStr2 := test.RandomString()
 
 	file := fl.File{Name: randomStr, Path: testDir}
 	fileWithDontExistName := fl.File{Name: randomStr2, Path: testDir}
