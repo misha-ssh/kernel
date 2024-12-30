@@ -1,11 +1,12 @@
 package logger
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 	"log"
 	"os"
 	"path/filepath"
+
+	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 )
 
 func GenerateFile(fl file.File) error {
@@ -34,24 +35,24 @@ func getOpenLogFile(fl file.File) (*os.File, error) {
 }
 
 // Info Danger TODO написать одну логику а функции только различаются строкой
-func Info() {
+func Info(message string) {
 	logFile := GetFile()
 	openLogFile, err := getOpenLogFile(logFile)
 	if err != nil {
 		output.GetOutError("dont open log file")
 	}
 
-	infoLog := log.New(openLogFile, "[info]", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	infoLog.Println("this is info")
+	infoLog := log.New(openLogFile, "[info] ", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
+	infoLog.Println(message)
 }
 
-func Danger() {
+func Danger(message string) {
 	logFile := GetFile()
 	openLogFile, err := getOpenLogFile(logFile)
 	if err != nil {
 		output.GetOutError("dont open log file")
 	}
 
-	errorLog := log.New(openLogFile, "[error]", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	errorLog.Println("this is error")
+	errorLog := log.New(openLogFile, "[error] ", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
+	errorLog.Println(message)
 }
