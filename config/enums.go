@@ -12,6 +12,7 @@ const (
 const (
 	NameFileConnects string = "connect-ssh.json"
 	NameFileCryptKey string = "key.txt"
+	NameFileLogger   string = "log.txt"
 )
 
 const (

@@ -2,6 +2,7 @@ package inits
 
 import (
 	"github.com/spf13/viper"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 
 	"github.com/ssh-connection-manager/kernel/v2/config"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/crypt"
@@ -38,8 +39,21 @@ func generateCryptKey() {
 	}
 }
 
+func generateLogFile() {
+	pathConf := viper.GetString("FullPathConfig")
+	fileNameKey := viper.GetString("NameFileLogger")
+
+	fileLogger := file.File{Path: pathConf, Name: fileNameKey}
+
+	err := logger.GenerateFile(fileLogger)
+	if err != nil {
+		output.GetOutError("err generate logger")
+	}
+}
+
 func SetDependencies() {
 	generateConfigFile()
 	createFileConnects()
 	generateCryptKey()
+	generateLogFile()
 }

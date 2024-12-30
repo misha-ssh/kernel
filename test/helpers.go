@@ -6,15 +6,11 @@ import (
 	"os/user"
 )
 
-func RandomString(count int) string {
-	letterRunes := []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+const DefaultChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+const DefaultCountChars = 5
 
-	randomStr := make([]rune, count)
-	for i := range randomStr {
-		randomStr[i] = letterRunes[rand.Intn(len(letterRunes))]
-	}
-
-	return string(randomStr)
+func RandomString() string {
+	return generateRandomString(DefaultCountChars)
 }
 
 func GetDirForTests() string {
@@ -25,4 +21,15 @@ func GetDirForTests() string {
 	}
 
 	return usr.HomeDir + "/test/"
+}
+
+func generateRandomString(count int) string {
+	letterRunes := []rune(DefaultChars)
+
+	randomStr := make([]rune, count)
+	for i := range randomStr {
+		randomStr[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+
+	return string(randomStr)
 }
