@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 )
@@ -10,6 +11,7 @@ func Delete(alias string) {
 
 	err := connects.DeleteConnectToJson(alias)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError(err.Error())
 	}
 }

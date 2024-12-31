@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/spf13/viper"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
@@ -18,6 +19,7 @@ func Connect(alias string) {
 
 	err := connect.Ssh(&connections, alias, fileConnect)
 	if err != nil {
-		output.GetOutError("err connect")
+		logger.Danger(err.Error())
+		output.GetOutError(err.Error())
 	}
 }
