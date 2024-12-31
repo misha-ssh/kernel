@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
 )
@@ -13,16 +14,19 @@ import (
 func Ssh(c *json.Connections, alias string, fl file.File) error {
 	data, err := fl.ReadFile()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = c.SerializationJson(data)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = c.SetDecryptData()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -33,7 +37,10 @@ func Ssh(c *json.Connections, alias string, fl file.File) error {
 		}
 	}
 
-	return errors.New("alias not found")
+	errText := "alias not found"
+
+	logger.Danger(errText)
+	return errors.New(errText)
 }
 
 func sshConnect(address, login, password string) {
@@ -45,6 +52,7 @@ func sshConnect(address, login, password string) {
 	sshCmd.Stdin = os.Stdin
 
 	if err := sshCmd.Run(); err != nil {
+		logger.Danger(err.Error())
 		fmt.Println("Error while executing the command:", err)
 	}
 }

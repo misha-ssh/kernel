@@ -3,6 +3,7 @@ package crypt
 import (
 	"crypto/rand"
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 )
@@ -12,7 +13,10 @@ func GetKey() ([]byte, error) {
 
 	data, err := fileCrypt.ReadFile()
 	if err != nil {
-		return []byte(data), errors.New("empty name")
+		errText := "empty name"
+
+		logger.Danger(errText)
+		return []byte(data), errors.New(errText)
 	}
 
 	return []byte(data), nil
@@ -25,11 +29,13 @@ func GenerateFileKey(fl file.File) error {
 	if !fileKey.IsExistFile() {
 		err := fileKey.CreateFile()
 		if err != nil {
+			logger.Danger(err.Error())
 			return err
 		}
 
 		cryptKey, err := GetKey()
 		if err != nil {
+			logger.Danger(err.Error())
 			return errors.New("empty name")
 		}
 
@@ -38,11 +44,13 @@ func GenerateFileKey(fl file.File) error {
 
 			_, err := rand.Read(keyData)
 			if err != nil {
+				logger.Danger(err.Error())
 				return errors.New("key generation error")
 			}
 
 			err = fileKey.WriteFile(keyData)
 			if err != nil {
+				logger.Danger(err.Error())
 				return errors.New("error writing key")
 			}
 		}

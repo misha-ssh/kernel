@@ -2,6 +2,7 @@ package json
 
 import (
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 )
 
 type Connections struct {
@@ -23,16 +24,19 @@ func (c *Connections) getConnectData() error {
 
 	data, err := fileConn.ReadFile()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = c.SerializationJson(data)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = c.SetDecryptData()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -44,6 +48,7 @@ func (c *Connections) GetDataForListConnect() ([][]string, error) {
 
 	err := c.getConnectData()
 	if err != nil {
+		logger.Danger(err.Error())
 		return result, err
 	}
 
@@ -53,7 +58,10 @@ func (c *Connections) GetDataForListConnect() ([][]string, error) {
 	}
 
 	if len(result) == 0 {
-		return result, errors.New("no connection found")
+		errText := "no connection found"
+
+		logger.Danger(errText)
+		return result, errors.New(errText)
 	}
 
 	return result, nil
@@ -64,6 +72,7 @@ func (c *Connections) GetConnectionsAlias() ([]string, error) {
 
 	err := c.getConnectData()
 	if err != nil {
+		logger.Danger(err.Error())
 		return result, err
 	}
 
@@ -72,7 +81,10 @@ func (c *Connections) GetConnectionsAlias() ([]string, error) {
 	}
 
 	if len(result) == 0 {
-		return result, errors.New("no connection found")
+		errText := "no connection found"
+
+		logger.Danger(errText)
+		return result, errors.New(errText)
 	}
 
 	return result, nil
@@ -83,6 +95,7 @@ func (c *Connections) ExistConnectJsonByIndex(alias string) (int, error) {
 
 	err := c.getConnectData()
 	if err != nil {
+		logger.Danger(err.Error())
 		return noFound, err
 	}
 
@@ -92,7 +105,9 @@ func (c *Connections) ExistConnectJsonByIndex(alias string) (int, error) {
 
 	for i, v := range c.Connects {
 		if v.Alias == alias {
-			return i, errors.New("the alias is already in use")
+			errText := "the alias is already in use"
+			logger.Danger(errText)
+			return i, errors.New(errText)
 		}
 	}
 
@@ -102,6 +117,7 @@ func (c *Connections) ExistConnectJsonByIndex(alias string) (int, error) {
 func (c *Connections) WriteConnectToJson(connect Connect) error {
 	_, err := c.ExistConnectJsonByIndex(connect.Alias)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -109,16 +125,19 @@ func (c *Connections) WriteConnectToJson(connect Connect) error {
 
 	data, err := fileConn.ReadFile()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = c.SerializationJson(data)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	encodedConnect, err := SetCryptData(connect)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -126,11 +145,13 @@ func (c *Connections) WriteConnectToJson(connect Connect) error {
 
 	deserializationJson, err := c.deserializationJson()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = fileConn.WriteFile(deserializationJson)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -148,12 +169,16 @@ func (c *Connections) updateJsonDataByIndex(index int, connect Connect) error {
 		return nil
 	}
 
-	return errors.New("connection update error")
+	errText := "connection update error"
+
+	logger.Danger(errText)
+	return errors.New(errText)
 }
 
 func (c *Connections) UpdateConnectJson(alias string, connect Connect) error {
 	index, err := c.ExistConnectJsonByIndex(alias)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -161,21 +186,25 @@ func (c *Connections) UpdateConnectJson(alias string, connect Connect) error {
 
 	cryptData, err := SetCryptData(connect)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = c.updateJsonDataByIndex(index, cryptData)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	deserializationJson, err := c.deserializationJson()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	err = fileConn.WriteFile(deserializationJson)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -192,6 +221,7 @@ func (c *Connections) deleteJsonDataByIndex(index int) {
 func (c *Connections) DeleteConnectToJson(alias string) error {
 	index, err := c.ExistConnectJsonByIndex(alias)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
@@ -199,12 +229,14 @@ func (c *Connections) DeleteConnectToJson(alias string) error {
 
 	deserializationJson, err := c.deserializationJson()
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 
 	fileConn := GetFile()
 	err = fileConn.WriteFile(deserializationJson)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 

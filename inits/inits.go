@@ -2,9 +2,9 @@ package inits
 
 import (
 	"github.com/spf13/viper"
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 
 	"github.com/ssh-connection-manager/kernel/v2/config"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/crypt"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
@@ -23,6 +23,7 @@ func createFileConnects() {
 
 	err := json.Generate(fileConnect)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("err create file connect")
 	}
 }
@@ -35,6 +36,7 @@ func generateCryptKey() {
 
 	err := crypt.GenerateFileKey(fileConnect)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("err generate key")
 	}
 }
@@ -47,6 +49,7 @@ func generateLogFile() {
 
 	err := logger.GenerateFile(fileLogger)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("err generate logger")
 	}
 }

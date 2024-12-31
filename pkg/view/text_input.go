@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"slices"
 
 	"github.com/erikgeiser/promptkit/textinput"
@@ -35,6 +36,7 @@ func (t TextInput) DrawInput() error {
 		*arg[1], err = input.RunPrompt()
 
 		if err != nil {
+			logger.Danger(err.Error())
 			return err
 		}
 	}

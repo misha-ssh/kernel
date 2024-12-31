@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/time"
@@ -22,6 +23,7 @@ func Create(alias, address, login, password string) {
 
 	err := connections.WriteConnectToJson(connect)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError(err.Error())
 	}
 }

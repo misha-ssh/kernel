@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/time"
@@ -23,6 +24,7 @@ func Change(
 
 	err := connections.UpdateConnectJson(oldAlias, connect)
 	if err != nil {
-		output.GetOutError("err update")
+		logger.Danger(err.Error())
+		output.GetOutError(err.Error())
 	}
 }
