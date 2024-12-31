@@ -2,6 +2,7 @@ package json
 
 import (
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 )
@@ -23,11 +24,13 @@ func Generate(fl file.File) error {
 	if !flConnect.IsExistFile() {
 		err := flConnect.CreateFile()
 		if err != nil {
+			logger.Danger(err.Error())
 			return err
 		}
 
 		err = CreateBaseJsonDataToFile(flConnect)
 		if err != nil {
+			logger.Danger(err.Error())
 			return errors.New("err generate base json: " + err.Error())
 		}
 	}

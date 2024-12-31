@@ -2,6 +2,7 @@ package file
 
 import (
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,11 +28,13 @@ func (fl *File) CreateFile() error {
 	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
 		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
 		if err != nil {
+			logger.Danger(err.Error())
 			return err
 		}
 
 		createdFile, err := os.Create(file)
 		if err != nil {
+			logger.Danger(err.Error())
 			return err
 		}
 
@@ -48,6 +51,7 @@ func (fl *File) ReadFile() (string, error) {
 
 	f, err := os.Open(file)
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 	defer func(f *os.File) {
@@ -56,6 +60,7 @@ func (fl *File) ReadFile() (string, error) {
 
 	fContent, err := io.ReadAll(f)
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
@@ -67,6 +72,7 @@ func (fl *File) WriteFile(rowData []byte) error {
 
 	f, err := os.OpenFile(file, os.O_WRONLY, 0666)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 	defer func(f *os.File) {
@@ -75,6 +81,7 @@ func (fl *File) WriteFile(rowData []byte) error {
 
 	_, err = f.Write(rowData)
 	if err != nil {
+		logger.Danger(err.Error())
 		return err
 	}
 

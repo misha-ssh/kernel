@@ -2,6 +2,7 @@ package json
 
 import (
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 
 	"github.com/ssh-connection-manager/kernel/v2/pkg/crypt"
 )
@@ -13,26 +14,32 @@ func SetCryptData(c Connect) (Connect, error) {
 
 	c.Alias, err = crypt.Encrypt(c.Alias)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.Address, err = crypt.Encrypt(c.Address)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.Login, err = crypt.Encrypt(c.Login)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.Password, err = crypt.Encrypt(c.Password)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.CreatedAt, err = crypt.Encrypt(c.CreatedAt)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.UpdatedAt, err = crypt.Encrypt(c.UpdatedAt)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 
@@ -46,26 +53,32 @@ func decryptData(c Connect) (Connect, error) {
 
 	c.Alias, err = crypt.Decrypt(c.Alias)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.Address, err = crypt.Decrypt(c.Address)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.Login, err = crypt.Decrypt(c.Login)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.Password, err = crypt.Decrypt(c.Password)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.CreatedAt, err = crypt.Decrypt(c.CreatedAt)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 	c.UpdatedAt, err = crypt.Decrypt(c.UpdatedAt)
 	if err != nil {
+		logger.Danger(err.Error())
 		return c, errMess
 	}
 
@@ -78,6 +91,7 @@ func (c *Connections) SetDecryptData() error {
 	for key, connect := range c.Connects {
 		data, err := decryptData(connect)
 		if err != nil {
+			logger.Danger(err.Error())
 			return errMess
 		}
 
@@ -93,6 +107,7 @@ func (c *Connections) SetCryptAllData() error {
 	for key, connect := range c.Connects {
 		data, err := SetCryptData(connect)
 		if err != nil {
+			logger.Danger(err.Error())
 			return errMess
 		}
 

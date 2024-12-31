@@ -7,6 +7,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"io"
 	"strings"
 )
@@ -35,7 +36,10 @@ func Unpad(src []byte) ([]byte, error) {
 	unpadding := int(src[length-1])
 
 	if unpadding > length {
-		return nil, errors.New("unpad error. This could happen when incorrect encryption key is used")
+		errText := "unpad error. This could happen when incorrect encryption key is used"
+
+		logger.Danger(errText)
+		return nil, errors.New(errText)
 	}
 
 	return src[:(length - unpadding)], nil
@@ -44,6 +48,7 @@ func Unpad(src []byte) ([]byte, error) {
 func encrypt(key []byte, text string) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
@@ -51,11 +56,12 @@ func encrypt(key []byte, text string) (string, error) {
 	ciphertext := make([]byte, aes.BlockSize+len(msg))
 	iv := ciphertext[:aes.BlockSize]
 	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
 	cfb := cipher.NewCFBEncrypter(block, iv)
-	cfb.XORKeyStream(ciphertext[aes.BlockSize:], []byte(msg))
+	cfb.XORKeyStream(ciphertext[aes.BlockSize:], msg)
 	finalMsg := removeBase64Padding(base64.URLEncoding.EncodeToString(ciphertext))
 	return finalMsg, nil
 }
@@ -63,16 +69,21 @@ func encrypt(key []byte, text string) (string, error) {
 func decrypt(key []byte, text string) (string, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
 	decodedMsg, err := base64.URLEncoding.DecodeString(addBase64Padding(text))
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
 	if (len(decodedMsg) % aes.BlockSize) != 0 {
-		return "", errors.New("blocksize must be multipe of decoded message length")
+		errText := "blocksize must be multipe of decoded message length"
+
+		logger.Danger(errText)
+		return "", errors.New(errText)
 	}
 
 	iv := decodedMsg[:aes.BlockSize]

@@ -1,6 +1,7 @@
 package view
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"strconv"
 	"strings"
 
@@ -28,6 +29,7 @@ func (s Select) SelectedValue(aliases []string) (string, error) {
 	pageSize, err := strconv.Atoi(s.PageSize)
 
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
@@ -50,6 +52,7 @@ func (s Select) SelectedValue(aliases []string) (string, error) {
 	selectedValue, err := sp.RunPrompt()
 
 	if err != nil {
+		logger.Danger(err.Error())
 		return "", err
 	}
 
