@@ -23,6 +23,7 @@ func createFileConnects() {
 
 	err := json.Generate(fileConnect)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("err create file connect")
 	}
 }
@@ -35,6 +36,7 @@ func generateCryptKey() {
 
 	err := crypt.GenerateFileKey(fileConnect)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("err generate key")
 	}
 }
@@ -47,6 +49,7 @@ func generateLogFile() {
 
 	err := logger.GenerateFile(fileLogger)
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("err generate logger")
 	}
 }
