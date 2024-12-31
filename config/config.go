@@ -1,6 +1,7 @@
 package config
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"os/user"
 
 	"github.com/spf13/viper"
@@ -11,6 +12,7 @@ import (
 func getHomeDir() string {
 	usr, err := user.Current()
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("Error retrieving user data")
 	}
 
@@ -22,11 +24,13 @@ func existOrCreateConfig(fl file.File) {
 	if err != nil {
 		err := fl.CreateFile()
 		if err != nil {
+			logger.Danger(err.Error())
 			output.GetOutError("File creation error down")
 		}
 
 		err = viper.ReadInConfig()
 		if err != nil {
+			logger.Danger(err.Error())
 			output.GetOutError("File creation error")
 		}
 	}
@@ -42,6 +46,7 @@ func setConfigVariable() {
 
 	err := viper.WriteConfig()
 	if err != nil {
+		logger.Danger(err.Error())
 		output.GetOutError("Error writing to configuration file")
 	}
 }
