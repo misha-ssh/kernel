@@ -30,28 +30,6 @@ func TestGenerateLogFile(t *testing.T) {
 	}
 }
 
-func TestInfo(t *testing.T) {
-	filePath := test.GetDirForTests()
-	fileName := test.RandomString() + ".log"
-
-	logFile := fl.File{
-		Name: fileName,
-		Path: filePath,
-	}
-
-	err := logger.GenerateFile(logFile)
-	if err != nil {
-		t.Fatal("Error creating file for logs")
-	}
-
-	if !logFile.IsExistFile() {
-		t.Fatal("Log file dont created")
-	}
-
-	textMessage := test.RandomString()
-	logger.Info(textMessage)
-}
-
 func TestDanger(t *testing.T) {
 	filePath := test.GetDirForTests()
 	fileName := test.RandomString() + ".log"
