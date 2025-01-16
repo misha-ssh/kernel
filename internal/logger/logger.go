@@ -4,10 +4,14 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strconv"
 
 	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 )
+
+const Skip = 1
 
 func GenerateFile(fl file.File) error {
 	SetFile(fl)
@@ -34,18 +38,6 @@ func getOpenLogFile(fl file.File) (*os.File, error) {
 	return logFile, nil
 }
 
-// Info Danger TODO написать одну логику а функции только различаются строкой
-func Info(message string) {
-	logFile := GetFile()
-	openLogFile, err := getOpenLogFile(logFile)
-	if err != nil {
-		output.GetOutError("dont open log file")
-	}
-
-	infoLog := log.New(openLogFile, "[info] ", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
-	infoLog.Println(message)
-}
-
 func Danger(message string) {
 	logFile := GetFile()
 	openLogFile, err := getOpenLogFile(logFile)
@@ -53,6 +45,18 @@ func Danger(message string) {
 		output.GetOutError("dont open log file")
 	}
 
-	errorLog := log.New(openLogFile, "[error] ", log.LstdFlags|log.Lshortfile|log.Lmicroseconds)
+	defer func(openLogFile *os.File) {
+		err := openLogFile.Close()
+		if err != nil {
+			output.GetOutError("dont close opened log file")
+		}
+	}(openLogFile)
+
+	_, calledFile, line, ok := runtime.Caller(Skip)
+	if ok {
+		message = "file: " + calledFile + ", line: " + strconv.Itoa(line) + ", message: " + message
+	}
+
+	errorLog := log.New(openLogFile, "[error] ", log.LstdFlags|log.Lmicroseconds)
 	errorLog.Println(message)
 }
