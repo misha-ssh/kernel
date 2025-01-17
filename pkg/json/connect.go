@@ -220,9 +220,11 @@ func (c *Connections) deleteJsonDataByIndex(index int) {
 
 func (c *Connections) DeleteConnectToJson(alias string) error {
 	index, err := c.ExistConnectJsonByIndex(alias)
-	if err != nil {
-		logger.Danger(err.Error())
-		return err
+	if err == nil {
+		errText := "connection not found by index"
+
+		logger.Danger(errText)
+		return errors.New(errText)
 	}
 
 	c.deleteJsonDataByIndex(index)
