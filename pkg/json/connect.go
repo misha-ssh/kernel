@@ -177,9 +177,11 @@ func (c *Connections) updateJsonDataByIndex(index int, connect Connect) error {
 
 func (c *Connections) UpdateConnectJson(alias string, connect Connect) error {
 	index, err := c.ExistConnectJsonByIndex(alias)
-	if err != nil {
-		logger.Danger(err.Error())
-		return err
+	if err == nil {
+		errText := "connection not found by index"
+
+		logger.Danger(errText)
+		return errors.New(errText)
 	}
 
 	fileConn := GetFile()
