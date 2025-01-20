@@ -24,14 +24,18 @@ func existOrCreateConfig(fl file.File) {
 	if err != nil {
 		err := fl.CreateFile()
 		if err != nil {
-			logger.Danger(err.Error())
-			output.GetOutError("File creation error down")
+			errMessage := "File creation error down"
+
+			logger.Danger(errMessage)
+			output.GetOutError(errMessage)
 		}
 
 		err = viper.ReadInConfig()
 		if err != nil {
-			logger.Danger(err.Error())
-			output.GetOutError("File creation error")
+			errMessage := "File creation error"
+
+			logger.Danger(errMessage)
+			output.GetOutError(errMessage)
 		}
 	}
 }
@@ -46,8 +50,10 @@ func setConfigVariable() {
 
 	err := viper.WriteConfig()
 	if err != nil {
-		logger.Danger(err.Error())
-		output.GetOutError("Error writing to configuration file")
+		errMessage := "Error writing to configuration file"
+
+		logger.Danger(errMessage)
+		output.GetOutError(errMessage)
 	}
 }
 
@@ -66,6 +72,7 @@ func Generate() {
 		fileConf := file.File{Path: confPath, Name: confName}
 
 		existOrCreateConfig(fileConf)
-		setConfigVariable()
 	}
+
+	setConfigVariable()
 }
