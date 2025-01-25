@@ -25,7 +25,7 @@ func (t *Table) ViewTable(value [][]string, headers []string) *table.Table {
 	render := lipgloss.NewRenderer(os.Stdout)
 
 	HeaderStyle := render.NewStyle().Foreground(t.HeaderStyle).Bold(true).Align(lipgloss.Center)
-	CellStyle := render.NewStyle().Padding(TopPadding, RightPadding).Width(CellWidth)
+	CellStyle := render.NewStyle().Padding(TopPadding, RightPadding).Width(CellWidth).Align(lipgloss.Center)
 
 	OddRowStyle := CellStyle.Foreground(t.OddCellStyle)
 	EvenRowStyle := CellStyle.Foreground(t.EvenRowStyle)
