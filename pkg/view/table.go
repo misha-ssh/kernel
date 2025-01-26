@@ -24,11 +24,14 @@ const (
 func (t *Table) ViewTable(value [][]string, headers []string) *table.Table {
 	render := lipgloss.NewRenderer(os.Stdout)
 
-	HeaderStyle := render.NewStyle().Foreground(t.HeaderStyle).Bold(true).Align(lipgloss.Center)
-	CellStyle := render.NewStyle().Padding(TopPadding, RightPadding).Width(CellWidth).Align(lipgloss.Center)
+	CellStyle := render.NewStyle().
+		Width(CellWidth).
+		Align(lipgloss.Center).
+		Padding(TopPadding, RightPadding)
 
 	OddRowStyle := CellStyle.Foreground(t.OddCellStyle)
 	EvenRowStyle := CellStyle.Foreground(t.EvenRowStyle)
+	HeaderColumnsStyle := CellStyle.Foreground(t.HeaderStyle)
 
 	BorderStyle := lipgloss.NewStyle().Foreground(t.BorderStyle)
 
@@ -36,18 +39,13 @@ func (t *Table) ViewTable(value [][]string, headers []string) *table.Table {
 		Border(lipgloss.NormalBorder()).
 		BorderStyle(BorderStyle).
 		StyleFunc(func(row, col int) lipgloss.Style {
-			var style lipgloss.Style
-
-			switch {
-			case row == 0:
-				return HeaderStyle
-			case row%2 == 0:
-				style = EvenRowStyle
-			default:
-				style = OddRowStyle
+			if row == -1 {
+				return HeaderColumnsStyle
+			} else if row%2 == 0 {
+				return OddRowStyle
 			}
 
-			return style
+			return EvenRowStyle
 		}).
 		Headers(headers...).
 		Rows(value...).
