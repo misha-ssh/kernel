@@ -2,9 +2,10 @@ package json
 
 import (
 	"errors"
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 
-	"github.com/ssh-connection-manager/kernel/v2/pkg/crypt"
+	crypt2 "github.com/ssh-connection-manager/kernel/v2/internal/crypt"
+
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 )
 
 func SetCryptData(c Connect) (Connect, error) {
@@ -12,32 +13,32 @@ func SetCryptData(c Connect) (Connect, error) {
 
 	errMess := errors.New("err set crypt data")
 
-	c.Alias, err = crypt.Encrypt(c.Alias)
+	c.Alias, err = crypt2.Encrypt(c.Alias)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.Address, err = crypt.Encrypt(c.Address)
+	c.Address, err = crypt2.Encrypt(c.Address)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.Login, err = crypt.Encrypt(c.Login)
+	c.Login, err = crypt2.Encrypt(c.Login)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.Password, err = crypt.Encrypt(c.Password)
+	c.Password, err = crypt2.Encrypt(c.Password)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.CreatedAt, err = crypt.Encrypt(c.CreatedAt)
+	c.CreatedAt, err = crypt2.Encrypt(c.CreatedAt)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.UpdatedAt, err = crypt.Encrypt(c.UpdatedAt)
+	c.UpdatedAt, err = crypt2.Encrypt(c.UpdatedAt)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
@@ -51,32 +52,32 @@ func decryptData(c Connect) (Connect, error) {
 
 	errMess := errors.New("err decrypt data")
 
-	c.Alias, err = crypt.Decrypt(c.Alias)
+	c.Alias, err = crypt2.Decrypt(c.Alias)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.Address, err = crypt.Decrypt(c.Address)
+	c.Address, err = crypt2.Decrypt(c.Address)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.Login, err = crypt.Decrypt(c.Login)
+	c.Login, err = crypt2.Decrypt(c.Login)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.Password, err = crypt.Decrypt(c.Password)
+	c.Password, err = crypt2.Decrypt(c.Password)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.CreatedAt, err = crypt.Decrypt(c.CreatedAt)
+	c.CreatedAt, err = crypt2.Decrypt(c.CreatedAt)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
 	}
-	c.UpdatedAt, err = crypt.Decrypt(c.UpdatedAt)
+	c.UpdatedAt, err = crypt2.Decrypt(c.UpdatedAt)
 	if err != nil {
 		logger.Danger(err.Error())
 		return c, errMess
