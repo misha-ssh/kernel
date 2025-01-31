@@ -7,7 +7,7 @@ import (
 
 	fl "github.com/ssh-connection-manager/kernel/v2/pkg/file"
 
-	"github.com/ssh-connection-manager/kernel/v2/inits"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/inits"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
 	"github.com/ssh-connection-manager/kernel/v2/test"
 )
