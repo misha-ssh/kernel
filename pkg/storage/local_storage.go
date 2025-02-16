@@ -71,7 +71,7 @@ func (s *LocalStorage) Get(filename string) (string, error) {
 	return string(fContent), nil
 }
 
-func (s *LocalStorage) Write(filename string, data []byte) error {
+func (s *LocalStorage) Write(filename string, data string) error {
 	file := s.fullPath(filename)
 
 	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
@@ -82,7 +82,7 @@ func (s *LocalStorage) Write(filename string, data []byte) error {
 		err = f.Close()
 	}(f)
 
-	_, err = f.Write(data)
+	_, err = f.Write([]byte(data))
 	if err != nil {
 		return err
 	}
