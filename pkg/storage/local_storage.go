@@ -89,3 +89,14 @@ func (s *LocalStorage) Write(filename string, data string) error {
 
 	return nil
 }
+
+func (s *LocalStorage) GetOpenFile(filename string) (*os.File, error) {
+	file := s.fullPath(filename)
+
+	logFile, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	return logFile, nil
+}
