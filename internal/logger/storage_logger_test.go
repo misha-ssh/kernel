@@ -1,68 +1,119 @@
 package logger
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
+	"errors"
+	"math/rand"
+	"os"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStorageLogger_Error(t *testing.T) {
-	type fields struct {
-		Storage storage.Storage
-	}
-	type args struct {
-		value any
-	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
+		name      string
+		setupMock func(*storage.MockStorage)
+		value     any
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success logging function",
+			setupMock: func(m *storage.MockStorage) {
+				m.On("Create", NameLogFile).Return(nil)
+
+				file, _ := os.CreateTemp("", "test-log-*.log")
+				m.On("GetOpenFile", NameLogFile).Return(file, nil)
+			},
+			value: rand.Int(),
+		},
+		{
+			name: "error on file creation",
+			setupMock: func(m *storage.MockStorage) {
+				m.On("Create", NameLogFile).Return(errors.New("create error"))
+			},
+			value: rand.Int(),
+		},
+		{
+			name: "error on getting open file",
+			setupMock: func(m *storage.MockStorage) {
+				m.On("Create", NameLogFile).Return(nil)
+				m.On("GetOpenFile", NameLogFile).Return(nil, errors.New("open error"))
+			},
+			value: rand.Int(),
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mockStorage := new(storage.MockStorage)
+			tt.setupMock(mockStorage)
+
 			sl := &StorageLogger{
-				Storage: tt.fields.Storage,
+				Storage: mockStorage,
 			}
-			sl.Error(tt.args.value)
+
+			sl.Error(tt.value)
+
+			mockStorage.AssertExpectations(t)
 		})
 	}
 }
 
 func TestStorageLogger_log(t *testing.T) {
-	type fields struct {
-		Storage storage.Storage
-	}
-	type args struct {
-		value any
-	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name      string
+		setupMock func(*storage.MockStorage)
+		value     any
+		wantErr   bool
 	}{
 		{
 			name: "success logging function",
-			fields: fields{
-				Storage: &storage.LocalStorage{
-					BaseDir: "test",
-				},
+			setupMock: func(m *storage.MockStorage) {
+				m.On("Create", NameLogFile).Return(nil)
+
+				file, _ := os.CreateTemp("", "test-log-*.log")
+				m.On("GetOpenFile", NameLogFile).Return(file, nil)
 			},
-			args: args{
-				value: 123,
-			},
+			value:   rand.Int(),
 			wantErr: false,
 		},
+		{
+			name: "error on file creation",
+			setupMock: func(m *storage.MockStorage) {
+				m.On("Create", NameLogFile).Return(errors.New("create error"))
+			},
+			value:   rand.Int(),
+			wantErr: true,
+		},
+		{
+			name: "error on getting open file",
+			setupMock: func(m *storage.MockStorage) {
+				m.On("Create", NameLogFile).Return(nil)
+				m.On("GetOpenFile", NameLogFile).Return(nil, errors.New("open error"))
+			},
+			value:   rand.Int(),
+			wantErr: true,
+		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			mockStorage := new(storage.MockStorage)
+			tt.setupMock(mockStorage)
+
 			sl := &StorageLogger{
-				Storage: tt.fields.Storage,
+				Storage: mockStorage,
 			}
-			if err := sl.log(tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("log() error = %v, wantErr %v", err, tt.wantErr)
+
+			err := sl.log(tt.value)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
+
+			mockStorage.AssertExpectations(t)
 		})
 	}
 }
