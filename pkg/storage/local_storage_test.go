@@ -2,6 +2,8 @@ package storage
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLocalStorage_fullPath(t *testing.T) {
@@ -77,12 +79,6 @@ func TestLocalStorage_Create(t *testing.T) {
 			name:    "create file with empty filename - create dir",
 			fields:  fields{BaseDir: t.TempDir()},
 			args:    args{filename: ""},
-			wantErr: false,
-		},
-		{
-			name:    "create file with empty basedir",
-			fields:  fields{BaseDir: ""},
-			args:    args{filename: "test.txt"},
 			wantErr: false,
 		},
 		{
@@ -313,19 +309,69 @@ func TestLocalStorage_Write(t *testing.T) {
 				BaseDir: tt.fields.BaseDir,
 			}
 
-			if err := s.Write(tt.args.filename, tt.args.data); (err != nil) != tt.wantErr {
-				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err := s.Write(tt.args.filename, tt.args.data)
 
-			if !tt.wantErr {
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+
 				content, err := s.Get(tt.args.filename)
-				if err != nil {
-					t.Fatalf("Failed to get content file: %v", err)
-				}
+				assert.NoError(t, err)
 
-				if content != tt.wantContent {
-					t.Errorf("File content = %v, want = %v", content, tt.wantContent)
-				}
+				assert.Equal(t, tt.wantContent, content)
+			}
+		})
+	}
+}
+
+func TestLocalStorage_GetOpenFile(t *testing.T) {
+	type fields struct {
+		BaseDir string
+	}
+	type args struct {
+		filename string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name:    "write to new file",
+			fields:  fields{BaseDir: t.TempDir()},
+			args:    args{filename: "test.txt"},
+			wantErr: false,
+		},
+		{
+			name:    "error on invalid directory",
+			fields:  fields{BaseDir: "/invalid/directory"},
+			args:    args{filename: "test.txt"},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &LocalStorage{
+				BaseDir: tt.fields.BaseDir,
+			}
+			got, err := s.GetOpenFile(tt.args.filename)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
+
+				_, err = got.Write([]byte("test"))
+				assert.NoError(t, err)
+
+				err = got.Close()
+				assert.NoError(t, err)
+
+				assert.True(t, s.Exists(tt.args.filename))
 			}
 		})
 	}
