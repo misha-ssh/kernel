@@ -7,9 +7,7 @@ import (
 
 	"github.com/ssh-connection-manager/kernel/v2/config"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 )
 
 func generateConfigFile() {

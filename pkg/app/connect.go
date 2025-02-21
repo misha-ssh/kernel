@@ -4,9 +4,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
 )
 
 func Connect(alias string) {
