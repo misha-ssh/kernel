@@ -49,9 +49,9 @@ func TestLocalStorage_fullPath(t *testing.T) {
 			s := &LocalStorage{
 				BaseDir: tt.fields.BaseDir,
 			}
-			if got := s.fullPath(tt.args.filename); got != tt.want {
-				t.Errorf("fullPath() = %v, want %v", got, tt.want)
-			}
+
+			got := s.fullPath(tt.args.filename)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -93,8 +93,13 @@ func TestLocalStorage_Create(t *testing.T) {
 			s := &LocalStorage{
 				BaseDir: tt.fields.BaseDir,
 			}
-			if err := s.Create(tt.args.filename); (err != nil) != tt.wantErr {
-				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+
+			err := s.Create(tt.args.filename)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -108,22 +113,25 @@ func TestLocalStorage_Delete(t *testing.T) {
 		filename string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
+		name         string
+		fields       fields
+		args         args
+		isCreateFile bool
+		wantErr      bool
 	}{
 		{
-			name:    "delete existing file",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "test.txt"},
-			wantErr: false,
+			name:         "delete existing file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "test.txt"},
+			isCreateFile: true,
+			wantErr:      false,
 		},
 		{
-			name:    "delete dont created file",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "nonexistent.txt"},
-			wantErr: true,
+			name:         "delete dont created file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "nonexistent.txt"},
+			isCreateFile: false,
+			wantErr:      true,
 		},
 	}
 	for _, tt := range tests {
@@ -132,15 +140,17 @@ func TestLocalStorage_Delete(t *testing.T) {
 				BaseDir: tt.fields.BaseDir,
 			}
 
-			if tt.name == "delete existing file" {
+			if tt.isCreateFile {
 				err := s.Create(tt.args.filename)
-				if err != nil {
-					t.Fatalf("Failed to create test file: %v", err)
-				}
+				assert.NoError(t, err)
 			}
 
-			if err := s.Delete(tt.args.filename); (err != nil) != tt.wantErr {
-				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
+			err := s.Delete(tt.args.filename)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
 			}
 		})
 	}
@@ -154,22 +164,25 @@ func TestLocalStorage_Exists(t *testing.T) {
 		filename string
 	}
 	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   bool
+		name         string
+		fields       fields
+		args         args
+		isCreateFile bool
+		want         bool
 	}{
 		{
-			name:   "is exist created file",
-			fields: fields{BaseDir: t.TempDir()},
-			args:   args{filename: "test.txt"},
-			want:   true,
+			name:         "is exist created file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "test.txt"},
+			isCreateFile: true,
+			want:         true,
 		},
 		{
-			name:   "is exist dont created file",
-			fields: fields{BaseDir: t.TempDir()},
-			args:   args{filename: "nonexistent.txt"},
-			want:   false,
+			name:         "is exist dont created file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "nonexistent.txt"},
+			isCreateFile: false,
+			want:         false,
 		},
 	}
 	for _, tt := range tests {
@@ -178,16 +191,13 @@ func TestLocalStorage_Exists(t *testing.T) {
 				BaseDir: tt.fields.BaseDir,
 			}
 
-			if tt.name == "is exist created file" {
+			if tt.isCreateFile {
 				err := s.Create(tt.args.filename)
-				if err != nil {
-					t.Fatalf("Failed to create test file: %v", err)
-				}
+				assert.Nil(t, err)
 			}
 
-			if got := s.Exists(tt.args.filename); got != tt.want {
-				t.Errorf("Exists() = %v, want %v", got, tt.want)
-			}
+			got := s.Exists(tt.args.filename)
+			assert.Equal(t, tt.want, got)
 		})
 	}
 }
@@ -200,32 +210,36 @@ func TestLocalStorage_Get(t *testing.T) {
 		filename string
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    string
-		wantErr bool
+		name         string
+		fields       fields
+		args         args
+		want         string
+		isCreateFile bool
+		wantErr      bool
 	}{
 		{
-			name:    "get dont empty file",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "test.txt"},
-			want:    "test data",
-			wantErr: false,
+			name:         "get dont empty file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "test.txt"},
+			want:         "test data",
+			isCreateFile: true,
+			wantErr:      false,
 		},
 		{
-			name:    "get empty file",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "nonexistent.txt"},
-			want:    "",
-			wantErr: false,
+			name:         "get empty file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "nonexistent.txt"},
+			want:         "",
+			isCreateFile: true,
+			wantErr:      false,
 		},
 		{
-			name:    "get dont created file",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "nonexistent.txt"},
-			want:    "",
-			wantErr: true,
+			name:         "get dont created file",
+			fields:       fields{BaseDir: t.TempDir()},
+			args:         args{filename: "nonexistent.txt"},
+			want:         "",
+			isCreateFile: false,
+			wantErr:      true,
 		},
 	}
 	for _, tt := range tests {
@@ -234,26 +248,21 @@ func TestLocalStorage_Get(t *testing.T) {
 				BaseDir: tt.fields.BaseDir,
 			}
 
-			if tt.name == "get dont empty file" || tt.name == "get empty file" {
+			if tt.isCreateFile {
 				err := s.Create(tt.args.filename)
-				if err != nil {
-					t.Errorf("dont create file - error = %v", err)
-				}
+				assert.NoError(t, err)
 
 				err = s.Write(tt.args.filename, tt.want)
-				if err != nil {
-					t.Errorf("dont write to file - error = %v", err)
-				}
+				assert.NoError(t, err)
 			}
 
 			got, err := s.Get(tt.args.filename)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
 
-			if got != tt.want {
-				t.Errorf("Get() got = %v, want %v", got, tt.want)
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.want, got)
 			}
 		})
 	}
