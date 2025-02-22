@@ -23,8 +23,8 @@ type StorageLogger struct {
 	Storage storage.Storage
 }
 
-func (sl *StorageLogger) log(value any) error {
-	err := sl.Storage.Create(NameLogFile)
+func (s *StorageLogger) log(value any) error {
+	err := s.Storage.Create(NameLogFile)
 	if err != nil {
 		return ErrCreateStorage
 	}
@@ -36,7 +36,7 @@ func (sl *StorageLogger) log(value any) error {
 
 	logInfo := fmt.Sprintf("file: %s, line: %v, message: %#v", calledFile, line, value)
 
-	openFile, err := sl.Storage.GetOpenFile(NameLogFile)
+	openFile, err := s.Storage.GetOpenFile(NameLogFile)
 	if err != nil {
 		return ErrGetOpenFile
 	}
@@ -47,6 +47,6 @@ func (sl *StorageLogger) log(value any) error {
 	return nil
 }
 
-func (sl *StorageLogger) Error(value any) {
-	_ = sl.log(value)
+func (s *StorageLogger) Error(value any) {
+	_ = s.log(value)
 }
