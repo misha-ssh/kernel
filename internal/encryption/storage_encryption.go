@@ -5,48 +5,65 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"errors"
-	"io"
+)
+
+const SizeKey = 64
+
+var (
+	ErrGenerateKey = errors.New("err at created log file")
 )
 
 type StorageEncryption struct{}
 
 func (s *StorageEncryption) Encrypt(plaintext []byte, key []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
+	newCipher, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
-	iv := ciphertext[:aes.BlockSize]
-	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
-		return nil, err
+	gcm, err := cipher.NewGCM(newCipher)
+	if err != nil {
+		panic(err)
 	}
 
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+	nonce := make([]byte, gcm.NonceSize())
+	_, err = rand.Read(nonce)
+	if err != nil {
+		panic(err)
+	}
 
-	return ciphertext, nil
+	return gcm.Seal(nonce, nonce, plaintext, nil), nil
 }
 
 func (s *StorageEncryption) Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
+	newCipher, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
 
-	if len(ciphertext) < aes.BlockSize {
-		return nil, errors.New("ciphertext too short")
+	gcm, err := cipher.NewGCM(newCipher)
+	if err != nil {
+		panic(err)
 	}
 
-	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
+	nonceSize := gcm.NonceSize()
+	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
 
-	stream := cipher.NewCFBDecrypter(block, iv)
-	stream.XORKeyStream(ciphertext, ciphertext)
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		panic(err)
+	}
 
-	return ciphertext, nil
+	return plaintext, nil
 }
 
-func (s *StorageEncryption) GetKey() ([]byte, error) {
-	return nil, nil
+func (s *StorageEncryption) GenerateKey() ([]byte, error) {
+	key := make([]byte, SizeKey)
+
+	_, err := rand.Read(key)
+	if err != nil {
+		return nil, ErrGenerateKey
+	}
+
+	return key, nil
 }
