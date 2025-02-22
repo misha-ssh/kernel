@@ -6,95 +6,49 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLocalStorage_fullPath(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
-	type args struct {
-		filename string
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-		want   string
-	}{
-		{
-			name:   "full path with two arg",
-			fields: fields{BaseDir: "/test"},
-			args:   args{filename: "test.txt"},
-			want:   "/test/test.txt",
-		},
-		{
-			name:   "full path with filename",
-			fields: fields{BaseDir: ""},
-			args:   args{filename: "test.txt"},
-			want:   "test.txt",
-		},
-		{
-			name:   "full path with basedir",
-			fields: fields{BaseDir: "/test"},
-			args:   args{filename: ""},
-			want:   "/test",
-		},
-		{
-			name:   "full path with empty args",
-			fields: fields{BaseDir: ""},
-			args:   args{filename: ""},
-			want:   "",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
-
-			got := s.fullPath(tt.args.filename)
-			assert.Equal(t, tt.want, got)
-		})
-	}
-}
-
 func TestLocalStorage_Create(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
 	type args struct {
-		filename string
+		filename  string
+		direction string
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		wantErr bool
 	}{
 		{
-			name:    "create file with valida data",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "test.txt"},
+			name: "create file with valida data",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+			},
 			wantErr: false,
 		},
 		{
-			name:    "create file with empty filename - create dir",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: ""},
+			name: "create file with empty filename - create dir",
+			args: args{
+				filename:  "",
+				direction: t.TempDir(),
+			},
 			wantErr: false,
 		},
 		{
-			name:    "create file with empty two args",
-			fields:  fields{BaseDir: ""},
-			args:    args{filename: ""},
+			name: "create file with empty two args",
+			args: args{
+				filename:  "",
+				direction: "",
+			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
+			s := &LocalStorage{}
 
-			err := s.Create(tt.args.filename)
+			err := s.Create(
+				tt.args.filename,
+				tt.args.direction,
+			)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -106,46 +60,45 @@ func TestLocalStorage_Create(t *testing.T) {
 }
 
 func TestLocalStorage_Delete(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
 	type args struct {
-		filename string
+		filename  string
+		direction string
 	}
 	tests := []struct {
 		name         string
-		fields       fields
 		args         args
 		isCreateFile bool
 		wantErr      bool
 	}{
 		{
-			name:         "delete existing file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "test.txt"},
+			name: "delete existing file",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+			},
 			isCreateFile: true,
 			wantErr:      false,
 		},
 		{
-			name:         "delete dont created file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "nonexistent.txt"},
+			name: "delete dont created file",
+			args: args{
+				filename:  "nonexistent.txt",
+				direction: t.TempDir(),
+			},
 			isCreateFile: false,
 			wantErr:      true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
+			s := &LocalStorage{}
 
 			if tt.isCreateFile {
-				err := s.Create(tt.args.filename)
+				err := s.Create(tt.args.filename, tt.args.direction)
 				assert.NoError(t, err)
 			}
 
-			err := s.Delete(tt.args.filename)
+			err := s.Delete(tt.args.filename, tt.args.direction)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -157,86 +110,88 @@ func TestLocalStorage_Delete(t *testing.T) {
 }
 
 func TestLocalStorage_Exists(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
 	type args struct {
-		filename string
+		filename  string
+		direction string
 	}
 	tests := []struct {
 		name         string
-		fields       fields
 		args         args
 		isCreateFile bool
 		want         bool
 	}{
 		{
-			name:         "is exist created file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "test.txt"},
+			name: "is exist created file",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+			},
 			isCreateFile: true,
 			want:         true,
 		},
 		{
-			name:         "is exist dont created file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "nonexistent.txt"},
+			name: "is exist dont created file",
+			args: args{
+				filename:  "nonexistent.txt",
+				direction: t.TempDir(),
+			},
 			isCreateFile: false,
 			want:         false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
+			s := &LocalStorage{}
 
 			if tt.isCreateFile {
-				err := s.Create(tt.args.filename)
+				err := s.Create(tt.args.filename, tt.args.direction)
 				assert.Nil(t, err)
 			}
 
-			got := s.Exists(tt.args.filename)
+			got := s.Exists(tt.args.filename, tt.args.direction)
 			assert.Equal(t, tt.want, got)
 		})
 	}
 }
 
 func TestLocalStorage_Get(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
 	type args struct {
-		filename string
+		filename  string
+		direction string
 	}
 	tests := []struct {
 		name         string
-		fields       fields
 		args         args
 		want         string
 		isCreateFile bool
 		wantErr      bool
 	}{
 		{
-			name:         "get dont empty file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "test.txt"},
+			name: "get dont empty file",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+			},
 			want:         "test data",
 			isCreateFile: true,
 			wantErr:      false,
 		},
 		{
-			name:         "get empty file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "nonexistent.txt"},
+			name: "get empty file",
+			args: args{
+				filename:  "nonexistent.txt",
+				direction: t.TempDir(),
+			},
 			want:         "",
 			isCreateFile: true,
 			wantErr:      false,
 		},
 		{
-			name:         "get dont created file",
-			fields:       fields{BaseDir: t.TempDir()},
-			args:         args{filename: "nonexistent.txt"},
+			name: "get dont created file",
+			args: args{
+				filename:  "nonexistent.txt",
+				direction: t.TempDir(),
+			},
 			want:         "",
 			isCreateFile: false,
 			wantErr:      true,
@@ -244,19 +199,17 @@ func TestLocalStorage_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
+			s := &LocalStorage{}
 
 			if tt.isCreateFile {
-				err := s.Create(tt.args.filename)
+				err := s.Create(tt.args.filename, tt.args.direction)
 				assert.NoError(t, err)
 
-				err = s.Write(tt.args.filename, tt.want)
+				err = s.Write(tt.args.filename, tt.args.direction, tt.want)
 				assert.NoError(t, err)
 			}
 
-			got, err := s.Get(tt.args.filename)
+			got, err := s.Get(tt.args.filename, tt.args.direction)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -269,63 +222,70 @@ func TestLocalStorage_Get(t *testing.T) {
 }
 
 func TestLocalStorage_Write(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
 	type args struct {
-		filename string
-		data     string
+		filename  string
+		direction string
+		data      string
 	}
 	tests := []struct {
 		name        string
-		fields      fields
 		args        args
 		wantErr     bool
 		wantContent string
 	}{
 		{
-			name:        "write to new file",
-			fields:      fields{BaseDir: t.TempDir()},
-			args:        args{filename: "test.txt", data: "Hello, World!"},
+			name: "write to new file",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+				data:      "test",
+			},
 			wantErr:     false,
-			wantContent: "Hello, World!",
+			wantContent: "test",
 		},
 		{
-			name:        "write to existing file (overwrite)",
-			fields:      fields{BaseDir: t.TempDir()},
-			args:        args{filename: "test.txt", data: "New content"},
+			name: "write to existing file (overwrite)",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+				data:      "test",
+			},
 			wantErr:     false,
-			wantContent: "New content",
+			wantContent: "test",
 		},
 		{
-			name:        "write empty data to new file",
-			fields:      fields{BaseDir: t.TempDir()},
-			args:        args{filename: "empty.txt", data: ""},
+			name: "write empty data to new file",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+				data:      "",
+			},
 			wantErr:     false,
 			wantContent: "",
 		},
 		{
-			name:        "write to invalid filename",
-			fields:      fields{BaseDir: t.TempDir()},
-			args:        args{filename: "", data: "Invalid"},
+			name: "write to invalid filename",
+			args: args{
+				filename:  "",
+				direction: t.TempDir(),
+				data:      "Hello, World!",
+			},
 			wantErr:     true,
 			wantContent: "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
+			s := &LocalStorage{}
 
-			err := s.Write(tt.args.filename, tt.args.data)
+			err := s.Write(tt.args.filename, tt.args.direction, tt.args.data)
 
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 
-				content, err := s.Get(tt.args.filename)
+				content, err := s.Get(tt.args.filename, tt.args.direction)
 				assert.NoError(t, err)
 
 				assert.Equal(t, tt.wantContent, content)
@@ -336,52 +296,49 @@ func TestLocalStorage_Write(t *testing.T) {
 
 func FuzzLocalStorage_Write(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value string) {
-		s := LocalStorage{
-			BaseDir: t.TempDir(),
-		}
+		s := LocalStorage{}
 
 		fileName := "test"
 
-		err := s.Write(fileName, value)
+		err := s.Write(fileName, t.TempDir(), value)
 		assert.NoError(t, err)
 
-		got, err := s.Get(fileName)
+		got, err := s.Get(fileName, t.TempDir())
 		assert.Equal(t, value, got)
 	})
 }
 
 func TestLocalStorage_GetOpenFile(t *testing.T) {
-	type fields struct {
-		BaseDir string
-	}
 	type args struct {
-		filename string
+		filename  string
+		direction string
 	}
 	tests := []struct {
 		name    string
-		fields  fields
 		args    args
 		wantErr bool
 	}{
 		{
-			name:    "write to new file",
-			fields:  fields{BaseDir: t.TempDir()},
-			args:    args{filename: "test.txt"},
+			name: "write to new file",
+			args: args{
+				filename:  "test.txt",
+				direction: t.TempDir(),
+			},
 			wantErr: false,
 		},
 		{
-			name:    "error on invalid directory",
-			fields:  fields{BaseDir: "/invalid/directory"},
-			args:    args{filename: "test.txt"},
+			name: "error on invalid directory",
+			args: args{
+				filename:  "test.txt",
+				direction: "/invalid/" + t.TempDir(),
+			},
 			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				BaseDir: tt.fields.BaseDir,
-			}
-			got, err := s.GetOpenFile(tt.args.filename)
+			s := &LocalStorage{}
+			got, err := s.GetOpenFile(tt.args.filename, tt.args.direction)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -396,7 +353,8 @@ func TestLocalStorage_GetOpenFile(t *testing.T) {
 				err = got.Close()
 				assert.NoError(t, err)
 
-				assert.True(t, s.Exists(tt.args.filename))
+				fileExist := s.Exists(tt.args.filename, tt.args.direction)
+				assert.True(t, fileExist)
 			}
 		})
 	}
