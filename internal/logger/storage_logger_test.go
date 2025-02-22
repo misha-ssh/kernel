@@ -21,7 +21,7 @@ func TestStorageLogger_Error(t *testing.T) {
 			setupMock: func(m *storage.MockStorage) {
 				m.On("Create", NameLogFile).Return(nil)
 
-				file, _ := os.CreateTemp("", "test-log-*.log")
+				file, _ := os.CreateTemp("", "log.log")
 				m.On("GetOpenFile", NameLogFile).Return(file, nil)
 			},
 			value: rand.Int(),
@@ -71,7 +71,12 @@ func TestStorageLogger_log(t *testing.T) {
 			setupMock: func(m *storage.MockStorage) {
 				m.On("Create", NameLogFile).Return(nil)
 
-				file, _ := os.CreateTemp("", "test-log-*.log")
+				file, _ := os.CreateTemp("", "log.log")
+				defer func() {
+					err := os.Remove(file.Name())
+					assert.NoError(t, err)
+				}()
+
 				m.On("GetOpenFile", NameLogFile).Return(file, nil)
 			},
 			value:   rand.Int(),
@@ -116,4 +121,26 @@ func TestStorageLogger_log(t *testing.T) {
 			mockStorage.AssertExpectations(t)
 		})
 	}
+}
+
+func FuzzStorageLogger_log(f *testing.F) {
+	mockStorage := new(storage.MockStorage)
+	mockStorage.On("Create", NameLogFile).Return(nil)
+
+	file, _ := os.CreateTemp("", "log.log")
+	defer func() {
+		err := os.Remove(file.Name())
+		assert.NoError(f, err)
+	}()
+
+	mockStorage.On("GetOpenFile", NameLogFile).Return(file, nil)
+
+	sl := &StorageLogger{
+		Storage: mockStorage,
+	}
+
+	f.Fuzz(func(t *testing.T, value []uint8) {
+		err := sl.log(value)
+		assert.NoError(t, err)
+	})
 }
