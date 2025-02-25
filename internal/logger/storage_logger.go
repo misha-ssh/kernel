@@ -11,7 +11,6 @@ import (
 const (
 	SkipUseLevel = 1
 	NameLogFile  = "log.log"
-	Direction    = "./ssh+"
 )
 
 var (
@@ -25,7 +24,7 @@ type StorageLogger struct {
 }
 
 func (s *StorageLogger) log(value any) error {
-	err := s.Storage.Create(NameLogFile, Direction)
+	err := s.Storage.Create(NameLogFile)
 	if err != nil {
 		return ErrCreateStorage
 	}
@@ -37,7 +36,7 @@ func (s *StorageLogger) log(value any) error {
 
 	logInfo := fmt.Sprintf("file: %s, line: %v, message: %#v", calledFile, line, value)
 
-	openFile, err := s.Storage.GetOpenFile(NameLogFile, Direction)
+	openFile, err := s.Storage.GetOpenFile(NameLogFile)
 	if err != nil {
 		return ErrGetOpenFile
 	}

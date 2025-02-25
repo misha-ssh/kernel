@@ -7,45 +7,45 @@ import (
 )
 
 type Storage interface {
-	Exists(filename string, direction string) bool
-	Create(filename string, direction string) error
-	Get(filename string, direction string) (string, error)
-	Delete(filename string, direction string) error
-	Write(filename string, direction string, data string) error
-	GetOpenFile(filename string, direction string) (*os.File, error)
+	Exists(filename string) bool
+	Create(filename string) error
+	Get(filename string) (string, error)
+	Delete(filename string) error
+	Write(filename string, data string) error
+	GetOpenFile(filename string) (*os.File, error)
 }
 
 type MockStorage struct {
 	mock.Mock
 }
 
-func (m *MockStorage) Exists(filename string, direction string) bool {
-	args := m.Called(filename, direction)
+func (m *MockStorage) Exists(filename string) bool {
+	args := m.Called(filename)
 	return args.Bool(0)
 }
 
-func (m *MockStorage) Create(filename string, direction string) error {
-	args := m.Called(filename, direction)
+func (m *MockStorage) Create(filename string) error {
+	args := m.Called(filename)
 	return args.Error(0)
 }
 
-func (m *MockStorage) Get(filename string, direction string) (string, error) {
-	args := m.Called(filename, direction)
+func (m *MockStorage) Get(filename string) (string, error) {
+	args := m.Called(filename)
 	return args.String(0), args.Error(1)
 }
 
-func (m *MockStorage) Delete(filename string, direction string) error {
-	args := m.Called(filename, direction)
+func (m *MockStorage) Delete(filename string) error {
+	args := m.Called(filename)
 	return args.Error(0)
 }
 
-func (m *MockStorage) Write(filename string, direction string, data string) error {
-	args := m.Called(filename, direction, data)
+func (m *MockStorage) Write(filename string, data string) error {
+	args := m.Called(filename, data)
 	return args.Error(0)
 }
 
-func (m *MockStorage) GetOpenFile(filename string, direction string) (*os.File, error) {
-	args := m.Called(filename, direction)
+func (m *MockStorage) GetOpenFile(filename string) (*os.File, error) {
+	args := m.Called(filename)
 
 	if args.Error(1) != nil {
 		return nil, args.Error(1)
