@@ -5,9 +5,13 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 )
 
-const SizeKey = 64
+const (
+	SizeKey  = 32
+	FileName = "encryption.key"
+)
 
 var (
 	ErrGenerateKey    = errors.New("err at created log file")
@@ -19,8 +23,8 @@ var (
 
 type StorageEncryption struct{}
 
-func (s *StorageEncryption) getGcm(key []byte) (cipher.AEAD, error) {
-	newCipher, err := aes.NewCipher(key)
+func (s *StorageEncryption) getGcm(key string) (cipher.AEAD, error) {
+	newCipher, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return nil, ErrVerifyKEy
 	}
@@ -33,49 +37,72 @@ func (s *StorageEncryption) getGcm(key []byte) (cipher.AEAD, error) {
 	return gcm, nil
 }
 
-func (s *StorageEncryption) Encrypt(plaintext []byte, key []byte) ([]byte, error) {
+func (s *StorageEncryption) Encrypt(plaintext string, key string) (string, error) {
 	gcm, err := s.getGcm(key)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = rand.Read(nonce)
 	if err != nil {
-		return nil, ErrRandRead
+		return "", ErrRandRead
 	}
 
-	return gcm.Seal(nonce, nonce, plaintext, nil), nil
+	encryptData := string(gcm.Seal(nonce, nonce, []byte(plaintext), nil))
+
+	return encryptData, nil
 }
 
-func (s *StorageEncryption) Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
+func (s *StorageEncryption) Decrypt(ciphertext string, key string) (string, error) {
+	ciphertextToByte := []byte(ciphertext)
+
 	gcm, err := s.getGcm(key)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	nonceSize := gcm.NonceSize()
-	nonce, ciphertext := ciphertext[:nonceSize], ciphertext[nonceSize:]
+	nonce, ciphertextToByte := ciphertextToByte[:nonceSize], ciphertextToByte[nonceSize:]
 
-	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	plaintext, err := gcm.Open(nil, nonce, ciphertextToByte, nil)
 	if err != nil {
-		return nil, ErrAuthCiphertext
+		return "", ErrAuthCiphertext
 	}
 
-	return plaintext, nil
+	return string(plaintext), nil
 }
 
-func (s *StorageEncryption) GenerateKey() ([]byte, error) {
+func (s *StorageEncryption) GenerateKey() (string, error) {
 	key := make([]byte, SizeKey)
 
 	_, err := rand.Read(key)
 	if err != nil {
-		return nil, ErrGenerateKey
+		return "", ErrGenerateKey
+	}
+
+	return string(key), nil
+}
+
+func (s *StorageEncryption) GetKey(storage storage.Storage) (string, error) {
+	if storage.Exists(FileName) {
+		key, err := storage.Get(FileName)
+		if err != nil {
+			return "", err
+		}
+
+		return key, nil
+	}
+
+	key, err := s.GenerateKey()
+	if err != nil {
+		return "", err
+	}
+
+	err = storage.Write(FileName, key)
+	if err != nil {
+		return "", err
 	}
 
 	return key, nil
-}
-
-func (s *StorageEncryption) GetKey() ([]byte, error) {
-	return nil, nil
 }
