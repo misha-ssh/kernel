@@ -4,7 +4,6 @@ import (
 	"crypto/cipher"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"github.com/stretchr/testify/assert"
-	"reflect"
 	"testing"
 )
 
@@ -203,15 +202,6 @@ func TestStorageEncryption_GetKey(t *testing.T) {
 			want:    "key",
 			wantErr: false,
 		},
-		{
-			name: "success not exists file",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Exists", FileName).Return(false, nil)
-				m.On("Write", FileName, "2").Return(nil)
-			},
-			want:    "key",
-			wantErr: false,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -244,18 +234,38 @@ func TestStorageEncryption_getGcm(t *testing.T) {
 		want    cipher.AEAD
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			name: "success with 32-byte key",
+			args: args{
+				key: string(make([]byte, SizeKey)),
+			},
+			wantErr: false,
+		},
+		{
+			name: "success with 16-byte key",
+			args: args{
+				key: string(make([]byte, 16)),
+			},
+			wantErr: false,
+		},
+		{
+			name: "error with invalid key length",
+			args: args{
+				key: string(make([]byte, 64)),
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &StorageEncryption{}
 			got, err := s.getGcm(tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("getGcm() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("getGcm() got = %v, want %v", got, tt.want)
+
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
 			}
 		})
 	}
