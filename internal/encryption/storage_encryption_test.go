@@ -159,6 +159,16 @@ func TestStorageEncryption_Encrypt(t *testing.T) {
 	}
 }
 
+func FuzzStorageEncryption_Encrypt(f *testing.F) {
+	se := &StorageEncryption{}
+	key, _ := se.GenerateKey()
+
+	f.Fuzz(func(t *testing.T, ciphertext string) {
+		_, err := se.Encrypt(ciphertext, key)
+		assert.NoError(t, err)
+	})
+}
+
 func TestStorageEncryption_GenerateKey(t *testing.T) {
 	tests := []struct {
 		name    string
