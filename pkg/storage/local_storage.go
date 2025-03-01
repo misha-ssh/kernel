@@ -8,11 +8,11 @@ import (
 )
 
 type LocalStorage struct {
-	direction string
+	Direction string
 }
 
 func (s *LocalStorage) Create(filename string) error {
-	file := filepath.Join(s.direction, filename)
+	file := filepath.Join(s.Direction, filename)
 
 	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
 		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
@@ -34,11 +34,11 @@ func (s *LocalStorage) Create(filename string) error {
 }
 
 func (s *LocalStorage) Delete(filename string) error {
-	return os.Remove(filepath.Join(s.direction, filename))
+	return os.Remove(filepath.Join(s.Direction, filename))
 }
 
 func (s *LocalStorage) Exists(filename string) bool {
-	filePath := filepath.Join(s.direction, filename)
+	filePath := filepath.Join(s.Direction, filename)
 
 	_, err := os.Stat(filePath)
 	if os.IsNotExist(err) {
@@ -49,7 +49,7 @@ func (s *LocalStorage) Exists(filename string) bool {
 }
 
 func (s *LocalStorage) Get(filename string) (string, error) {
-	file := filepath.Join(s.direction, filename)
+	file := filepath.Join(s.Direction, filename)
 
 	f, err := os.Open(file)
 	if err != nil {
@@ -68,7 +68,7 @@ func (s *LocalStorage) Get(filename string) (string, error) {
 }
 
 func (s *LocalStorage) Write(filename string, data string) error {
-	file := filepath.Join(s.direction, filename)
+	file := filepath.Join(s.Direction, filename)
 
 	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
@@ -87,7 +87,7 @@ func (s *LocalStorage) Write(filename string, data string) error {
 }
 
 func (s *LocalStorage) GetOpenFile(filename string) (*os.File, error) {
-	file := filepath.Join(s.direction, filename)
+	file := filepath.Join(s.Direction, filename)
 
 	logFile, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {

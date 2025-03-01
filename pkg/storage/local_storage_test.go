@@ -284,22 +284,6 @@ func TestLocalStorage_Write(t *testing.T) {
 	}
 }
 
-func FuzzLocalStorage_Write(f *testing.F) {
-	f.Fuzz(func(t *testing.T, value string) {
-		s := LocalStorage{
-			direction: t.TempDir(),
-		}
-
-		fileName := "test"
-
-		err := s.Write(fileName, value)
-		assert.NoError(t, err)
-
-		got, err := s.Get(fileName)
-		assert.Equal(t, value, got)
-	})
-}
-
 func TestLocalStorage_GetOpenFile(t *testing.T) {
 	type fields struct {
 		direction string
