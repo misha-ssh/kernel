@@ -1,4 +1,4 @@
-package encryption
+package crypto
 
 import (
 	"crypto/aes"
@@ -21,9 +21,11 @@ var (
 	ErrAuthCiphertext = errors.New("err open decrypts and authenticates ciphertext")
 )
 
-type StorageEncryption struct{}
+var s *StorageCrypto
 
-func (s *StorageEncryption) getGcm(key string) (cipher.AEAD, error) {
+type StorageCrypto struct{}
+
+func (s *StorageCrypto) getGcm(key string) (cipher.AEAD, error) {
 	newCipher, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return nil, ErrVerifyKEy
@@ -37,7 +39,9 @@ func (s *StorageEncryption) getGcm(key string) (cipher.AEAD, error) {
 	return gcm, nil
 }
 
-func (s *StorageEncryption) Encrypt(plaintext string, key string) (string, error) {
+func Encrypt(plaintext string, key string) (string, error) { return s.Encrypt(plaintext, key) }
+
+func (s *StorageCrypto) Encrypt(plaintext string, key string) (string, error) {
 	gcm, err := s.getGcm(key)
 	if err != nil {
 		return "", err
@@ -54,7 +58,9 @@ func (s *StorageEncryption) Encrypt(plaintext string, key string) (string, error
 	return encryptData, nil
 }
 
-func (s *StorageEncryption) Decrypt(ciphertext string, key string) (string, error) {
+func Decrypt(encryptedData string, key string) (string, error) { return s.Decrypt(encryptedData, key) }
+
+func (s *StorageCrypto) Decrypt(ciphertext string, key string) (string, error) {
 	ciphertextToByte := []byte(ciphertext)
 
 	gcm, err := s.getGcm(key)
@@ -73,7 +79,9 @@ func (s *StorageEncryption) Decrypt(ciphertext string, key string) (string, erro
 	return string(plaintext), nil
 }
 
-func (s *StorageEncryption) GenerateKey() (string, error) {
+func GenerateKey() (string, error) { return s.GenerateKey() }
+
+func (s *StorageCrypto) GenerateKey() (string, error) {
 	key := make([]byte, SizeKey)
 
 	_, err := rand.Read(key)
@@ -84,7 +92,9 @@ func (s *StorageEncryption) GenerateKey() (string, error) {
 	return string(key), nil
 }
 
-func (s *StorageEncryption) GetKey(storage storage.Storage) (string, error) {
+func GetKey() (string, error) { return s.GenerateKey() }
+
+func (s *StorageCrypto) GetKey(storage storage.Storage) (string, error) {
 	if storage.Exists(FileName) {
 		key, err := storage.Get(FileName)
 		if err != nil {

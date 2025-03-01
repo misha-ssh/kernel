@@ -3,7 +3,7 @@ package json
 import (
 	"errors"
 
-	crypt2 "github.com/ssh-connection-manager/kernel/v2/internal/encryption"
+	crypt2 "github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 )

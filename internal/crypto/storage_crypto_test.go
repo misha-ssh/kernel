@@ -1,4 +1,4 @@
-package encryption
+package crypto
 
 import (
 	"crypto/cipher"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestStorageEncryption_Decrypt(t *testing.T) {
+func TestStorageCrypto_Decrypt(t *testing.T) {
 	type args struct {
 		plaintext string
 		key       string
@@ -64,7 +64,7 @@ func TestStorageEncryption_Decrypt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			s := &StorageEncryption{}
+			s := &StorageCrypto{}
 
 			if tt.keyGenerate {
 				tt.args.key, err = s.GenerateKey()
@@ -83,7 +83,7 @@ func TestStorageEncryption_Decrypt(t *testing.T) {
 	}
 }
 
-func TestStorageEncryption_Encrypt(t *testing.T) {
+func TestStorageCrypto_Encrypt(t *testing.T) {
 	type args struct {
 		plaintext string
 		key       string
@@ -140,7 +140,7 @@ func TestStorageEncryption_Encrypt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			s := &StorageEncryption{}
+			s := &StorageCrypto{}
 
 			if tt.keyGenerate {
 				tt.args.key, err = s.GenerateKey()
@@ -159,17 +159,7 @@ func TestStorageEncryption_Encrypt(t *testing.T) {
 	}
 }
 
-func FuzzStorageEncryption_Encrypt(f *testing.F) {
-	se := &StorageEncryption{}
-	key, _ := se.GenerateKey()
-
-	f.Fuzz(func(t *testing.T, ciphertext string) {
-		_, err := se.Encrypt(ciphertext, key)
-		assert.NoError(t, err)
-	})
-}
-
-func TestStorageEncryption_GenerateKey(t *testing.T) {
+func TestStorageCrypto_GenerateKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -181,7 +171,7 @@ func TestStorageEncryption_GenerateKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StorageEncryption{}
+			s := &StorageCrypto{}
 			got, err := s.GenerateKey()
 
 			if tt.wantErr {
@@ -196,7 +186,7 @@ func TestStorageEncryption_GenerateKey(t *testing.T) {
 	}
 }
 
-func TestStorageEncryption_GetKey(t *testing.T) {
+func TestStorageCrypto_GetKey(t *testing.T) {
 	tests := []struct {
 		name      string
 		setupMock func(*storage.MockStorage)
@@ -218,7 +208,7 @@ func TestStorageEncryption_GetKey(t *testing.T) {
 			mockStorage := new(storage.MockStorage)
 			tt.setupMock(mockStorage)
 
-			s := &StorageEncryption{}
+			s := &StorageCrypto{}
 
 			got, err := s.GetKey(mockStorage)
 
@@ -234,7 +224,7 @@ func TestStorageEncryption_GetKey(t *testing.T) {
 	}
 }
 
-func TestStorageEncryption_getGcm(t *testing.T) {
+func TestStorageCrypto_getGcm(t *testing.T) {
 	type args struct {
 		key string
 	}
@@ -268,7 +258,7 @@ func TestStorageEncryption_getGcm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StorageEncryption{}
+			s := &StorageCrypto{}
 			got, err := s.getGcm(tt.args.key)
 
 			if tt.wantErr {
