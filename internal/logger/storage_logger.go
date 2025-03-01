@@ -19,6 +19,8 @@ var (
 	ErrGetInfo       = errors.New("err get info use log")
 )
 
+var s *StorageLogger
+
 type StorageLogger struct {
 	Storage storage.Storage
 }
@@ -46,6 +48,8 @@ func (s *StorageLogger) log(value any) error {
 
 	return nil
 }
+
+func Error(value any) { s.Error(value) }
 
 func (s *StorageLogger) Error(value any) {
 	_ = s.log(value)
