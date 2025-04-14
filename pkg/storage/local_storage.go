@@ -89,10 +89,10 @@ func (s *LocalStorage) Write(filename string, data string) error {
 func (s *LocalStorage) GetOpenFile(filename string) (*os.File, error) {
 	file := filepath.Join(s.Direction, filename)
 
-	logFile, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	openFile, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
 	if err != nil {
 		return nil, err
 	}
 
-	return logFile, nil
+	return openFile, nil
 }
