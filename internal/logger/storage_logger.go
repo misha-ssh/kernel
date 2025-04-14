@@ -3,9 +3,11 @@ package logger
 import (
 	"errors"
 	"fmt"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"log"
+	"os"
 	"runtime"
+
+	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 )
 
 const (
@@ -38,12 +40,16 @@ func (s *StorageLogger) log(value any) error {
 
 	logInfo := fmt.Sprintf("file: %s, line: %v, message: %#v", calledFile, line, value)
 
-	openFile, err := s.Storage.GetOpenFile(NameLogFile)
+	openLogFile, err := s.Storage.GetOpenFile(NameLogFile)
+	defer func(openLogFile *os.File) {
+		err = openLogFile.Close()
+	}(openLogFile)
+
 	if err != nil {
 		return ErrGetOpenFile
 	}
 
-	errorLog := log.New(openFile, "", log.LstdFlags|log.Lmicroseconds)
+	errorLog := log.New(openLogFile, "", log.LstdFlags|log.Lmicroseconds)
 	errorLog.Println(logInfo)
 
 	return nil
