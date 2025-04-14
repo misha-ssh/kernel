@@ -8,7 +8,7 @@ import (
 func FuzzLocalStorage_Write(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value string) {
 		s := LocalStorage{
-			direction: t.TempDir(),
+			Direction: t.TempDir(),
 		}
 
 		fileName := "test"

@@ -41,7 +41,7 @@ func TestLocalStorage_Create(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &LocalStorage{
-				direction: tt.fields.direction,
+				Direction: tt.fields.direction,
 			}
 
 			err := s.Create(tt.args.filename)
@@ -87,7 +87,7 @@ func TestLocalStorage_Delete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &LocalStorage{
-				direction: tt.fields.direction,
+				Direction: tt.fields.direction,
 			}
 
 			if tt.isCreateFile {
@@ -138,7 +138,7 @@ func TestLocalStorage_Exists(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &LocalStorage{
-				direction: tt.fields.direction,
+				Direction: tt.fields.direction,
 			}
 
 			if tt.isCreateFile {
@@ -195,7 +195,7 @@ func TestLocalStorage_Get(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &LocalStorage{
-				direction: tt.fields.direction,
+				Direction: tt.fields.direction,
 			}
 
 			if tt.isCreateFile {
@@ -265,7 +265,7 @@ func TestLocalStorage_Write(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &LocalStorage{
-				direction: tt.fields.direction,
+				Direction: tt.fields.direction,
 			}
 
 			err := s.Write(tt.args.filename, tt.args.data)
@@ -313,7 +313,7 @@ func TestLocalStorage_GetOpenFile(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &LocalStorage{
-				direction: tt.fields.direction,
+				Direction: tt.fields.direction,
 			}
 			got, err := s.GetOpenFile(tt.args.filename)
 
