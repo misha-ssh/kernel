@@ -1,39 +1,49 @@
 package config
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStorageConfig_Set(t *testing.T) {
-	type args struct {
+	tests := []struct {
+		name  string
 		key   string
 		value string
-	}
-	tests := []struct {
-		name      string
-		setupMock func(*storage.MockStorage)
-		args      args
 	}{
 		{
-			name: "success",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Exists", FileName).Return(true)
-				m.On("Write", "").Return(nil)
-			},
+			name:  "set default value",
+			key:   "test",
+			value: "1",
+		},
+		{
+			name:  "set value with spaces",
+			key:   "test 2",
+			value: "2",
+		},
+		{
+			name:  "set value with random register",
+			key:   "RaRd",
+			value: "2",
 		},
 	}
+
+	configStorage := storage.LocalStorage{
+		Direction: "/home/deniskorbakov/storage-config/",
+	}
+
+	s := StorageConfig{
+		Storage: &configStorage,
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockStorage := new(storage.MockStorage)
-			tt.setupMock(mockStorage)
+			s.Set(tt.key, tt.value)
+			got := s.Get(tt.key)
 
-			l := &StorageConfig{
-				Storage: mockStorage,
-			}
-
-			l.Set(tt.args.key, tt.args.value)
-			mockStorage.AssertExpectations(t)
+			assert.Equal(t, tt.value, got)
 		})
 	}
 }
