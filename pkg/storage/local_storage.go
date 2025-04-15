@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"io"
 	"os"
 	"path/filepath"
@@ -95,4 +96,24 @@ func (s *LocalStorage) GetOpenFile(filename string) (*os.File, error) {
 	}
 
 	return openFile, nil
+}
+
+func (s *LocalStorage) WriteToOpenFile(openFile *os.File, data string) error {
+	var err error
+
+	defer func(openFile *os.File) {
+		err = openFile.Close()
+	}(openFile)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	_, err = openFile.WriteString(data)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
 }

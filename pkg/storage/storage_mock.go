@@ -43,3 +43,8 @@ func (m *MockStorage) GetOpenFile(filename string) (*os.File, error) {
 
 	return args.Get(0).(*os.File), args.Error(1)
 }
+
+func (m *MockStorage) WriteToOpenFile(openFile *os.File, data string) error {
+	args := m.Called(openFile, data)
+	return args.Error(0)
+}
