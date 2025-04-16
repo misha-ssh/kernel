@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
@@ -14,11 +15,11 @@ const (
 	Separator  = "="
 )
 
-var s *StorageConfig
-
 var (
 	ErrWriteDataToOpenFile = errors.New("write data to open file error")
+	ErrValueIsInvalid      = errors.New("dont valid value at set data")
 	ErrCreateConfigFile    = errors.New("create config file error")
+	ErrKeyOfNonLetters     = errors.New("key of non letters error")
 	ErrGetOpenFile         = errors.New("get open file error")
 )
 
@@ -39,10 +40,21 @@ func (s *StorageConfig) createConfig() error {
 }
 
 func (s *StorageConfig) validateData(key, value string) error {
+	matchedKey, err := regexp.MatchString("^[a-zA-Z]", key)
+	if err != nil {
+		return err
+	}
+
+	if !matchedKey {
+		return ErrKeyOfNonLetters
+	}
+
+	if strings.TrimSpace(value) == "" {
+		return ErrValueIsInvalid
+	}
+
 	return nil
 }
-
-func Set(key, value string) error { return s.Set(key, value) }
 
 func (s *StorageConfig) Set(key, value string) error {
 	err := s.validateData(key, value)
@@ -72,8 +84,6 @@ func (s *StorageConfig) Set(key, value string) error {
 	return nil
 }
 
-func Get(key string) string { return s.Get(key) }
-
 func (s *StorageConfig) Get(key string) string {
 	got, err := s.Storage.Get(FileName)
 	if err != nil {
@@ -81,10 +91,27 @@ func (s *StorageConfig) Get(key string) string {
 		return EmptyValue
 	}
 
-	return got
-}
+	startIndexKey := 0
 
-func Exists(key string) bool { return s.Exists(key) }
+	for pos, char := range got {
+		if string(char) == Separator {
+			if strings.ToLower(got[startIndexKey:pos]) == strings.ToLower(key) {
+				neededKey := got[pos+1:]
+				for i, k := range neededKey {
+					if string(k) == "\n" {
+						return neededKey[:i]
+					}
+				}
+			}
+		}
+
+		if string(char) == "\n" {
+			startIndexKey = pos + 1
+		}
+	}
+
+	return EmptyValue
+}
 
 func (s *StorageConfig) Exists(key string) bool {
 	return true
