@@ -49,14 +49,56 @@ func (s *StorageConfig) validateData(key, value string) error {
 		return ErrKeyOfNonLetters
 	}
 
-	if strings.TrimSpace(value) == "" {
+	if value == "" {
 		return ErrValueIsInvalid
+	}
+
+	for _, char := range value {
+		if string(char) == " " {
+			return ErrValueIsInvalid
+		}
+	}
+
+	for _, char := range key {
+		if string(char) == " " {
+			return ErrValueIsInvalid
+		}
 	}
 
 	return nil
 }
 
-func (s *StorageConfig) rewriteData(value string) error {
+func (s *StorageConfig) rewriteData(key, value string) error {
+	got, err := s.Storage.Get(FileName)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	startIndexKey := 0
+
+	for pos, char := range got {
+		if string(char) == Separator {
+			if strings.ToLower(got[startIndexKey:pos]) == strings.ToLower(key) {
+				neededKey := got[pos+1:]
+				for i, k := range neededKey {
+					if string(k) == "\n" {
+						err = s.Storage.Write(FileName, got[:pos+1]+value+got[pos+i+1:])
+						if err != nil {
+							return err
+						}
+
+						return nil
+					}
+				}
+			}
+		}
+
+		if string(char) == "\n" {
+			startIndexKey = pos + 1
+		}
+	}
+
 	return nil
 }
 
@@ -72,7 +114,7 @@ func (s *StorageConfig) Set(key, value string) error {
 	}
 
 	if s.Exists(key) {
-		err = s.rewriteData(value)
+		err = s.rewriteData(key, value)
 		if err != nil {
 			return err
 		}
