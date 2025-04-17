@@ -76,9 +76,8 @@ func TestStorageConfig_Set(t *testing.T) {
 		},
 	}
 
-	//TODO: не забыть заменить на временную директорию
 	configStorage := storage.LocalStorage{
-		Direction: "/Users/deniskorbakov/storage-config-set/",
+		Direction: t.TempDir(),
 	}
 
 	s := StorageConfig{
@@ -128,9 +127,8 @@ func TestStorageConfig_Get(t *testing.T) {
 		},
 	}
 
-	//TODO: не забыть заменить на временную директорию
 	configStorage := storage.LocalStorage{
-		Direction: "/Users/deniskorbakov/storage-config-get/",
+		Direction: t.TempDir(),
 	}
 
 	s := StorageConfig{
@@ -183,9 +181,8 @@ func TestStorageConfig_Exists(t *testing.T) {
 		},
 	}
 
-	//TODO: не забыть заменить на временную директорию
 	configStorage := storage.LocalStorage{
-		Direction: "/Users/deniskorbakov/storage-config-exist/",
+		Direction: t.TempDir(),
 	}
 
 	s := StorageConfig{
