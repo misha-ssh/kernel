@@ -56,6 +56,10 @@ func (s *StorageConfig) validateData(key, value string) error {
 	return nil
 }
 
+func (s *StorageConfig) rewriteData(value string) error {
+	return nil
+}
+
 func (s *StorageConfig) Set(key, value string) error {
 	err := s.validateData(key, value)
 	if err != nil {
@@ -65,6 +69,15 @@ func (s *StorageConfig) Set(key, value string) error {
 	err = s.createConfig()
 	if err != nil {
 		return err
+	}
+
+	if s.Exists(key) {
+		err = s.rewriteData(value)
+		if err != nil {
+			return err
+		}
+
+		return nil
 	}
 
 	param := strings.ToUpper(key) + Separator + value + "\n"
@@ -114,5 +127,15 @@ func (s *StorageConfig) Get(key string) string {
 }
 
 func (s *StorageConfig) Exists(key string) bool {
-	return true
+	if strings.TrimSpace(key) == "" {
+		return false
+	}
+
+	got, err := s.Storage.Get(FileName)
+	if err != nil {
+		logger.Error(err.Error())
+		return false
+	}
+
+	return strings.Index(got, strings.ToUpper(key)) != -1
 }
