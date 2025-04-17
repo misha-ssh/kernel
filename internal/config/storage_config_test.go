@@ -149,3 +149,58 @@ func TestStorageConfig_Get(t *testing.T) {
 		})
 	}
 }
+
+func TestStorageConfig_Exists(t *testing.T) {
+	tests := []struct {
+		name        string
+		key         string
+		isCreateKey bool
+		want        bool
+	}{
+		{
+			name:        "key exists",
+			key:         "test",
+			isCreateKey: true,
+			want:        true,
+		},
+		{
+			name:        "key dont exists",
+			key:         "dontExistKey",
+			isCreateKey: false,
+			want:        false,
+		},
+		{
+			name:        "empty key",
+			key:         "",
+			isCreateKey: false,
+			want:        false,
+		},
+		{
+			name:        "key exists - dont create key",
+			key:         "test",
+			isCreateKey: false,
+			want:        true,
+		},
+	}
+
+	//TODO: не забыть заменить на временную директорию
+	configStorage := storage.LocalStorage{
+		Direction: "/Users/deniskorbakov/storage-config-exist/",
+	}
+
+	s := StorageConfig{
+		Storage: &configStorage,
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if tt.isCreateKey {
+				err := s.Set(tt.key, "test")
+				assert.NoError(t, err)
+			}
+
+			got := s.Exists(tt.key)
+			assert.Equal(t, tt.want, got)
+		})
+	}
+}
