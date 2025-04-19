@@ -40,7 +40,7 @@ func (s *StorageLogger) log(value any) error {
 
 	logInfo := fmt.Sprintf("file: %s, line: %v, message: %#v", calledFile, line, value)
 
-	openLogFile, err := s.Storage.GetOpenFile(NameLogFile)
+	openLogFile, err := s.Storage.GetOpenFile(NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
 	defer func(openLogFile *os.File) {
 		err = openLogFile.Close()
 	}(openLogFile)
@@ -58,5 +58,8 @@ func (s *StorageLogger) log(value any) error {
 func Error(value any) { s.Error(value) }
 
 func (s *StorageLogger) Error(value any) {
-	_ = s.log(value)
+	err := s.log(value)
+	if err != nil {
+		panic(err)
+	}
 }
