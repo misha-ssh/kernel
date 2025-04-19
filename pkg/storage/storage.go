@@ -8,6 +8,5 @@ type Storage interface {
 	Get(filename string) (string, error)
 	Delete(filename string) error
 	Write(filename string, data string) error
-	GetOpenFile(filename string) (*os.File, error)
-	WriteToOpenFile(openFile *os.File, data string) error
+	GetOpenFile(filename string, flags int) (*os.File, error)
 }
