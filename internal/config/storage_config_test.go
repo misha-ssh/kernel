@@ -110,8 +110,20 @@ func TestStorageConfig_Get(t *testing.T) {
 		{
 			name:       "get existing value",
 			key:        "test",
-			want:       "testasdas",
+			want:       "testData",
 			isSetValue: true,
+		},
+		{
+			name:       "get rewriting value",
+			key:        "test",
+			want:       "rewriteData",
+			isSetValue: true,
+		},
+		{
+			name:       "get lat set value",
+			key:        "test",
+			want:       "rewriteData",
+			isSetValue: false,
 		},
 		{
 			name:       "get non existing value",
@@ -162,6 +174,12 @@ func TestStorageConfig_Exists(t *testing.T) {
 			want:        true,
 		},
 		{
+			name:        "key exists with random register",
+			key:         "tEsT",
+			isCreateKey: false,
+			want:        true,
+		},
+		{
 			name:        "key dont exists",
 			key:         "dontExistKey",
 			isCreateKey: false,
@@ -172,12 +190,6 @@ func TestStorageConfig_Exists(t *testing.T) {
 			key:         "",
 			isCreateKey: false,
 			want:        false,
-		},
-		{
-			name:        "key exists - dont create key",
-			key:         "test",
-			isCreateKey: false,
-			want:        true,
 		},
 	}
 
