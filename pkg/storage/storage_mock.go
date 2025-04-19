@@ -34,17 +34,12 @@ func (m *MockStorage) Write(filename string, data string) error {
 	return args.Error(0)
 }
 
-func (m *MockStorage) GetOpenFile(filename string) (*os.File, error) {
-	args := m.Called(filename)
+func (m *MockStorage) GetOpenFile(filename string, flags int) (*os.File, error) {
+	args := m.Called(filename, flags)
 
 	if args.Error(1) != nil {
 		return nil, args.Error(1)
 	}
 
 	return args.Get(0).(*os.File), args.Error(1)
-}
-
-func (m *MockStorage) WriteToOpenFile(openFile *os.File, data string) error {
-	args := m.Called(openFile, data)
-	return args.Error(0)
 }
