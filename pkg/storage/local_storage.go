@@ -86,10 +86,10 @@ func (s *LocalStorage) Write(filename string, data string) error {
 	return nil
 }
 
-func (s *LocalStorage) GetOpenFile(filename string) (*os.File, error) {
+func (s *LocalStorage) GetOpenFile(filename string, flags int) (*os.File, error) {
 	file := filepath.Join(s.Direction, filename)
 
-	openFile, err := os.OpenFile(file, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
+	openFile, err := os.OpenFile(file, flags, os.ModePerm)
 	if err != nil {
 		return nil, err
 	}
