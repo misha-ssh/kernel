@@ -22,7 +22,7 @@ func TestStorageLogger_Error(t *testing.T) {
 				m.On("Create", NameLogFile).Return(nil)
 
 				file, _ := os.CreateTemp("", "log.log")
-				m.On("GetOpenFile", NameLogFile).Return(file, nil)
+				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(file, nil)
 			},
 			value: rand.Int(),
 		},
@@ -37,7 +37,7 @@ func TestStorageLogger_Error(t *testing.T) {
 			name: "error on getting open file",
 			setupMock: func(m *storage.MockStorage) {
 				m.On("Create", NameLogFile).Return(nil)
-				m.On("GetOpenFile", NameLogFile).Return(nil, errors.New("open error"))
+				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(nil, errors.New("open error"))
 			},
 			value: rand.Int(),
 		},
@@ -77,7 +77,7 @@ func TestStorageLogger_log(t *testing.T) {
 					assert.NoError(t, err)
 				}()
 
-				m.On("GetOpenFile", NameLogFile).Return(file, nil)
+				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(file, nil)
 			},
 			value:   rand.Int(),
 			wantErr: false,
@@ -94,7 +94,7 @@ func TestStorageLogger_log(t *testing.T) {
 			name: "error on getting open file",
 			setupMock: func(m *storage.MockStorage) {
 				m.On("Create", NameLogFile).Return(nil)
-				m.On("GetOpenFile", NameLogFile).Return(nil, errors.New("open error"))
+				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(nil, errors.New("open error"))
 			},
 			value:   rand.Int(),
 			wantErr: true,
