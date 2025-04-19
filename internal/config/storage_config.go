@@ -1,8 +1,9 @@
 package config
 
 import (
+	"bufio"
 	"errors"
-	"regexp"
+	"os"
 	"strings"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
@@ -10,16 +11,18 @@ import (
 )
 
 const (
-	FileName   = "config.txt"
-	EmptyValue = ""
-	Separator  = "="
+	CharNewLine = "\n"
+	EmptyValue  = ""
+	Separator   = "="
+	FileName    = "config"
 )
 
 var (
 	ErrWriteDataToOpenFile = errors.New("write data to open file error")
-	ErrValueIsInvalid      = errors.New("dont valid value at set data")
 	ErrCreateConfigFile    = errors.New("create config file error")
+	ErrGetKeyValueData     = errors.New("get value data error")
 	ErrKeyOfNonLetters     = errors.New("key of non letters error")
+	ErrValueIsInvalid      = errors.New("dont valid value at set data")
 	ErrGetOpenFile         = errors.New("get open file error")
 )
 
@@ -27,7 +30,7 @@ type StorageConfig struct {
 	Storage storage.Storage
 }
 
-func (s *StorageConfig) createConfig() error {
+func (s *StorageConfig) create() error {
 	if !s.Storage.Exists(FileName) {
 		err := s.Storage.Create(FileName)
 		if err != nil {
@@ -39,36 +42,7 @@ func (s *StorageConfig) createConfig() error {
 	return nil
 }
 
-func (s *StorageConfig) validateData(key, value string) error {
-	matchedKey, err := regexp.MatchString("^[a-zA-Z]", key)
-	if err != nil {
-		return err
-	}
-
-	if !matchedKey {
-		return ErrKeyOfNonLetters
-	}
-
-	if value == "" {
-		return ErrValueIsInvalid
-	}
-
-	for _, char := range value {
-		if string(char) == " " {
-			return ErrValueIsInvalid
-		}
-	}
-
-	for _, char := range key {
-		if string(char) == " " {
-			return ErrValueIsInvalid
-		}
-	}
-
-	return nil
-}
-
-func (s *StorageConfig) rewriteData(key, value string) error {
+func (s *StorageConfig) rewrite(key, value string) error {
 	got, err := s.Storage.Get(FileName)
 	if err != nil {
 		logger.Error(err.Error())
@@ -103,18 +77,23 @@ func (s *StorageConfig) rewriteData(key, value string) error {
 }
 
 func (s *StorageConfig) Set(key, value string) error {
-	err := s.validateData(key, value)
+	err := validateKey(key)
 	if err != nil {
 		return err
 	}
 
-	err = s.createConfig()
+	err = validateValue(value)
+	if err != nil {
+		return err
+	}
+
+	err = s.create()
 	if err != nil {
 		return err
 	}
 
 	if s.Exists(key) {
-		err = s.rewriteData(key, value)
+		err = s.rewrite(key, value)
 		if err != nil {
 			return err
 		}
@@ -122,15 +101,18 @@ func (s *StorageConfig) Set(key, value string) error {
 		return nil
 	}
 
-	param := strings.ToUpper(key) + Separator + value + "\n"
+	param := strings.ToUpper(key) + Separator + value + CharNewLine
 
-	openConfigFile, err := s.Storage.GetOpenFile(FileName)
+	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	defer func(openConfigFile *os.File) {
+		err = openConfigFile.Close()
+	}(openConfigFile)
 	if err != nil {
 		logger.Error(ErrGetOpenFile)
 		return ErrGetOpenFile
 	}
 
-	err = s.Storage.WriteToOpenFile(openConfigFile, param)
+	_, err = openConfigFile.WriteString(param)
 	if err != nil {
 		logger.Error(ErrWriteDataToOpenFile)
 		return ErrWriteDataToOpenFile
@@ -140,36 +122,45 @@ func (s *StorageConfig) Set(key, value string) error {
 }
 
 func (s *StorageConfig) Get(key string) string {
-	got, err := s.Storage.Get(FileName)
+	got, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
+	defer func(got *os.File) {
+		err = got.Close()
+	}(got)
 	if err != nil {
 		logger.Error(err.Error())
 		return EmptyValue
 	}
 
-	startIndexKey := 0
+	sc := bufio.NewScanner(got)
 
-	for pos, char := range got {
-		if string(char) == Separator {
-			if strings.ToLower(got[startIndexKey:pos]) == strings.ToLower(key) {
-				neededKey := got[pos+1:]
-				for i, k := range neededKey {
-					if string(k) == "\n" {
-						return neededKey[:i]
-					}
-				}
-			}
+	for sc.Scan() {
+		data := strings.Split(sc.Text(), Separator)
+
+		if len(data) != 2 {
+			logger.Error(ErrGetKeyValueData)
+			return EmptyValue
 		}
 
-		if string(char) == "\n" {
-			startIndexKey = pos + 1
+		keyConfig := strings.ToLower(data[0])
+		valueConfig := data[1]
+
+		if keyConfig == key {
+			return valueConfig
 		}
+	}
+
+	if err = sc.Err(); err != nil {
+		logger.Error(err.Error())
+		return EmptyValue
 	}
 
 	return EmptyValue
 }
 
 func (s *StorageConfig) Exists(key string) bool {
-	if strings.TrimSpace(key) == "" {
+	err := validateKey(key)
+	if err != nil {
+		logger.Error(err.Error())
 		return false
 	}
 
