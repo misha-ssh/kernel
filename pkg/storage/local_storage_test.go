@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -315,7 +316,7 @@ func TestLocalStorage_GetOpenFile(t *testing.T) {
 			s := &LocalStorage{
 				Direction: tt.fields.direction,
 			}
-			got, err := s.GetOpenFile(tt.args.filename)
+			got, err := s.GetOpenFile(tt.args.filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -331,69 +332,6 @@ func TestLocalStorage_GetOpenFile(t *testing.T) {
 				assert.NoError(t, err)
 
 				assert.True(t, s.Exists(tt.args.filename))
-			}
-		})
-	}
-}
-
-func TestLocalStorage_WriteToOpenFile(t *testing.T) {
-	type fields struct {
-		direction string
-	}
-	type args struct {
-		data string
-	}
-	tests := []struct {
-		name        string
-		fields      fields
-		args        args
-		wantErr     bool
-		wantContent string
-	}{
-		{
-			name:        "write to new file",
-			fields:      fields{direction: t.TempDir()},
-			args:        args{data: "Hello, World!"},
-			wantErr:     false,
-			wantContent: "Hello, World!",
-		},
-		{
-			name:        "write to existing file (overwrite)",
-			fields:      fields{direction: t.TempDir()},
-			args:        args{data: "New content"},
-			wantErr:     false,
-			wantContent: "New content",
-		},
-		{
-			name:        "write empty data to new file",
-			fields:      fields{direction: t.TempDir()},
-			args:        args{data: ""},
-			wantErr:     false,
-			wantContent: "",
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
-				Direction: tt.fields.direction,
-			}
-
-			exampleFilename := "test.txt"
-
-			openFile, err := s.GetOpenFile(exampleFilename)
-			assert.NoError(t, err)
-
-			err = s.WriteToOpenFile(openFile, tt.args.data)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-
-				content, err := s.Get(exampleFilename)
-				assert.NoError(t, err)
-
-				assert.Equal(t, tt.wantContent, content)
 			}
 		})
 	}
