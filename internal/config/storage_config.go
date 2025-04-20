@@ -34,7 +34,7 @@ func (s *StorageConfig) create() error {
 	if !s.Storage.Exists(FileName) {
 		err := s.Storage.Create(FileName)
 		if err != nil {
-			logger.Error(ErrCreateConfigFile)
+			logger.LocStorageErr(ErrCreateConfigFile)
 			return ErrCreateConfigFile
 		}
 	}
@@ -45,7 +45,7 @@ func (s *StorageConfig) create() error {
 func (s *StorageConfig) rewrite(key, value string) error {
 	got, err := s.Storage.Get(FileName)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.LocStorageErr(err.Error())
 		return err
 	}
 
@@ -108,13 +108,13 @@ func (s *StorageConfig) Set(key, value string) error {
 		err = openConfigFile.Close()
 	}(openConfigFile)
 	if err != nil {
-		logger.Error(ErrGetOpenFile)
+		logger.LocStorageErr(ErrGetOpenFile)
 		return ErrGetOpenFile
 	}
 
 	_, err = openConfigFile.WriteString(param)
 	if err != nil {
-		logger.Error(ErrWriteDataToOpenFile)
+		logger.LocStorageErr(ErrWriteDataToOpenFile)
 		return ErrWriteDataToOpenFile
 	}
 
@@ -127,7 +127,7 @@ func (s *StorageConfig) Get(key string) string {
 		err = got.Close()
 	}(got)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.LocStorageErr(err.Error())
 		return EmptyValue
 	}
 
@@ -137,7 +137,7 @@ func (s *StorageConfig) Get(key string) string {
 		data := strings.Split(sc.Text(), Separator)
 
 		if len(data) != 2 {
-			logger.Error(ErrGetKeyValueData)
+			logger.LocStorageErr(ErrGetKeyValueData)
 			return EmptyValue
 		}
 
@@ -150,7 +150,7 @@ func (s *StorageConfig) Get(key string) string {
 	}
 
 	if err = sc.Err(); err != nil {
-		logger.Error(err.Error())
+		logger.LocStorageErr(err.Error())
 		return EmptyValue
 	}
 
@@ -160,13 +160,13 @@ func (s *StorageConfig) Get(key string) string {
 func (s *StorageConfig) Exists(key string) bool {
 	err := validateKey(key)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.LocStorageErr(err.Error())
 		return false
 	}
 
 	got, err := s.Storage.Get(FileName)
 	if err != nil {
-		logger.Error(err.Error())
+		logger.LocStorageErr(err.Error())
 		return false
 	}
 
