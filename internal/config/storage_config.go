@@ -141,10 +141,10 @@ func (s *StorageConfig) Get(key string) string {
 			return EmptyValue
 		}
 
-		keyConfig := strings.ToLower(data[0])
+		keyConfig := data[0]
 		valueConfig := data[1]
 
-		if keyConfig == key {
+		if keyConfig == strings.ToUpper(key) {
 			return valueConfig
 		}
 	}
