@@ -2,12 +2,19 @@ package config
 
 import (
 	"regexp"
-	"strings"
+	"unicode"
 )
 
 func validateOnEmptyString(value string) error {
-	if len(strings.Fields(value)) > 1 || value == "" {
+	if value == "" {
 		return ErrValueIsInvalid
+	}
+
+	runes := []rune(value)
+	for _, r := range runes {
+		if unicode.IsSpace(r) {
+			return ErrValueIsInvalid
+		}
 	}
 
 	return nil
