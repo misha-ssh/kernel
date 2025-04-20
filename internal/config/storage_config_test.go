@@ -71,7 +71,7 @@ func TestStorageConfig_Set(t *testing.T) {
 		{
 			name:    "set value with random register",
 			key:     "RaRd",
-			value:   "2",
+			value:   "test",
 			wantErr: false,
 		},
 	}
