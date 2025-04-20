@@ -21,8 +21,6 @@ var (
 	ErrGetInfo       = errors.New("err get info use log")
 )
 
-var s *StorageLogger
-
 type StorageLogger struct {
 	Storage storage.Storage
 }
@@ -44,7 +42,6 @@ func (s *StorageLogger) log(value any) error {
 	defer func(openLogFile *os.File) {
 		err = openLogFile.Close()
 	}(openLogFile)
-
 	if err != nil {
 		return ErrGetOpenFile
 	}
@@ -55,7 +52,17 @@ func (s *StorageLogger) log(value any) error {
 	return nil
 }
 
-func Error(value any) { s.Error(value) }
+func LocStorageErr(value any) {
+	localStorage := storage.LocalStorage{
+		Direction: storage.HomeDir,
+	}
+
+	storageLogger := StorageLogger{
+		Storage: &localStorage,
+	}
+
+	_ = storageLogger.log(value)
+}
 
 func (s *StorageLogger) Error(value any) {
 	err := s.log(value)
