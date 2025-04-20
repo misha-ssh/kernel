@@ -7,6 +7,10 @@ import (
 	"path/filepath"
 )
 
+const (
+	HomeDir string = "~/.ssh+/"
+)
+
 type LocalStorage struct {
 	Direction string
 }
