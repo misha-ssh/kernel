@@ -43,37 +43,61 @@ func (s *StorageConfig) create() error {
 }
 
 func (s *StorageConfig) rewrite(key, value string) error {
-	got, err := s.Storage.Get(FileName)
+	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
+	defer func(openConfigFile *os.File) {
+		err = openConfigFile.Close()
+	}(openConfigFile)
 	if err != nil {
+		logger.LocStorageErr(ErrGetOpenFile)
+		return ErrGetOpenFile
+	}
+
+	sc := bufio.NewScanner(openConfigFile)
+	var lines []string
+
+	for sc.Scan() {
+		line := sc.Text()
+		data := strings.Split(line, Separator)
+
+		if len(data) != 2 {
+			logger.LocStorageErr(ErrGetKeyValueData)
+			return ErrGetKeyValueData
+		}
+
+		keyConfig := data[0]
+		UpperKey := strings.ToUpper(key)
+
+		if keyConfig == UpperKey {
+			newValue := UpperKey + Separator + value + CharNewLine
+			lines = append(lines, newValue)
+		} else {
+			lines = append(lines, line)
+		}
+	}
+
+	if err = sc.Err(); err != nil {
 		logger.LocStorageErr(err.Error())
 		return err
 	}
 
-	startIndexKey := 0
+	if _, err = openConfigFile.Seek(0, 0); err != nil {
+		logger.LocStorageErr(err.Error())
+		return err
+	}
+	if err = openConfigFile.Truncate(0); err != nil {
+		logger.LocStorageErr(err.Error())
+		return err
+	}
 
-	for pos, char := range got {
-		if string(char) == Separator {
-			if strings.ToLower(got[startIndexKey:pos]) == strings.ToLower(key) {
-				neededKey := got[pos+1:]
-				for i, k := range neededKey {
-					if string(k) == "\n" {
-						err = s.Storage.Write(FileName, got[:pos+1]+value+got[pos+i+1:])
-						if err != nil {
-							return err
-						}
-
-						return nil
-					}
-				}
-			}
-		}
-
-		if string(char) == "\n" {
-			startIndexKey = pos + 1
+	writer := bufio.NewWriter(openConfigFile)
+	for _, line := range lines {
+		if _, err = writer.WriteString(line); err != nil {
+			logger.LocStorageErr(err.Error())
+			return err
 		}
 	}
 
-	return nil
+	return writer.Flush()
 }
 
 func (s *StorageConfig) Set(key, value string) error {
@@ -122,16 +146,16 @@ func (s *StorageConfig) Set(key, value string) error {
 }
 
 func (s *StorageConfig) Get(key string) string {
-	got, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
-	defer func(got *os.File) {
-		err = got.Close()
-	}(got)
+	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
+	defer func(openConfigFile *os.File) {
+		err = openConfigFile.Close()
+	}(openConfigFile)
 	if err != nil {
 		logger.LocStorageErr(err.Error())
 		return EmptyValue
 	}
 
-	sc := bufio.NewScanner(got)
+	sc := bufio.NewScanner(openConfigFile)
 
 	for sc.Scan() {
 		data := strings.Split(sc.Text(), Separator)
