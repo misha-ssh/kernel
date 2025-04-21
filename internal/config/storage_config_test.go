@@ -21,6 +21,12 @@ func TestStorageConfig_Set(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "set one char",
+			key:     "test",
+			value:   "z",
+			wantErr: false,
+		},
+		{
 			name:    "set letters",
 			key:     "test",
 			value:   "randomString",
