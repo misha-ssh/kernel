@@ -1,12 +1,14 @@
-package crypto
+package fuzz
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
+	"github.com/stretchr/testify/assert"
 )
 
 func FuzzStorageCrypto_Encrypt(f *testing.F) {
-	se := &StorageCrypto{}
+	se := &crypto.StorageCrypto{}
 	key, _ := se.GenerateKey()
 
 	f.Fuzz(func(t *testing.T, ciphertext string) {

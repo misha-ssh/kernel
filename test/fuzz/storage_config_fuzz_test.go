@@ -1,8 +1,9 @@
-package config
+package fuzz
 
 import (
 	"testing"
 
+	"github.com/ssh-connection-manager/kernel/v2/internal/config"
 	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"github.com/stretchr/testify/assert"
 )
@@ -13,7 +14,7 @@ func FuzzLocalStorage_Set(f *testing.F) {
 			Direction: t.TempDir(),
 		}
 
-		s := StorageConfig{
+		s := config.StorageConfig{
 			Storage: &localStorage,
 		}
 
