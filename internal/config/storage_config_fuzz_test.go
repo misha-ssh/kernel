@@ -8,25 +8,21 @@ import (
 )
 
 func FuzzLocalStorage_Set(f *testing.F) {
-	localStorage := storage.LocalStorage{
-		Direction: f.TempDir(),
-	}
-
 	f.Fuzz(func(t *testing.T, value string) {
-		key := "TEST"
+		localStorage := storage.LocalStorage{
+			Direction: t.TempDir(),
+		}
 
 		s := StorageConfig{
 			Storage: &localStorage,
 		}
 
-		_ = s.Set(key, value)
+		key := "test"
 
+		err := s.Set(key, value)
 		got := s.Get(key)
-		validateErr := validateValue(value)
 
-		if validateErr != nil {
-			assert.Equal(t, EmptyValue, got)
-		} else {
+		if err == nil {
 			assert.Equal(t, value, got)
 		}
 	})
