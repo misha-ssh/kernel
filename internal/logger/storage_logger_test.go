@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStorageLogger_Error(t *testing.T) {
+func TestStorageLogger_LocStorageErr(t *testing.T) {
 	tests := []struct {
 		name      string
 		setupMock func(*storage.MockStorage)
