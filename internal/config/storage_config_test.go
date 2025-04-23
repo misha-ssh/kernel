@@ -21,6 +21,24 @@ func TestStorageConfig_Set(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "set char early",
+			key:     "testEarly",
+			value:   "=",
+			wantErr: true,
+		},
+		{
+			name:    "set char early - rewrite key",
+			key:     "test",
+			value:   "=",
+			wantErr: true,
+		},
+		{
+			name:    "set numeric",
+			key:     "randomKey",
+			value:   "0",
+			wantErr: false,
+		},
+		{
 			name:    "set one char",
 			key:     "test",
 			value:   "z",
@@ -123,6 +141,12 @@ func TestStorageConfig_Get(t *testing.T) {
 			name:       "get rewriting value",
 			key:        "test",
 			want:       "rewriteData",
+			isSetValue: true,
+		},
+		{
+			name:       "get numeric value",
+			key:        "newTestKey",
+			want:       "0",
 			isSetValue: true,
 		},
 		{
