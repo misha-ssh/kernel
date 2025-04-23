@@ -38,7 +38,15 @@ func validateKey(key string) error {
 }
 
 func validateValue(value string) error {
-	err := validateOnEmptyString(value)
+	matchedValue, err := regexp.MatchString("^[a-zA-Z0-9.\\-_]+$", value)
+	if err != nil {
+		return err
+	}
+	if !matchedValue {
+		return ErrKeyOfNonLetters
+	}
+
+	err = validateOnEmptyString(value)
 	if err != nil {
 		return err
 	}
