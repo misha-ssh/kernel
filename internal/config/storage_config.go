@@ -30,7 +30,7 @@ type StorageConfig struct {
 	Storage storage.Storage
 }
 
-func (s *StorageConfig) create() error {
+func (s *StorageConfig) createConfigFile() error {
 	if !s.Storage.Exists(FileName) {
 		err := s.Storage.Create(FileName)
 		if err != nil {
@@ -71,7 +71,7 @@ func (s *StorageConfig) rewrite(key, value string) error {
 			newValue := UpperKey + Separator + value + CharNewLine
 			lines = append(lines, newValue)
 		} else {
-			lines = append(lines, line)
+			lines = append(lines, line+CharNewLine)
 		}
 	}
 
@@ -111,7 +111,7 @@ func (s *StorageConfig) Set(key, value string) error {
 		return err
 	}
 
-	err = s.create()
+	err = s.createConfigFile()
 	if err != nil {
 		return err
 	}
@@ -146,6 +146,12 @@ func (s *StorageConfig) Set(key, value string) error {
 }
 
 func (s *StorageConfig) Get(key string) string {
+	err := validateKey(key)
+	if err != nil {
+		logger.LocStorageErr(ErrGetOpenFile)
+		return EmptyValue
+	}
+
 	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
