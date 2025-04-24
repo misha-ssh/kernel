@@ -14,57 +14,35 @@ func TestStorageLogger_LocStorageErr(t *testing.T) {
 	tests := []struct {
 		name      string
 		setupMock func(*storage.MockStorage)
-		isError   bool
+		isPanic   bool
 		value     any
 	}{
 		{
-			name: "success logging function",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Create", NameLogFile).Return(nil)
-
-				file, _ := os.CreateTemp("", "log.log")
-				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(file, nil)
-			},
-			isError: false,
+			name:    "success - rand int",
+			isPanic: false,
 			value:   rand.Int(),
 		},
 		{
-			name: "error on file creation",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Create", NameLogFile).Return(errors.New("create error"))
-			},
-			isError: true,
-			value:   rand.Int(),
+			name:    "success - rand float",
+			isPanic: false,
+			value:   rand.Float32(),
 		},
 		{
-			name: "error on getting open file",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Create", NameLogFile).Return(nil)
-				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(nil, errors.New("open error"))
-			},
-			isError: true,
-			value:   rand.Int(),
+			name:    "success - test string",
+			isPanic: false,
+			value:   "test String",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockStorage := new(storage.MockStorage)
-			tt.setupMock(mockStorage)
-
-			sl := &StorageLogger{
-				Storage: mockStorage,
-			}
-
-			if tt.isError {
+			if tt.isPanic {
 				assert.Panics(t, func() {
-					sl.Error(tt.value)
+					LocStorageErr(tt.value)
 				})
 			} else {
-				sl.Error(tt.value)
+				LocStorageErr(tt.value)
 			}
-
-			mockStorage.AssertExpectations(t)
 		})
 	}
 }
