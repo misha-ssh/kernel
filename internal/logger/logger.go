@@ -1,5 +1,5 @@
 package logger
 
 type Logger interface {
-	Error(value any)
+	log(value any) error
 }
