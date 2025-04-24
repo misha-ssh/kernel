@@ -61,11 +61,7 @@ func LocStorageErr(value any) {
 		Storage: &localStorage,
 	}
 
-	_ = storageLogger.log(value)
-}
-
-func (s *StorageLogger) Error(value any) {
-	err := s.log(value)
+	err := storageLogger.log(value)
 	if err != nil {
 		panic(err)
 	}
