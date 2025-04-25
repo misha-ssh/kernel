@@ -7,10 +7,6 @@ import (
 	"path/filepath"
 )
 
-const (
-	HomeDir string = "~/.ssh+/"
-)
-
 type LocalStorage struct {
 	Direction string
 }
@@ -44,12 +40,13 @@ func (s *LocalStorage) Delete(filename string) error {
 func (s *LocalStorage) Exists(filename string) bool {
 	filePath := filepath.Join(s.Direction, filename)
 
-	_, err := os.Stat(filePath)
+	info, err := os.Stat(filePath)
+
 	if os.IsNotExist(err) {
 		return false
 	}
 
-	return true
+	return !info.IsDir()
 }
 
 func (s *LocalStorage) Get(filename string) (string, error) {
@@ -74,7 +71,7 @@ func (s *LocalStorage) Get(filename string) (string, error) {
 func (s *LocalStorage) Write(filename string, data string) error {
 	file := filepath.Join(s.Direction, filename)
 
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
+	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -99,22 +96,4 @@ func (s *LocalStorage) GetOpenFile(filename string, flags int) (*os.File, error)
 	}
 
 	return openFile, nil
-}
-
-func (s *LocalStorage) WriteToOpenFile(openFile *os.File, data string) error {
-	var err error
-
-	defer func(openFile *os.File) {
-		err = openFile.Close()
-	}(openFile)
-	if err != nil {
-		return err
-	}
-
-	_, err = openFile.WriteString(data)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
