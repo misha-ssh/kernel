@@ -76,23 +76,23 @@ func (s *StorageConfig) rewrite(key, value string) error {
 	}
 
 	if err = sc.Err(); err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return err
 	}
 
 	if _, err = openConfigFile.Seek(0, 0); err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return err
 	}
 	if err = openConfigFile.Truncate(0); err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return err
 	}
 
 	writer := bufio.NewWriter(openConfigFile)
 	for _, line := range lines {
 		if _, err = writer.WriteString(line); err != nil {
-			logger.LocStorageErr(err.Error())
+			logger.LocStorageErr(err)
 			return err
 		}
 	}
@@ -103,22 +103,26 @@ func (s *StorageConfig) rewrite(key, value string) error {
 func (s *StorageConfig) Set(key, value string) error {
 	err := validateKey(key)
 	if err != nil {
+		logger.LocStorageErr(err)
 		return err
 	}
 
 	err = validateValue(value)
 	if err != nil {
+		logger.LocStorageErr(err)
 		return err
 	}
 
 	err = s.createConfigFile()
 	if err != nil {
+		logger.LocStorageErr(err)
 		return err
 	}
 
 	if s.Exists(key) {
 		err = s.rewrite(key, value)
 		if err != nil {
+			logger.LocStorageErr(err)
 			return err
 		}
 
@@ -157,7 +161,7 @@ func (s *StorageConfig) Get(key string) string {
 		err = openConfigFile.Close()
 	}(openConfigFile)
 	if err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return EmptyValue
 	}
 
@@ -180,7 +184,7 @@ func (s *StorageConfig) Get(key string) string {
 	}
 
 	if err = sc.Err(); err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return EmptyValue
 	}
 
@@ -190,13 +194,13 @@ func (s *StorageConfig) Get(key string) string {
 func (s *StorageConfig) Exists(key string) bool {
 	err := validateKey(key)
 	if err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return false
 	}
 
 	got, err := s.Storage.Get(FileName)
 	if err != nil {
-		logger.LocStorageErr(err.Error())
+		logger.LocStorageErr(err)
 		return false
 	}
 
