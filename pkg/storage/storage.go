@@ -1,6 +1,12 @@
 package storage
 
-import "os"
+import (
+	"os"
+	"os/user"
+	"path/filepath"
+
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
+)
 
 type Storage interface {
 	Exists(filename string) bool
@@ -9,4 +15,15 @@ type Storage interface {
 	Delete(filename string) error
 	Write(filename string, data string) error
 	GetOpenFile(filename string, flags int) (*os.File, error)
+}
+
+func GetHomeDir() string {
+	usr, err := user.Current()
+	if err != nil {
+		panic(err)
+	}
+
+	hiddenDir := "." + envconst.AppName
+
+	return filepath.Join(usr.HomeDir, hiddenDir)
 }
