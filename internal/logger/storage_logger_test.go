@@ -1,21 +1,18 @@
 package logger
 
 import (
-	"errors"
 	"math/rand"
-	"os"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStorageLogger_LocStorageErr(t *testing.T) {
+func TestStorageLogger_Error(t *testing.T) {
 	tests := []struct {
-		name      string
-		setupMock func(*storage.MockStorage)
-		isPanic   bool
-		value     any
+		name    string
+		status  Status
+		isPanic bool
+		value   any
 	}{
 		{
 			name:    "success - rand int",
@@ -23,90 +20,140 @@ func TestStorageLogger_LocStorageErr(t *testing.T) {
 			value:   rand.Int(),
 		},
 		{
-			name:    "success - rand float",
+			name:    "success - default string",
 			isPanic: false,
-			value:   rand.Float32(),
-		},
-		{
-			name:    "success - test string",
-			isPanic: false,
-			value:   "test String",
+			value:   "test",
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isPanic {
-				assert.Panics(t, func() {
-					LocStorageErr(tt.value)
-				})
-			} else {
-				LocStorageErr(tt.value)
-			}
+			assert.NotPanics(t, func() {
+				Error(tt.value)
+			})
+		})
+	}
+}
+
+func TestStorageLogger_Warn(t *testing.T) {
+	tests := []struct {
+		name    string
+		status  Status
+		isPanic bool
+		value   any
+	}{
+		{
+			name:    "success - rand int",
+			isPanic: false,
+			value:   rand.Int(),
+		},
+		{
+			name:    "success - default string",
+			isPanic: false,
+			value:   "test",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NotPanics(t, func() {
+				Warn(tt.value)
+			})
+		})
+	}
+}
+
+func TestStorageLogger_Info(t *testing.T) {
+	tests := []struct {
+		name    string
+		status  Status
+		isPanic bool
+		value   any
+	}{
+		{
+			name:    "success - rand int",
+			isPanic: false,
+			value:   rand.Int(),
+		},
+		{
+			name:    "success - default string",
+			isPanic: false,
+			value:   "test",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NotPanics(t, func() {
+				Info(tt.value)
+			})
+		})
+	}
+}
+
+func TestStorageLogger_Debug(t *testing.T) {
+	tests := []struct {
+		name    string
+		status  Status
+		isPanic bool
+		value   any
+	}{
+		{
+			name:    "success - rand int",
+			isPanic: false,
+			value:   rand.Int(),
+		},
+		{
+			name:    "success - default string",
+			isPanic: false,
+			value:   "test",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NotPanics(t, func() {
+				Debug(tt.value)
+			})
 		})
 	}
 }
 
 func TestStorageLogger_log(t *testing.T) {
 	tests := []struct {
-		name      string
-		setupMock func(*storage.MockStorage)
-		value     any
-		wantErr   bool
+		name   string
+		status Status
+		value  any
 	}{
 		{
-			name: "success logging function",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Create", NameLogFile).Return(nil)
-
-				file, _ := os.CreateTemp("", "log.log")
-				defer func() {
-					err := os.Remove(file.Name())
-					assert.NoError(t, err)
-				}()
-
-				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(file, nil)
-			},
-			value:   rand.Int(),
-			wantErr: false,
+			name:   "success - set value with info status",
+			status: InfoStatus,
+			value:  rand.Int(),
 		},
 		{
-			name: "error on file creation",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Create", NameLogFile).Return(errors.New("create error"))
-			},
-			value:   rand.Int(),
-			wantErr: true,
+			name:   "success - set value with error status",
+			status: ErrorStatus,
+			value:  rand.Int(),
 		},
 		{
-			name: "error on getting open file",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Create", NameLogFile).Return(nil)
-				m.On("GetOpenFile", NameLogFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE).Return(nil, errors.New("open error"))
-			},
-			value:   rand.Int(),
-			wantErr: true,
+			name:   "success - set value with debug status",
+			status: DebugStatus,
+			value:  rand.Int(),
+		},
+		{
+			name:   "success - set value with warn status",
+			status: WarnStatus,
+			value:  rand.Int(),
 		},
 	}
 
+	storageLogger := New()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			mockStorage := new(storage.MockStorage)
-			tt.setupMock(mockStorage)
+			err := storageLogger.log(tt.value, tt.status)
 
-			sl := &StorageLogger{
-				Storage: mockStorage,
-			}
-
-			err := sl.log(tt.value)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-			}
-
-			mockStorage.AssertExpectations(t)
+			assert.NoError(t, err)
 		})
 	}
 }
