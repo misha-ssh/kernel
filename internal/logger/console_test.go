@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStorageLogger_Error(t *testing.T) {
+func TestConsoleLogger_Error(t *testing.T) {
 	tests := []struct {
 		name    string
 		status  Status
@@ -26,16 +26,18 @@ func TestStorageLogger_Error(t *testing.T) {
 		},
 	}
 
+	consoleLogger := ConsoleLogger{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.NotPanics(t, func() {
-				Error(tt.value)
+				consoleLogger.Error(tt.value)
 			})
 		})
 	}
 }
 
-func TestStorageLogger_Warn(t *testing.T) {
+func TestConsoleLogger_Warn(t *testing.T) {
 	tests := []struct {
 		name    string
 		status  Status
@@ -54,16 +56,18 @@ func TestStorageLogger_Warn(t *testing.T) {
 		},
 	}
 
+	consoleLogger := ConsoleLogger{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.NotPanics(t, func() {
-				Warn(tt.value)
+				consoleLogger.Warn(tt.value)
 			})
 		})
 	}
 }
 
-func TestStorageLogger_Info(t *testing.T) {
+func TestConsoleLogger_Info(t *testing.T) {
 	tests := []struct {
 		name    string
 		status  Status
@@ -82,16 +86,18 @@ func TestStorageLogger_Info(t *testing.T) {
 		},
 	}
 
+	consoleLogger := ConsoleLogger{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.NotPanics(t, func() {
-				Info(tt.value)
+				consoleLogger.Info(tt.value)
 			})
 		})
 	}
 }
 
-func TestStorageLogger_Debug(t *testing.T) {
+func TestConsoleLogger_Debug(t *testing.T) {
 	tests := []struct {
 		name    string
 		status  Status
@@ -110,16 +116,18 @@ func TestStorageLogger_Debug(t *testing.T) {
 		},
 	}
 
+	consoleLogger := ConsoleLogger{}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			assert.NotPanics(t, func() {
-				Debug(tt.value)
+				consoleLogger.Debug(tt.value)
 			})
 		})
 	}
 }
 
-func TestStorageLogger_log(t *testing.T) {
+func TestConsoleLogger_log(t *testing.T) {
 	tests := []struct {
 		name   string
 		status Status
@@ -147,12 +155,11 @@ func TestStorageLogger_log(t *testing.T) {
 		},
 	}
 
-	storageLogger := New()
+	consoleLogger := ConsoleLogger{}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := storageLogger.log(tt.value, tt.status)
-
+			err := consoleLogger.log(tt.value, tt.status)
 			assert.NoError(t, err)
 		})
 	}
