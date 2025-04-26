@@ -1,7 +1,6 @@
 package logger
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -10,46 +9,8 @@ import (
 	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 )
 
-const (
-	SkipUseLevel = 1
-	FileName     = "log.log"
-)
-
-var (
-	ErrCreateStorage = errors.New("err at created log file")
-	ErrGetOpenFile   = errors.New("err get open log file")
-	ErrGetInfo       = errors.New("err get info use log")
-)
-
-type Status string
-
-const (
-	ErrorStatus Status = "ERROR"
-	DebugStatus Status = "DEBUG"
-	InfoStatus  Status = "INFO"
-	WarnStatus  Status = "WARN"
-)
-
-var sl *StorageLogger
-
 type StorageLogger struct {
 	Storage storage.Storage
-}
-
-func init() {
-	sl = New()
-}
-
-// New returns an initialized StorageLogger instance.
-func New() *StorageLogger {
-	localStorage := storage.LocalStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	sl := new(StorageLogger)
-	sl.Storage = &localStorage
-
-	return sl
 }
 
 func (sl *StorageLogger) createLogFile() error {
@@ -90,66 +51,30 @@ func (sl *StorageLogger) log(value any, status Status) error {
 	return nil
 }
 
-func Error(value any) {
-	err := sl.Error(value)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func (sl *StorageLogger) Error(value any) error {
+func (sl *StorageLogger) Error(value any) {
 	err := sl.log(value, ErrorStatus)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Debug(value any) {
-	err := sl.Debug(value)
-	if err != nil {
 		panic(err)
 	}
 }
 
-func (sl *StorageLogger) Debug(value any) error {
+func (sl *StorageLogger) Debug(value any) {
 	err := sl.log(value, DebugStatus)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Info(value any) {
-	err := sl.Info(value)
-	if err != nil {
 		panic(err)
 	}
 }
 
-func (sl *StorageLogger) Info(value any) error {
+func (sl *StorageLogger) Info(value any) {
 	err := sl.log(value, InfoStatus)
 	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func Warn(value any) {
-	err := sl.Warn(value)
-	if err != nil {
 		panic(err)
 	}
 }
 
-func (sl *StorageLogger) Warn(value any) error {
+func (sl *StorageLogger) Warn(value any) {
 	err := sl.log(value, WarnStatus)
 	if err != nil {
-		return err
+		panic(err)
 	}
-
-	return nil
 }
