@@ -2,12 +2,12 @@ package logger
 
 import (
 	"fmt"
+	"log"
 	"runtime"
 )
 
 type ConsoleLogger struct{}
 
-// todo добавить чтоб показывалось время так же как и в StorageLogger
 func (sl *ConsoleLogger) log(value any, status Status) error {
 	_, calledFile, line, success := runtime.Caller(SkipUseLevel)
 	if !success {
@@ -15,7 +15,9 @@ func (sl *ConsoleLogger) log(value any, status Status) error {
 	}
 
 	logInfo := fmt.Sprintf("|%v| file: %s, line: %v, message: %#v", status, calledFile, line, value)
-	fmt.Println(logInfo)
+
+	log.SetFlags(log.LstdFlags | log.Lmicroseconds)
+	log.Println(logInfo)
 
 	return nil
 }
