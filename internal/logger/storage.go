@@ -45,8 +45,8 @@ func (sl *StorageLogger) log(value any, status Status) error {
 		return ErrGetOpenFile
 	}
 
-	errorLog := log.New(openLogFile, "", log.LstdFlags|log.Lmicroseconds)
-	errorLog.Println(logInfo)
+	logger := log.New(openLogFile, "", log.LstdFlags|log.Lmicroseconds)
+	logger.Println(logInfo)
 
 	return nil
 }
