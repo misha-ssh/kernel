@@ -7,13 +7,9 @@ import (
 	"errors"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 )
 
-const (
-	SizeKey  = 32
-	FileName = "encryption.key"
-)
+const SizeKey = 32
 
 var (
 	ErrGenerateKey    = errors.New("err at created log file")
@@ -46,14 +42,14 @@ func Encrypt(plaintext string, key string) (string, error) { return s.Encrypt(pl
 func (s *StorageCrypto) Encrypt(plaintext string, key string) (string, error) {
 	gcm, err := s.getGcm(key)
 	if err != nil {
-		logger.LocStorageErr(err)
+		logger.Error(err)
 		return "", err
 	}
 
 	nonce := make([]byte, gcm.NonceSize())
 	_, err = rand.Read(nonce)
 	if err != nil {
-		logger.LocStorageErr(err)
+		logger.Error(err)
 		return "", ErrRandRead
 	}
 
@@ -69,7 +65,7 @@ func (s *StorageCrypto) Decrypt(ciphertext string, key string) (string, error) {
 
 	gcm, err := s.getGcm(key)
 	if err != nil {
-		logger.LocStorageErr(err)
+		logger.Error(err)
 		return "", err
 	}
 
@@ -78,7 +74,7 @@ func (s *StorageCrypto) Decrypt(ciphertext string, key string) (string, error) {
 
 	plaintext, err := gcm.Open(nil, nonce, ciphertextToByte, nil)
 	if err != nil {
-		logger.LocStorageErr(err)
+		logger.Error(err)
 		return "", ErrAuthCiphertext
 	}
 
@@ -92,37 +88,9 @@ func (s *StorageCrypto) GenerateKey() (string, error) {
 
 	_, err := rand.Read(key)
 	if err != nil {
-		logger.LocStorageErr(err)
+		logger.Error(err)
 		return "", ErrGenerateKey
 	}
 
 	return string(key), nil
-}
-
-func GetKey() (string, error) { return s.GenerateKey() }
-
-func (s *StorageCrypto) GetKey(storage storage.Storage) (string, error) {
-	if storage.Exists(FileName) {
-		key, err := storage.Get(FileName)
-		if err != nil {
-			logger.LocStorageErr(err)
-			return "", err
-		}
-
-		return key, nil
-	}
-
-	key, err := s.GenerateKey()
-	if err != nil {
-		logger.LocStorageErr(err)
-		return "", err
-	}
-
-	err = storage.Write(FileName, key)
-	if err != nil {
-		logger.LocStorageErr(err)
-		return "", err
-	}
-
-	return key, nil
 }

@@ -1,17 +1,24 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"runtime"
 )
 
+var ErrGetConsoleInfo = errors.New("err get info use log - console")
+
 type ConsoleLogger struct{}
+
+func NewConsoleLogger() *ConsoleLogger {
+	return &ConsoleLogger{}
+}
 
 func (sl *ConsoleLogger) log(value any, status Status) error {
 	_, calledFile, line, success := runtime.Caller(SkipUseLevel)
 	if !success {
-		return ErrGetInfo
+		return ErrGetConsoleInfo
 	}
 
 	logInfo := fmt.Sprintf("|%v| file: %s, line: %v, message: %#v", status, calledFile, line, value)

@@ -2,12 +2,11 @@ package crypto
 
 import (
 	"crypto/cipher"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestStorageCrypto_Decrypt(t *testing.T) {
+func TestStorage_Decrypt(t *testing.T) {
 	type args struct {
 		plaintext string
 		key       string
@@ -83,7 +82,7 @@ func TestStorageCrypto_Decrypt(t *testing.T) {
 	}
 }
 
-func TestStorageCrypto_Encrypt(t *testing.T) {
+func TestStorage_Encrypt(t *testing.T) {
 	type args struct {
 		plaintext string
 		key       string
@@ -159,7 +158,7 @@ func TestStorageCrypto_Encrypt(t *testing.T) {
 	}
 }
 
-func TestStorageCrypto_GenerateKey(t *testing.T) {
+func TestStorage_GenerateKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -186,45 +185,7 @@ func TestStorageCrypto_GenerateKey(t *testing.T) {
 	}
 }
 
-func TestStorageCrypto_GetKey(t *testing.T) {
-	tests := []struct {
-		name      string
-		setupMock func(*storage.MockStorage)
-		want      string
-		wantErr   bool
-	}{
-		{
-			name: "success",
-			setupMock: func(m *storage.MockStorage) {
-				m.On("Exists", FileName).Return(true, nil)
-				m.On("Get", FileName).Return("key", nil)
-			},
-			want:    "key",
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			mockStorage := new(storage.MockStorage)
-			tt.setupMock(mockStorage)
-
-			s := &StorageCrypto{}
-
-			got, err := s.GetKey(mockStorage)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
-			}
-
-			mockStorage.AssertExpectations(t)
-		})
-	}
-}
-
-func TestStorageCrypto_getGcm(t *testing.T) {
+func TestStorage_getGcm(t *testing.T) {
 	type args struct {
 		key string
 	}

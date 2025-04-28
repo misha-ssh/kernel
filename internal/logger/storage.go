@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -9,8 +10,22 @@ import (
 	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 )
 
+const FileName = "log.log"
+
+var (
+	ErrGetStorageInfo = errors.New("err get info use log - storage")
+	ErrCreateStorage  = errors.New("err at created log file")
+	ErrGetOpenFile    = errors.New("err get open log file")
+)
+
 type StorageLogger struct {
 	Storage storage.Storage
+}
+
+func NewStorageLogger(storage storage.Storage) *StorageLogger {
+	return &StorageLogger{
+		Storage: storage,
+	}
 }
 
 func (sl *StorageLogger) createLogFile() error {
@@ -32,7 +47,7 @@ func (sl *StorageLogger) log(value any, status Status) error {
 
 	_, calledFile, line, success := runtime.Caller(SkipUseLevel)
 	if !success {
-		return ErrGetInfo
+		return ErrGetStorageInfo
 	}
 
 	logInfo := fmt.Sprintf("|%v| file: %s, line: %v, message: %#v", status, calledFile, line, value)

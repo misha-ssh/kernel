@@ -1,6 +1,9 @@
 package logger
 
-import "errors"
+import (
+	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
+	"sync"
+)
 
 type Logger interface {
 	Error(value any)
@@ -9,13 +12,64 @@ type Logger interface {
 	Warn(value any)
 }
 
+// todo убрать эту константу и вызывать логику без нее
+const SkipUseLevel = 1
+
+type TypeLogger int
+
 const (
-	SkipUseLevel = 1
-	FileName     = "log.log"
+	StorageLoggerType TypeLogger = iota
+	ConsoleLoggerType
+	CombinedLoggerType
 )
 
 var (
-	ErrCreateStorage = errors.New("err at created log file")
-	ErrGetOpenFile   = errors.New("err get open log file")
-	ErrGetInfo       = errors.New("err get info use log")
+	defaultLogger Logger
+	once          sync.Once
 )
+
+func Init(loggerType TypeLogger, storage storage.Storage) {
+	once.Do(func() {
+		switch loggerType {
+		case StorageLoggerType:
+			defaultLogger = NewStorageLogger(storage)
+		case ConsoleLoggerType:
+			defaultLogger = NewConsoleLogger()
+		case CombinedLoggerType:
+			defaultLogger = NewCombinedLogger(
+				NewStorageLogger(storage),
+				NewConsoleLogger(),
+			)
+		default:
+			defaultLogger = NewConsoleLogger()
+		}
+	})
+}
+
+func Get() Logger {
+	if defaultLogger == nil {
+		defaultLogger = NewConsoleLogger()
+	}
+
+	return defaultLogger
+}
+
+func SetLogger(logger Logger) {
+	defaultLogger = logger
+}
+
+func Error(value any) {
+	Get().Error(value)
+}
+
+func Debug(value any) {
+	Get().Debug(value)
+}
+
+func Info(value any) {
+	Get().Info(value)
+}
+
+func Warn(value any) {
+	Get().Warn(value)
+}

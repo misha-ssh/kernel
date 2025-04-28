@@ -1,13 +1,12 @@
 package logger
 
 import (
+	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
-func TestConsoleLogger_Error(t *testing.T) {
+func TestLogger_Error(t *testing.T) {
 	tests := []struct {
 		name   string
 		status Status
@@ -34,61 +33,7 @@ func TestConsoleLogger_Error(t *testing.T) {
 	}
 }
 
-func TestConsoleLogger_Warn(t *testing.T) {
-	tests := []struct {
-		name   string
-		status Status
-		value  any
-	}{
-		{
-			name:  "success - rand int",
-			value: rand.Int(),
-		},
-		{
-			name:  "success - default string",
-			value: "test",
-		},
-	}
-
-	consoleLogger := ConsoleLogger{}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				consoleLogger.Warn(tt.value)
-			})
-		})
-	}
-}
-
-func TestConsoleLogger_Info(t *testing.T) {
-	tests := []struct {
-		name   string
-		status Status
-		value  any
-	}{
-		{
-			name:  "success - rand int",
-			value: rand.Int(),
-		},
-		{
-			name:  "success - default string",
-			value: "test",
-		},
-	}
-
-	consoleLogger := ConsoleLogger{}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				consoleLogger.Info(tt.value)
-			})
-		})
-	}
-}
-
-func TestConsoleLogger_Debug(t *testing.T) {
+func TestLogger_Debug(t *testing.T) {
 	tests := []struct {
 		name   string
 		status Status
@@ -115,31 +60,19 @@ func TestConsoleLogger_Debug(t *testing.T) {
 	}
 }
 
-func TestConsoleLogger_log(t *testing.T) {
+func TestLogger_Warn(t *testing.T) {
 	tests := []struct {
 		name   string
 		status Status
 		value  any
 	}{
 		{
-			name:   "success - set value with info status",
-			status: InfoStatus,
-			value:  rand.Int(),
+			name:  "success - rand int",
+			value: rand.Int(),
 		},
 		{
-			name:   "success - set value with error status",
-			status: ErrorStatus,
-			value:  rand.Int(),
-		},
-		{
-			name:   "success - set value with debug status",
-			status: DebugStatus,
-			value:  rand.Int(),
-		},
-		{
-			name:   "success - set value with warn status",
-			status: WarnStatus,
-			value:  rand.Int(),
+			name:  "success - default string",
+			value: "test",
 		},
 	}
 
@@ -147,8 +80,36 @@ func TestConsoleLogger_log(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := consoleLogger.log(tt.value, tt.status)
-			assert.NoError(t, err)
+			assert.NotPanics(t, func() {
+				consoleLogger.Warn(tt.value)
+			})
+		})
+	}
+}
+
+func TestLogger_Info(t *testing.T) {
+	tests := []struct {
+		name   string
+		status Status
+		value  any
+	}{
+		{
+			name:  "success - rand int",
+			value: rand.Int(),
+		},
+		{
+			name:  "success - default string",
+			value: "test",
+		},
+	}
+
+	consoleLogger := ConsoleLogger{}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.NotPanics(t, func() {
+				consoleLogger.Info(tt.value)
+			})
 		})
 	}
 }

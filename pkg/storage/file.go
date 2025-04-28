@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 )
 
-type LocalStorage struct {
+type FileStorage struct {
 	Direction string
 }
 
-func (s *LocalStorage) Create(filename string) error {
+func (s *FileStorage) Create(filename string) error {
 	file := filepath.Join(s.Direction, filename)
 
 	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
@@ -33,11 +33,11 @@ func (s *LocalStorage) Create(filename string) error {
 	return nil
 }
 
-func (s *LocalStorage) Delete(filename string) error {
+func (s *FileStorage) Delete(filename string) error {
 	return os.Remove(filepath.Join(s.Direction, filename))
 }
 
-func (s *LocalStorage) Exists(filename string) bool {
+func (s *FileStorage) Exists(filename string) bool {
 	filePath := filepath.Join(s.Direction, filename)
 
 	info, err := os.Stat(filePath)
@@ -49,7 +49,7 @@ func (s *LocalStorage) Exists(filename string) bool {
 	return !info.IsDir()
 }
 
-func (s *LocalStorage) Get(filename string) (string, error) {
+func (s *FileStorage) Get(filename string) (string, error) {
 	file := filepath.Join(s.Direction, filename)
 
 	f, err := os.Open(file)
@@ -68,7 +68,7 @@ func (s *LocalStorage) Get(filename string) (string, error) {
 	return string(fContent), nil
 }
 
-func (s *LocalStorage) Write(filename string, data string) error {
+func (s *FileStorage) Write(filename string, data string) error {
 	file := filepath.Join(s.Direction, filename)
 
 	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
@@ -87,7 +87,7 @@ func (s *LocalStorage) Write(filename string, data string) error {
 	return nil
 }
 
-func (s *LocalStorage) GetOpenFile(filename string, flags int) (*os.File, error) {
+func (s *FileStorage) GetOpenFile(filename string, flags int) (*os.File, error) {
 	file := filepath.Join(s.Direction, filename)
 
 	openFile, err := os.OpenFile(file, flags, os.ModePerm)

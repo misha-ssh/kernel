@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestLocalStorage_Create(t *testing.T) {
+func TestFileStorage_Create(t *testing.T) {
 	type fields struct {
 		direction string
 	}
@@ -41,7 +41,7 @@ func TestLocalStorage_Create(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
+			s := &FileStorage{
 				Direction: tt.fields.direction,
 			}
 
@@ -56,7 +56,7 @@ func TestLocalStorage_Create(t *testing.T) {
 	}
 }
 
-func TestLocalStorage_Delete(t *testing.T) {
+func TestFileStorage_Delete(t *testing.T) {
 	type fields struct {
 		direction string
 	}
@@ -87,7 +87,7 @@ func TestLocalStorage_Delete(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
+			s := &FileStorage{
 				Direction: tt.fields.direction,
 			}
 
@@ -107,7 +107,7 @@ func TestLocalStorage_Delete(t *testing.T) {
 	}
 }
 
-func TestLocalStorage_Exists(t *testing.T) {
+func TestFileStorage_Exists(t *testing.T) {
 	type fields struct {
 		direction string
 	}
@@ -138,7 +138,7 @@ func TestLocalStorage_Exists(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
+			s := &FileStorage{
 				Direction: tt.fields.direction,
 			}
 
@@ -153,7 +153,7 @@ func TestLocalStorage_Exists(t *testing.T) {
 	}
 }
 
-func TestLocalStorage_Get(t *testing.T) {
+func TestFileStorage_Get(t *testing.T) {
 	type fields struct {
 		direction string
 	}
@@ -195,7 +195,7 @@ func TestLocalStorage_Get(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
+			s := &FileStorage{
 				Direction: tt.fields.direction,
 			}
 
@@ -219,7 +219,7 @@ func TestLocalStorage_Get(t *testing.T) {
 	}
 }
 
-func TestLocalStorage_Write(t *testing.T) {
+func TestFileStorage_Write(t *testing.T) {
 	type fields struct {
 		direction string
 	}
@@ -265,7 +265,7 @@ func TestLocalStorage_Write(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
+			s := &FileStorage{
 				Direction: tt.fields.direction,
 			}
 
@@ -285,7 +285,7 @@ func TestLocalStorage_Write(t *testing.T) {
 	}
 }
 
-func TestLocalStorage_GetOpenFile(t *testing.T) {
+func TestFileStorage_GetOpenFile(t *testing.T) {
 	type fields struct {
 		direction string
 	}
@@ -313,7 +313,7 @@ func TestLocalStorage_GetOpenFile(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &LocalStorage{
+			s := &FileStorage{
 				Direction: tt.fields.direction,
 			}
 			got, err := s.GetOpenFile(tt.args.filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE)

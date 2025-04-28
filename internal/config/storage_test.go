@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStorageConfig_Set(t *testing.T) {
+func TestStorage_Set(t *testing.T) {
 	tests := []struct {
 		name    string
 		key     string
@@ -100,7 +100,7 @@ func TestStorageConfig_Set(t *testing.T) {
 		},
 	}
 
-	configStorage := storage.LocalStorage{
+	configStorage := storage.FileStorage{
 		Direction: t.TempDir(),
 	}
 
@@ -124,7 +124,7 @@ func TestStorageConfig_Set(t *testing.T) {
 	}
 }
 
-func TestStorageConfig_Get(t *testing.T) {
+func TestStorage_Get(t *testing.T) {
 	tests := []struct {
 		name       string
 		key        string
@@ -169,7 +169,7 @@ func TestStorageConfig_Get(t *testing.T) {
 		},
 	}
 
-	configStorage := storage.LocalStorage{
+	configStorage := storage.FileStorage{
 		Direction: t.TempDir(),
 	}
 
@@ -190,7 +190,7 @@ func TestStorageConfig_Get(t *testing.T) {
 	}
 }
 
-func TestStorageConfig_Exists(t *testing.T) {
+func TestStorage_Exists(t *testing.T) {
 	tests := []struct {
 		name        string
 		key         string
@@ -223,7 +223,7 @@ func TestStorageConfig_Exists(t *testing.T) {
 		},
 	}
 
-	configStorage := storage.LocalStorage{
+	configStorage := storage.FileStorage{
 		Direction: t.TempDir(),
 	}
 

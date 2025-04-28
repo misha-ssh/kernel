@@ -10,24 +10,21 @@ import (
 
 func TestStorageLogger_Error(t *testing.T) {
 	tests := []struct {
-		name    string
-		status  Status
-		isPanic bool
-		value   any
+		name   string
+		status Status
+		value  any
 	}{
 		{
-			name:    "success - rand int",
-			isPanic: false,
-			value:   rand.Int(),
+			name:  "success - rand int",
+			value: rand.Int(),
 		},
 		{
-			name:    "success - default string",
-			isPanic: false,
-			value:   "test",
+			name:  "success - default string",
+			value: "test",
 		},
 	}
 
-	localStorage := storage.LocalStorage{
+	localStorage := storage.FileStorage{
 		Direction: storage.GetHomeDir(),
 	}
 
@@ -46,24 +43,21 @@ func TestStorageLogger_Error(t *testing.T) {
 
 func TestStorageLogger_Warn(t *testing.T) {
 	tests := []struct {
-		name    string
-		status  Status
-		isPanic bool
-		value   any
+		name   string
+		status Status
+		value  any
 	}{
 		{
-			name:    "success - rand int",
-			isPanic: false,
-			value:   rand.Int(),
+			name:  "success - rand int",
+			value: rand.Int(),
 		},
 		{
-			name:    "success - default string",
-			isPanic: false,
-			value:   "test",
+			name:  "success - default string",
+			value: "test",
 		},
 	}
 
-	localStorage := storage.LocalStorage{
+	localStorage := storage.FileStorage{
 		Direction: storage.GetHomeDir(),
 	}
 
@@ -82,24 +76,21 @@ func TestStorageLogger_Warn(t *testing.T) {
 
 func TestStorageLogger_Info(t *testing.T) {
 	tests := []struct {
-		name    string
-		status  Status
-		isPanic bool
-		value   any
+		name   string
+		status Status
+		value  any
 	}{
 		{
-			name:    "success - rand int",
-			isPanic: false,
-			value:   rand.Int(),
+			name:  "success - rand int",
+			value: rand.Int(),
 		},
 		{
-			name:    "success - default string",
-			isPanic: false,
-			value:   "test",
+			name:  "success - default string",
+			value: "test",
 		},
 	}
 
-	localStorage := storage.LocalStorage{
+	localStorage := storage.FileStorage{
 		Direction: storage.GetHomeDir(),
 	}
 
@@ -118,24 +109,21 @@ func TestStorageLogger_Info(t *testing.T) {
 
 func TestStorageLogger_Debug(t *testing.T) {
 	tests := []struct {
-		name    string
-		status  Status
-		isPanic bool
-		value   any
+		name   string
+		status Status
+		value  any
 	}{
 		{
-			name:    "success - rand int",
-			isPanic: false,
-			value:   rand.Int(),
+			name:  "success - rand int",
+			value: rand.Int(),
 		},
 		{
-			name:    "success - default string",
-			isPanic: false,
-			value:   "test",
+			name:  "success - default string",
+			value: "test",
 		},
 	}
 
-	localStorage := storage.LocalStorage{
+	localStorage := storage.FileStorage{
 		Direction: storage.GetHomeDir(),
 	}
 
@@ -180,7 +168,7 @@ func TestStorageLogger_log(t *testing.T) {
 		},
 	}
 
-	localStorage := storage.LocalStorage{
+	localStorage := storage.FileStorage{
 		Direction: storage.GetHomeDir(),
 	}
 
