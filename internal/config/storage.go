@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 )
 
 const (

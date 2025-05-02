@@ -1,9 +1,10 @@
 package logger
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"math/rand"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 
 	"github.com/stretchr/testify/assert"
 )

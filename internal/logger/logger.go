@@ -1,8 +1,9 @@
 package logger
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
 	"sync"
+
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 )
 
 type Logger interface {

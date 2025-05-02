@@ -4,13 +4,13 @@ import (
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/config"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
 func FuzzLocalStorage_Set(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value string) {
-		localStorage := storage.LocalStorage{
+		localStorage := storage.FileStorage{
 			Direction: t.TempDir(),
 		}
 

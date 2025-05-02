@@ -1,10 +1,11 @@
 package logger
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/storage"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCombinedLogger_Debug(t *testing.T) {

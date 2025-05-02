@@ -10,7 +10,7 @@ import (
 func FuzzStorageLogger_LocStorageErr(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value []uint8) {
 		assert.NotPanics(t, func() {
-			logger.LocStorageErr(value)
+			logger.Error(value)
 		})
 	})
 }

@@ -1,9 +1,10 @@
 package logger
 
 import (
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestLogger_Error(t *testing.T) {

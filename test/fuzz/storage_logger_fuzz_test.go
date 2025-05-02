@@ -10,7 +10,7 @@ import (
 func FuzzStorageLogger_Error(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value []uint8) {
 		assert.NotPanics(t, func() {
-			logger.e(value)
+			logger.Error(value)
 		})
 	})
 }
