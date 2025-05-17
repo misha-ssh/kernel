@@ -1,7 +1,7 @@
 package connect
 
-type Connecter interface {
-	Connect() error
+type Connector interface {
+	Connect(connection *Connect) error
 }
 
 type ConnectionType string
@@ -24,11 +24,11 @@ type Connect struct {
 	Type      ConnectionType `json:"type"`
 	CreatedAt string         `json:"created_at"`
 	UpdatedAt string         `json:"updated_at"`
-	
-	SshOptions  *SshOptions    `json:"ssh_options,omitempty"`
+
+	SshOptions *SshOptions `json:"ssh_options,omitempty"`
 }
 
 type SshOptions struct {
-    Port        int    `json:"port"`
-    PrivateKey  string `json:"private_key"`
+	Port       int    `json:"port"`
+	PrivateKey string `json:"private_key"`
 }
