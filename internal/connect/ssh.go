@@ -26,17 +26,22 @@ const (
 type SshConnect struct{}
 
 func auth(connection *Connect) []ssh.AuthMethod {
-	if len(connection.SshOptions.PrivateKey) > 1 {
+	if connection.SshOptions.PrivateKey {
 		return []ssh.AuthMethod{
 			ssh.Password(connection.Password),
 		}
 	}
-	//todo доделать авторизацию через ключ
-	key := ssh.ParsePrivateKey(connection.SshOptions.PrivateKey)
 
 	return []ssh.AuthMethod{
-		ssh.PublicKeys(connection.SshOptions.PrivateKey),
+		ssh.Password(connection.Password),
 	}
+
+	//todo доделать авторизацию через ключ
+	//key := ssh.ParsePrivateKey(connection.SshOptions.PrivateKey)
+	//
+	//return []ssh.AuthMethod{
+	//	ssh.PublicKeys(connection.SshOptions.PrivateKey),
+	//}
 }
 
 func getClientConfig(connection *Connect) *ssh.ClientConfig {
