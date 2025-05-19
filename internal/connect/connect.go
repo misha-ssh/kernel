@@ -29,6 +29,6 @@ type Connect struct {
 }
 
 type SshOptions struct {
-	Port       int    `json:"port"`
-	PrivateKey string `json:"private_key"`
+	Port       int  `json:"port"`
+	PrivateKey bool `json:"private_key"`
 }
