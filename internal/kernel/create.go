@@ -1,3 +1,4 @@
 package kernel
 
-func Create() {}
+func Create() {
+}

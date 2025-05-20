@@ -5,7 +5,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 )
 
 type Storage interface {
