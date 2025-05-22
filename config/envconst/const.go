@@ -2,5 +2,9 @@ package envconst
 
 const (
 	AppName = "ssh+"
-	Theme   = "default"
+
+	FilenameConnection = "connection.json"
+
+	// const for config
+	Theme = "default"
 )
