@@ -2,12 +2,15 @@ package config
 
 import (
 	"errors"
+	"os/user"
 
 	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/config/envname"
 	"github.com/ssh-connection-manager/kernel/v2/internal/config"
+	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/zalando/go-keyring"
 )
 
 var ErrGetConsoleInfo = errors.New("err set default value")
@@ -52,14 +55,39 @@ func initFileConfig() error {
 
 	err := setDefaultValues(fileConfig)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return err
 	}
 
 	return nil
 }
 
-func generateCryptKey() error {
+func initCryptKey() error {
+	currentUser, err := user.Current()
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	username := currentUser.Username
+	service := envconst.NameServiceCryptKey
+
+	cryptKey, _ := keyring.Get(service, username)
+
+	if len(cryptKey) == 0 {
+		generatedKey, err := crypto.GenerateKey()
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+
+		err = keyring.Set(service, username, generatedKey)
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -71,6 +99,12 @@ func Init() error {
 	}
 
 	err = initFileConnections()
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+
+	err = initCryptKey()
 	if err != nil {
 		logger.Error(err)
 		return err
