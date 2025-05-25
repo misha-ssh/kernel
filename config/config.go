@@ -62,6 +62,8 @@ func initFileConfig() error {
 	return nil
 }
 
+// todo добавить логику при которой будет хешироваться ключ
+// чтобы можно было его потом расшироваться (более безопаснее будет данный метод)
 func initCryptKey() error {
 	currentUser, err := user.Current()
 	if err != nil {
