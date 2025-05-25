@@ -63,14 +63,12 @@ func TestStorage_Decrypt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			s := &StorageCrypto{}
-
 			if tt.keyGenerate {
-				tt.args.key, err = s.GenerateKey()
+				tt.args.key, err = GenerateKey()
 			}
 
-			cryptText, err := s.Encrypt(tt.args.plaintext, tt.args.key)
-			got, err := s.Decrypt(cryptText, tt.args.key)
+			cryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
+			got, err := Decrypt(cryptText, tt.args.key)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -139,14 +137,12 @@ func TestStorage_Encrypt(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			s := &StorageCrypto{}
-
 			if tt.keyGenerate {
-				tt.args.key, err = s.GenerateKey()
+				tt.args.key, err = GenerateKey()
 			}
 
-			encryptText, err := s.Encrypt(tt.args.plaintext, tt.args.key)
-			got, err := s.Decrypt(encryptText, tt.args.key)
+			encryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
+			got, err := Decrypt(encryptText, tt.args.key)
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -170,8 +166,7 @@ func TestStorage_GenerateKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StorageCrypto{}
-			got, err := s.GenerateKey()
+			got, err := GenerateKey()
 
 			if tt.wantErr {
 				assert.Error(t, err)
@@ -219,8 +214,7 @@ func TestStorage_getGcm(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			s := &StorageCrypto{}
-			got, err := s.getGcm(tt.args.key)
+			got, err := getGcm(tt.args.key)
 
 			if tt.wantErr {
 				assert.Error(t, err)
