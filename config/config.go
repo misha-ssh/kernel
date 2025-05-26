@@ -2,15 +2,12 @@ package config
 
 import (
 	"errors"
-	"os/user"
 
 	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/config/envname"
 	"github.com/ssh-connection-manager/kernel/v2/internal/config"
-	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-	"github.com/zalando/go-keyring"
 )
 
 var ErrGetConsoleInfo = errors.New("err set default value")
@@ -27,6 +24,7 @@ func setDefaultValues(config config.Config) error {
 	return nil
 }
 
+// todo добавить дефолтные значения при пустом файле и так же их шифрануть
 func initFileConnections() error {
 	fileName := envconst.FilenameConnection
 
@@ -62,37 +60,6 @@ func initFileConfig() error {
 	return nil
 }
 
-// todo добавить логику при которой будет хешироваться ключ
-// чтобы можно было его потом расшироваться (более безопаснее будет данный метод)
-func initCryptKey() error {
-	currentUser, err := user.Current()
-	if err != nil {
-		logger.Error(err)
-		return err
-	}
-
-	username := currentUser.Username
-	service := envconst.NameServiceCryptKey
-
-	cryptKey, _ := keyring.Get(service, username)
-
-	if len(cryptKey) == 0 {
-		generatedKey, err := crypto.GenerateKey()
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-
-		err = keyring.Set(service, username, generatedKey)
-		if err != nil {
-			logger.Error(err.Error())
-			return err
-		}
-	}
-
-	return nil
-}
-
 func Init() error {
 	err := initFileConfig()
 	if err != nil {
@@ -101,12 +68,6 @@ func Init() error {
 	}
 
 	err = initFileConnections()
-	if err != nil {
-		logger.Error(err)
-		return err
-	}
-
-	err = initCryptKey()
 	if err != nil {
 		logger.Error(err)
 		return err
