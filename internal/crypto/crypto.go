@@ -5,14 +5,17 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"errors"
+	"log"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 )
 
-const SizeKey = 32
+const (
+	SizeKey      = 32
+	FilenameSalt = "salt.txt"
+)
 
 var (
-	ErrGenerateKey    = errors.New("err at created log file")
 	ErrVerifyKEy      = errors.New("err verify key on standard aes")
 	ErrBlockCipher    = errors.New("err create 128-bit block cipher")
 	ErrRandRead       = errors.New("err rand read encrypt")
@@ -73,14 +76,19 @@ func Decrypt(ciphertext string, key string) (string, error) {
 	return string(plaintext), nil
 }
 
-func GenerateKey() (string, error) {
-	key := make([]byte, SizeKey)
+// todo здесь реализовать генерациб соли и сохранения ее файл - если есть то отдача соли из файла
+// так же можно добавить 600 права на файл
+func getSalt() {
 
-	_, err := rand.Read(key)
-	if err != nil {
-		logger.Error(err)
-		return "", ErrGenerateKey
+}
+
+// GetKey todo написать генерацию соли + сохранения в файле - чтобы можно было получить ключ из пароля
+func GetKey(password string) (string, error) {
+	salt := make([]byte, 16)
+
+	if _, err := rand.Read(salt); err != nil {
+		log.Fatal(err)
 	}
 
-	return string(key), nil
+	return string(""), nil
 }
