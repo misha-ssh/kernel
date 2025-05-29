@@ -1,9 +1,9 @@
 package crypto
 
 import (
-	"crypto/cipher"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestStorage_Decrypt(t *testing.T) {
@@ -12,11 +12,11 @@ func TestStorage_Decrypt(t *testing.T) {
 		key       string
 	}
 	tests := []struct {
-		name        string
-		args        args
-		want        string
-		wantErr     bool
-		keyGenerate bool
+		name     string
+		args     args
+		want     string
+		wantErr  bool
+		isGetKey bool
 	}{
 		{
 			name: "success",
@@ -24,9 +24,9 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:        "hello world",
-			wantErr:     false,
-			keyGenerate: true,
+			want:     "hello world",
+			wantErr:  false,
+			isGetKey: true,
 		},
 		{
 			name: "empty (string) plaintext",
@@ -34,9 +34,9 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "",
 				key:       "",
 			},
-			want:        "",
-			wantErr:     false,
-			keyGenerate: true,
+			want:     "",
+			wantErr:  false,
+			isGetKey: true,
 		},
 		{
 			name: "empty key",
@@ -44,9 +44,9 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:        "hello world",
-			wantErr:     true,
-			keyGenerate: false,
+			want:     "hello world",
+			wantErr:  true,
+			isGetKey: false,
 		},
 		{
 			name: "long size key",
@@ -54,17 +54,18 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "32-byte-long-key-1234567890123456",
 			},
-			want:        "hello world",
-			wantErr:     true,
-			keyGenerate: false,
+			want:     "hello world",
+			wantErr:  true,
+			isGetKey: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			if tt.keyGenerate {
-				tt.args.key, err = GenerateKey()
+			if tt.isGetKey {
+				password := "password"
+				tt.args.key, err = GetKey(password)
 			}
 
 			cryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
@@ -86,11 +87,11 @@ func TestStorage_Encrypt(t *testing.T) {
 		key       string
 	}
 	tests := []struct {
-		name        string
-		args        args
-		want        string
-		wantErr     bool
-		keyGenerate bool
+		name     string
+		args     args
+		want     string
+		wantErr  bool
+		isGetKey bool
 	}{
 		{
 			name: "success",
@@ -98,9 +99,9 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:        "hello world",
-			wantErr:     false,
-			keyGenerate: true,
+			want:     "hello world",
+			wantErr:  false,
+			isGetKey: true,
 		},
 		{
 			name: "empty (string) plaintext",
@@ -108,9 +109,9 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "",
 				key:       "",
 			},
-			want:        "",
-			wantErr:     false,
-			keyGenerate: true,
+			want:     "",
+			wantErr:  false,
+			isGetKey: true,
 		},
 		{
 			name: "empty key",
@@ -118,9 +119,9 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:        "hello world",
-			wantErr:     true,
-			keyGenerate: false,
+			want:     "hello world",
+			wantErr:  true,
+			isGetKey: false,
 		},
 		{
 			name: "long size key",
@@ -128,17 +129,18 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "32-byte-long-key-1234567890123456",
 			},
-			want:        "hello world",
-			wantErr:     true,
-			keyGenerate: false,
+			want:     "hello world",
+			wantErr:  true,
+			isGetKey: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			if tt.keyGenerate {
-				tt.args.key, err = GenerateKey()
+			if tt.isGetKey {
+				password := "password"
+				tt.args.key, err = GetKey(password)
 			}
 
 			encryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
@@ -154,73 +156,36 @@ func TestStorage_Encrypt(t *testing.T) {
 	}
 }
 
-func TestStorage_GenerateKey(t *testing.T) {
-	tests := []struct {
-		name    string
-		wantErr bool
-	}{
-		{
-			name:    "success",
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GenerateKey()
-
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-
-				assert.NotNil(t, got)
-				assert.NotEmpty(t, got)
-			}
-		})
-	}
-}
-
-func TestStorage_getGcm(t *testing.T) {
+func TestGetKey(t *testing.T) {
 	type args struct {
-		key string
+		password string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    cipher.AEAD
 		wantErr bool
 	}{
 		{
-			name: "success with 32-byte key",
+			name: "default test",
 			args: args{
-				key: string(make([]byte, SizeKey)),
+				password: "password",
 			},
 			wantErr: false,
 		},
 		{
-			name: "success with 16-byte key",
+			name: "empty password",
 			args: args{
-				key: string(make([]byte, 16)),
+				password: "",
 			},
 			wantErr: false,
-		},
-		{
-			name: "error with invalid key length",
-			args: args{
-				key: string(make([]byte, 64)),
-			},
-			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getGcm(tt.args.key)
+			_, err := GetKey(tt.args.password)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.NotNil(t, got)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
