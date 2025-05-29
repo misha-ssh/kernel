@@ -13,8 +13,7 @@ type Logger interface {
 	Warn(value any)
 }
 
-// todo убрать эту константу и вызывать логику без нее
-const SkipUseLevel = 1
+const SkipUseLevel = 3
 
 type TypeLogger int
 
