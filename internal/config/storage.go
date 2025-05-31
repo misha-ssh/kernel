@@ -6,20 +6,21 @@ import (
 	"os"
 	"strings"
 
+	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 )
 
 const (
+	Filename = envconst.FilenameConfig
+
 	CharNewLine = "\n"
 	EmptyValue  = ""
 	Separator   = "="
-	FileName    = "config"
 )
 
 var (
 	ErrWriteDataToOpenFile = errors.New("write data to open file error")
-	ErrCreateConfigFile    = errors.New("create config file error")
 	ErrGetKeyValueData     = errors.New("get value data error")
 	ErrKeyOfNonLetters     = errors.New("key of non letters error")
 	ErrValueIsInvalid      = errors.New("dont valid value at set data")
@@ -30,20 +31,8 @@ type StorageConfig struct {
 	Storage storage.Storage
 }
 
-func (s *StorageConfig) createConfigFile() error {
-	if !s.Storage.Exists(FileName) {
-		err := s.Storage.Create(FileName)
-		if err != nil {
-			logger.Error(ErrCreateConfigFile)
-			return ErrCreateConfigFile
-		}
-	}
-
-	return nil
-}
-
 func (s *StorageConfig) rewrite(key, value string) error {
-	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
+	openConfigFile, err := s.Storage.GetOpenFile(Filename, os.O_RDWR)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
 	}(openConfigFile)
@@ -76,23 +65,23 @@ func (s *StorageConfig) rewrite(key, value string) error {
 	}
 
 	if err = sc.Err(); err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return err
 	}
 
 	if _, err = openConfigFile.Seek(0, 0); err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return err
 	}
 	if err = openConfigFile.Truncate(0); err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return err
 	}
 
 	writer := bufio.NewWriter(openConfigFile)
 	for _, line := range lines {
 		if _, err = writer.WriteString(line); err != nil {
-			logger.Error(err)
+			logger.Error(err.Error())
 			return err
 		}
 	}
@@ -103,26 +92,20 @@ func (s *StorageConfig) rewrite(key, value string) error {
 func (s *StorageConfig) Set(key, value string) error {
 	err := validateKey(key)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return err
 	}
 
 	err = validateValue(value)
 	if err != nil {
-		logger.Error(err)
-		return err
-	}
-
-	err = s.createConfigFile()
-	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return err
 	}
 
 	if s.Exists(key) {
 		err = s.rewrite(key, value)
 		if err != nil {
-			logger.Error(err)
+			logger.Error(err.Error())
 			return err
 		}
 
@@ -131,7 +114,7 @@ func (s *StorageConfig) Set(key, value string) error {
 
 	param := strings.ToUpper(key) + Separator + value + CharNewLine
 
-	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	openConfigFile, err := s.Storage.GetOpenFile(Filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
 	}(openConfigFile)
@@ -156,12 +139,12 @@ func (s *StorageConfig) Get(key string) string {
 		return EmptyValue
 	}
 
-	openConfigFile, err := s.Storage.GetOpenFile(FileName, os.O_RDWR)
+	openConfigFile, err := s.Storage.GetOpenFile(Filename, os.O_RDWR)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
 	}(openConfigFile)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return EmptyValue
 	}
 
@@ -184,7 +167,7 @@ func (s *StorageConfig) Get(key string) string {
 	}
 
 	if err = sc.Err(); err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return EmptyValue
 	}
 
@@ -194,13 +177,13 @@ func (s *StorageConfig) Get(key string) string {
 func (s *StorageConfig) Exists(key string) bool {
 	err := validateKey(key)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return false
 	}
 
-	got, err := s.Storage.Get(FileName)
+	got, err := s.Storage.Get(Filename)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return false
 	}
 
