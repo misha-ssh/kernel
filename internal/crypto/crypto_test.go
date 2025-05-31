@@ -12,11 +12,11 @@ func TestStorage_Decrypt(t *testing.T) {
 		key       string
 	}
 	tests := []struct {
-		name     string
-		args     args
-		want     string
-		wantErr  bool
-		isGetKey bool
+		name        string
+		args        args
+		want        string
+		wantErr     bool
+		generateKey bool
 	}{
 		{
 			name: "success",
@@ -24,9 +24,9 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:     "hello world",
-			wantErr:  false,
-			isGetKey: true,
+			want:        "hello world",
+			wantErr:     false,
+			generateKey: true,
 		},
 		{
 			name: "empty (string) plaintext",
@@ -34,9 +34,9 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "",
 				key:       "",
 			},
-			want:     "",
-			wantErr:  false,
-			isGetKey: true,
+			want:        "",
+			wantErr:     false,
+			generateKey: true,
 		},
 		{
 			name: "empty key",
@@ -44,9 +44,9 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:     "hello world",
-			wantErr:  true,
-			isGetKey: false,
+			want:        "hello world",
+			wantErr:     true,
+			generateKey: false,
 		},
 		{
 			name: "long size key",
@@ -54,18 +54,17 @@ func TestStorage_Decrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "32-byte-long-key-1234567890123456",
 			},
-			want:     "hello world",
-			wantErr:  true,
-			isGetKey: false,
+			want:        "hello world",
+			wantErr:     true,
+			generateKey: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			if tt.isGetKey {
-				password := "password"
-				tt.args.key, err = GetKey(password)
+			if tt.generateKey {
+				tt.args.key, err = GenerateKey()
 			}
 
 			cryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
@@ -87,11 +86,11 @@ func TestStorage_Encrypt(t *testing.T) {
 		key       string
 	}
 	tests := []struct {
-		name     string
-		args     args
-		want     string
-		wantErr  bool
-		isGetKey bool
+		name        string
+		args        args
+		want        string
+		wantErr     bool
+		generateKey bool
 	}{
 		{
 			name: "success",
@@ -99,9 +98,9 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:     "hello world",
-			wantErr:  false,
-			isGetKey: true,
+			want:        "hello world",
+			wantErr:     false,
+			generateKey: true,
 		},
 		{
 			name: "empty (string) plaintext",
@@ -109,9 +108,9 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "",
 				key:       "",
 			},
-			want:     "",
-			wantErr:  false,
-			isGetKey: true,
+			want:        "",
+			wantErr:     false,
+			generateKey: true,
 		},
 		{
 			name: "empty key",
@@ -119,9 +118,9 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "",
 			},
-			want:     "hello world",
-			wantErr:  true,
-			isGetKey: false,
+			want:        "hello world",
+			wantErr:     true,
+			generateKey: false,
 		},
 		{
 			name: "long size key",
@@ -129,18 +128,17 @@ func TestStorage_Encrypt(t *testing.T) {
 				plaintext: "hello world",
 				key:       "32-byte-long-key-1234567890123456",
 			},
-			want:     "hello world",
-			wantErr:  true,
-			isGetKey: false,
+			want:        "hello world",
+			wantErr:     true,
+			generateKey: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var err error
 
-			if tt.isGetKey {
-				password := "password"
-				tt.args.key, err = GetKey(password)
+			if tt.generateKey {
+				tt.args.key, err = GenerateKey()
 			}
 
 			encryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
@@ -156,36 +154,26 @@ func TestStorage_Encrypt(t *testing.T) {
 	}
 }
 
-func TestGetKey(t *testing.T) {
-	type args struct {
-		password string
-	}
+func TestGenerateKey(t *testing.T) {
 	tests := []struct {
 		name    string
-		args    args
 		wantErr bool
 	}{
 		{
-			name: "default test",
-			args: args{
-				password: "password",
-			},
-			wantErr: false,
-		},
-		{
-			name: "empty password",
-			args: args{
-				password: "",
-			},
+			name:    "default test",
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := GetKey(tt.args.password)
+			key, err := GenerateKey()
+
+			if len(key) < SizeKey {
+				t.Errorf("key is invalid error = %v, wantErr %v", err, tt.wantErr)
+			}
 
 			if (err != nil) != tt.wantErr {
-				t.Errorf("GetKey() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("GenerateKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
