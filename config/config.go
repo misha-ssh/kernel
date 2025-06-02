@@ -16,7 +16,6 @@ import (
 var (
 	ErrGetConsoleInfo       = errors.New("err set default value")
 	ErrCreateFileConnection = errors.New("err create file connection")
-	ErrGetCryptKey          = errors.New("err get crypt key")
 	ErrSetCryptKey          = errors.New("err set crypt key")
 )
 
@@ -80,11 +79,7 @@ func initCryptKey() error {
 
 	service := envconst.NameServiceCryptKey
 
-	cryptKey, err := keyring.Get(service, username)
-	if err != nil {
-		logger.Error(ErrGetCryptKey.Error())
-		return ErrGetCryptKey
-	}
+	cryptKey, _ := keyring.Get(service, username)
 
 	if cryptKey == "" {
 		cryptKey, err = crypto.GenerateKey()
