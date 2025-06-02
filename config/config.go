@@ -1,12 +1,14 @@
 package config
 
 import (
+	"encoding/json"
 	"errors"
 	"os/user"
 
 	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/config/envname"
 	"github.com/ssh-connection-manager/kernel/v2/internal/config"
+	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
@@ -14,12 +16,15 @@ import (
 )
 
 var (
+	ErrMarshalJson          = errors.New("failed to marshal json")
 	ErrGetConsoleInfo       = errors.New("err set default value")
+	ErrWriteJson            = errors.New("failed to write json")
 	ErrCreateFileConnection = errors.New("err create file connection")
 	ErrSetCryptKey          = errors.New("err set crypt key")
+	ErrGetCryptKey          = errors.New("err get crypt key")
+	ErrEncryptData          = errors.New("err encrypt data")
 )
 
-// todo добавить дефолтные значения при пустом файле и так же их шифрануть
 func initFileConnections() error {
 	filename := envconst.FilenameConnection
 
@@ -32,6 +37,42 @@ func initFileConnections() error {
 		if err != nil {
 			logger.Error(ErrCreateFileConnection.Error())
 			return err
+		}
+
+		defaultConnections := &connect.Connections{
+			Connects: []connect.Connect{},
+		}
+
+		jsonConnections, err := json.Marshal(defaultConnections)
+		if err != nil {
+			logger.Error(ErrMarshalJson.Error())
+			return ErrMarshalJson
+		}
+
+		currentUser, err := user.Current()
+		if err != nil {
+			logger.Error(err.Error())
+			return err
+		}
+
+		username := currentUser.Username
+
+		cryptKey, err := keyring.Get(envconst.NameServiceCryptKey, username)
+		if err != nil {
+			logger.Error(ErrGetCryptKey.Error())
+			return err
+		}
+
+		encryptedConnections, err := crypto.Encrypt(string(jsonConnections), cryptKey)
+		if err != nil {
+			logger.Error(ErrEncryptData.Error())
+			return ErrEncryptData
+		}
+
+		err = fileStorage.Write(filename, encryptedConnections)
+		if err != nil {
+			logger.Error(ErrWriteJson.Error())
+			return ErrWriteJson
 		}
 	}
 
