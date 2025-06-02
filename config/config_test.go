@@ -138,3 +138,19 @@ func Test_initFileConfig(t *testing.T) {
 		})
 	}
 }
+
+func Test_initFileConnections(t *testing.T) {
+	tests := []struct {
+		name    string
+		wantErr bool
+	}{
+		{},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := initFileConnections(); (err != nil) != tt.wantErr {
+				t.Errorf("initFileConnections() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
