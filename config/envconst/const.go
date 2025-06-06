@@ -3,9 +3,10 @@ package envconst
 const (
 	AppName = "ssh+"
 
-	//filenames
+	// filenames
 	FilenameConnection = "connection.json"
 	FilenameConfig     = "config"
+	FilenameLogger     = "log.log"
 
 	// keyring services
 	NameServiceCryptKey = "cryptKey"
