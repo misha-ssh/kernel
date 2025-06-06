@@ -1,11 +1,5 @@
 package logger
 
-import (
-	"sync"
-
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-)
-
 type Logger interface {
 	Error(value any)
 	Debug(value any)
@@ -15,36 +9,7 @@ type Logger interface {
 
 const SkipUseLevel = 3
 
-type TypeLogger int
-
-const (
-	StorageLoggerType TypeLogger = iota
-	ConsoleLoggerType
-	CombinedLoggerType
-)
-
-var (
-	defaultLogger Logger
-	once          sync.Once
-)
-
-func Init(loggerType TypeLogger, storage storage.Storage) {
-	once.Do(func() {
-		switch loggerType {
-		case StorageLoggerType:
-			defaultLogger = NewStorageLogger(storage)
-		case ConsoleLoggerType:
-			defaultLogger = NewConsoleLogger()
-		case CombinedLoggerType:
-			defaultLogger = NewCombinedLogger(
-				NewStorageLogger(storage),
-				NewConsoleLogger(),
-			)
-		default:
-			defaultLogger = NewConsoleLogger()
-		}
-	})
-}
+var defaultLogger Logger
 
 func Get() Logger {
 	if defaultLogger == nil {
@@ -54,7 +19,7 @@ func Get() Logger {
 	return defaultLogger
 }
 
-func SetLogger(logger Logger) {
+func Set(logger Logger) {
 	defaultLogger = logger
 }
 
