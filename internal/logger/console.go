@@ -15,7 +15,7 @@ func NewConsoleLogger() *ConsoleLogger {
 	return &ConsoleLogger{}
 }
 
-func (sl *ConsoleLogger) log(value any, status Status) error {
+func (sl *ConsoleLogger) log(value any, status StatusLog) error {
 	_, calledFile, line, success := runtime.Caller(SkipUseLevel)
 	if !success {
 		return ErrGetConsoleInfo

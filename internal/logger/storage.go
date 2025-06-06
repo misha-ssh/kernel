@@ -7,10 +7,11 @@ import (
 	"os"
 	"runtime"
 
+	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 )
 
-const FileName = "log.log"
+const FileName = envconst.FilenameLogger
 
 var (
 	ErrGetStorageInfo = errors.New("err get info use log - storage")
@@ -39,7 +40,7 @@ func (sl *StorageLogger) createLogFile() error {
 	return nil
 }
 
-func (sl *StorageLogger) log(value any, status Status) error {
+func (sl *StorageLogger) log(value any, status StatusLog) error {
 	err := sl.createLogFile()
 	if err != nil {
 		return ErrCreateStorage

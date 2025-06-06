@@ -5,14 +5,13 @@ import (
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-
 	"github.com/stretchr/testify/assert"
 )
 
 func TestStorageLogger_Error(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -45,7 +44,7 @@ func TestStorageLogger_Error(t *testing.T) {
 func TestStorageLogger_Warn(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -78,7 +77,7 @@ func TestStorageLogger_Warn(t *testing.T) {
 func TestStorageLogger_Info(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -111,7 +110,7 @@ func TestStorageLogger_Info(t *testing.T) {
 func TestStorageLogger_Debug(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -144,7 +143,7 @@ func TestStorageLogger_Debug(t *testing.T) {
 func TestStorageLogger_log(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{

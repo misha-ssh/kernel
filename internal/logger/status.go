@@ -1,10 +1,10 @@
 package logger
 
-type Status string
+type StatusLog string
 
 const (
-	ErrorStatus Status = "ERROR"
-	DebugStatus Status = "DEBUG"
-	InfoStatus  Status = "INFO"
-	WarnStatus  Status = "WARN"
+	ErrorStatus StatusLog = "ERROR"
+	DebugStatus StatusLog = "DEBUG"
+	InfoStatus  StatusLog = "INFO"
+	WarnStatus  StatusLog = "WARN"
 )

@@ -10,7 +10,7 @@ import (
 func TestLogger_Error(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -37,7 +37,7 @@ func TestLogger_Error(t *testing.T) {
 func TestLogger_Debug(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -64,7 +64,7 @@ func TestLogger_Debug(t *testing.T) {
 func TestLogger_Warn(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
@@ -91,7 +91,7 @@ func TestLogger_Warn(t *testing.T) {
 func TestLogger_Info(t *testing.T) {
 	tests := []struct {
 		name   string
-		status Status
+		status StatusLog
 		value  any
 	}{
 		{
