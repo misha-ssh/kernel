@@ -139,16 +139,27 @@ func initCryptKey() error {
 	return nil
 }
 
+// todo реализивовать каждый логгер в зависимости от конфига
+func initLoggerFromConfig() error {
+	return nil
+}
+
 func Init() error {
 	var err error
 
-	err = initCryptKey()
+	err = initFileConfig()
 	if err != nil {
 		logger.Error(err.Error())
 		return err
 	}
 
-	err = initFileConfig()
+	err = initLoggerFromConfig()
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	err = initCryptKey()
 	if err != nil {
 		logger.Error(err.Error())
 		return err
