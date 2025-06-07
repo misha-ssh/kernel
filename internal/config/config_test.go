@@ -3,7 +3,6 @@ package config
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -100,24 +99,16 @@ func TestStorage_Set(t *testing.T) {
 		},
 	}
 
-	configStorage := storage.FileStorage{
-		Direction: t.TempDir(),
-	}
-
-	s := StorageConfig{
-		Storage: &configStorage,
-	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := s.Set(tt.key, tt.value)
+			err := Set(tt.key, tt.value)
 
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
 				assert.NoError(t, err)
 
-				got := s.Get(tt.key)
+				got := Get(tt.key)
 				assert.Equal(t, tt.value, got)
 			}
 		})
@@ -169,22 +160,14 @@ func TestStorage_Get(t *testing.T) {
 		},
 	}
 
-	configStorage := storage.FileStorage{
-		Direction: t.TempDir(),
-	}
-
-	s := StorageConfig{
-		Storage: &configStorage,
-	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isSetValue {
-				err := s.Set(tt.key, tt.want)
+				err := Set(tt.key, tt.want)
 				assert.NoError(t, err)
 			}
 
-			got := s.Get(tt.key)
+			got := Get(tt.key)
 			assert.Equal(t, tt.want, got)
 		})
 	}
@@ -223,22 +206,14 @@ func TestStorage_Exists(t *testing.T) {
 		},
 	}
 
-	configStorage := storage.FileStorage{
-		Direction: t.TempDir(),
-	}
-
-	s := StorageConfig{
-		Storage: &configStorage,
-	}
-
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateKey {
-				err := s.Set(tt.key, "test")
+				err := Set(tt.key, "test")
 				assert.NoError(t, err)
 			}
 
-			got := s.Exists(tt.key)
+			got := Exists(tt.key)
 			assert.Equal(t, tt.want, got)
 		})
 	}
