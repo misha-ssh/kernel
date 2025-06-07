@@ -1,5 +1,6 @@
 package envname
 
 const (
-	Theme = "THEME"
+	Theme  = "THEME"
+	Logger = "LOGGER"
 )
