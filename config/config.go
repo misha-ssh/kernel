@@ -5,9 +5,10 @@ import (
 	"errors"
 	"os/user"
 
+	fileConfig "github.com/ssh-connection-manager/kernel/v2/internal/config"
+
 	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/config/envname"
-	"github.com/ssh-connection-manager/kernel/v2/internal/config"
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
@@ -16,10 +17,11 @@ import (
 )
 
 var (
-	ErrMarshalJson          = errors.New("failed to marshal json")
-	ErrGetConsoleInfo       = errors.New("err set default value")
-	ErrWriteJson            = errors.New("failed to write json")
 	ErrCreateFileConnection = errors.New("err create file connection")
+	ErrSetLoggerFromConfig  = errors.New("err set logger from config")
+	ErrSetDefaultValue      = errors.New("err set default value")
+	ErrMarshalJson          = errors.New("failed to marshal json")
+	ErrWriteJson            = errors.New("failed to write json")
 	ErrSetCryptKey          = errors.New("err set crypt key")
 	ErrGetCryptKey          = errors.New("err get crypt key")
 	ErrEncryptData          = errors.New("err encrypt data")
@@ -35,7 +37,6 @@ func initFileConnections() error {
 	if !fileStorage.Exists(filename) {
 		err := fileStorage.Create(filename)
 		if err != nil {
-			logger.Error(ErrCreateFileConnection.Error())
 			return err
 		}
 
@@ -45,13 +46,11 @@ func initFileConnections() error {
 
 		jsonConnections, err := json.Marshal(defaultConnections)
 		if err != nil {
-			logger.Error(ErrMarshalJson.Error())
 			return ErrMarshalJson
 		}
 
 		currentUser, err := user.Current()
 		if err != nil {
-			logger.Error(err.Error())
 			return err
 		}
 
@@ -59,19 +58,16 @@ func initFileConnections() error {
 
 		cryptKey, err := keyring.Get(envconst.NameServiceCryptKey, username)
 		if err != nil {
-			logger.Error(ErrGetCryptKey.Error())
-			return err
+			return ErrGetCryptKey
 		}
 
 		encryptedConnections, err := crypto.Encrypt(string(jsonConnections), cryptKey)
 		if err != nil {
-			logger.Error(ErrEncryptData.Error())
 			return ErrEncryptData
 		}
 
 		err = fileStorage.Write(filename, encryptedConnections)
 		if err != nil {
-			logger.Error(ErrWriteJson.Error())
 			return ErrWriteJson
 		}
 	}
@@ -89,20 +85,21 @@ func initFileConfig() error {
 	if !fileStorage.Exists(filename) {
 		err := fileStorage.Create(filename)
 		if err != nil {
-			logger.Error(ErrCreateFileConnection.Error())
-			return err
+			return ErrCreateFileConnection
 		}
 	}
 
-	fileConfig := &config.StorageConfig{
-		Storage: fileStorage,
+	defaultValues := map[string]string{
+		envname.Theme:  envconst.Theme,
+		envname.Logger: envconst.TypeStorageLogger,
 	}
 
-	if !fileConfig.Exists(envname.Theme) {
-		err := fileConfig.Set(envname.Theme, envconst.Theme)
-		if err != nil {
-			logger.Error(ErrGetConsoleInfo.Error())
-			return ErrGetConsoleInfo
+	for key, value := range defaultValues {
+		if !fileConfig.Exists(key) {
+			err := fileConfig.Set(key, value)
+			if err != nil {
+				return ErrSetDefaultValue
+			}
 		}
 	}
 
@@ -112,7 +109,6 @@ func initFileConfig() error {
 func initCryptKey() error {
 	currentUser, err := user.Current()
 	if err != nil {
-		logger.Error(err.Error())
 		return err
 	}
 
@@ -125,13 +121,11 @@ func initCryptKey() error {
 	if cryptKey == "" {
 		cryptKey, err = crypto.GenerateKey()
 		if err != nil {
-			logger.Error(err.Error())
 			return err
 		}
 
 		err = keyring.Set(service, username, cryptKey)
 		if err != nil {
-			logger.Error(ErrSetCryptKey.Error())
 			return ErrSetCryptKey
 		}
 	}
@@ -139,37 +133,50 @@ func initCryptKey() error {
 	return nil
 }
 
-// todo реализивовать каждый логгер в зависимости от конфига
 func initLoggerFromConfig() error {
+	loggerType := fileConfig.Get(envname.Logger)
+
+	fileStorage := &storage.FileStorage{
+		Direction: storage.GetHomeDir(),
+	}
+
+	switch loggerType {
+	case envconst.TypeConsoleLogger:
+		logger.Set(logger.NewConsoleLogger())
+	case envconst.TypeStorageLogger:
+		logger.Set(logger.NewStorageLogger(fileStorage))
+	case envconst.TypeCombinedLogger:
+		logger.Set(logger.NewCombinedLogger(
+			logger.NewConsoleLogger(),
+			logger.NewStorageLogger(fileStorage),
+		))
+	default:
+		return ErrSetLoggerFromConfig
+	}
+
 	return nil
 }
 
-func Init() error {
+func Init() {
 	var err error
 
 	err = initFileConfig()
 	if err != nil {
-		logger.Error(err.Error())
-		return err
+		panic(err)
 	}
 
 	err = initLoggerFromConfig()
 	if err != nil {
-		logger.Error(err.Error())
-		return err
+		panic(err)
 	}
 
 	err = initCryptKey()
 	if err != nil {
-		logger.Error(err.Error())
-		return err
+		panic(err)
 	}
 
 	err = initFileConnections()
 	if err != nil {
-		logger.Error(err.Error())
-		return err
+		panic(err)
 	}
-
-	return nil
 }
