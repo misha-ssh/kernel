@@ -29,13 +29,10 @@ var (
 
 func initFileConnections() error {
 	filename := envconst.FilenameConnection
+	direction := storage.GetAppDir()
 
-	fileStorage := &storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	if !fileStorage.Exists(filename) {
-		err := fileStorage.Create(filename)
+	if !storage.Exists(direction, filename) {
+		err := storage.Create(direction, filename)
 		if err != nil {
 			return err
 		}
@@ -66,7 +63,7 @@ func initFileConnections() error {
 			return ErrEncryptData
 		}
 
-		err = fileStorage.Write(filename, encryptedConnections)
+		err = storage.Write(direction, filename, encryptedConnections)
 		if err != nil {
 			return ErrWriteJson
 		}
@@ -77,13 +74,10 @@ func initFileConnections() error {
 
 func initFileConfig() error {
 	filename := envconst.FilenameConfig
+	direction := storage.GetAppDir()
 
-	fileStorage := &storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	if !fileStorage.Exists(filename) {
-		err := fileStorage.Create(filename)
+	if !storage.Exists(direction, filename) {
+		err := storage.Create(direction, filename)
 		if err != nil {
 			return ErrCreateFileConnection
 		}
@@ -136,19 +130,15 @@ func initCryptKey() error {
 func initLoggerFromConfig() error {
 	loggerType := fileConfig.Get(envname.Logger)
 
-	fileStorage := &storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
 	switch loggerType {
 	case envconst.TypeConsoleLogger:
 		logger.Set(logger.NewConsoleLogger())
 	case envconst.TypeStorageLogger:
-		logger.Set(logger.NewStorageLogger(fileStorage))
+		logger.Set(logger.NewStorageLogger())
 	case envconst.TypeCombinedLogger:
 		logger.Set(logger.NewCombinedLogger(
 			logger.NewConsoleLogger(),
-			logger.NewStorageLogger(fileStorage),
+			logger.NewStorageLogger(),
 		))
 	default:
 		return ErrSetLoggerFromConfig

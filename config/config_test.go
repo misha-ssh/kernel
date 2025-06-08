@@ -73,7 +73,7 @@ func Test_initFileConfig(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "success",
+			name:    "success created file config",
 			wantErr: false,
 		},
 	}
@@ -83,11 +83,9 @@ func Test_initFileConfig(t *testing.T) {
 				t.Errorf("initFileConfig() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			fileStorage := storage.FileStorage{
-				Direction: storage.GetHomeDir(),
-			}
+			direction := storage.GetAppDir()
 
-			if !fileStorage.Exists(envconst.FilenameConfig) {
+			if !storage.Exists(direction, envconst.FilenameConfig) {
 				t.Error("initFileConfig() dont create file")
 			}
 		})
@@ -110,11 +108,9 @@ func Test_initFileConnections(t *testing.T) {
 				t.Errorf("initFileConnections() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			fileStorage := storage.FileStorage{
-				Direction: storage.GetHomeDir(),
-			}
+			direction := storage.GetAppDir()
 
-			if !fileStorage.Exists(envconst.FilenameConnection) {
+			if !storage.Exists(direction, envconst.FilenameConnection) {
 				t.Error("initFileConnections() dont create file")
 			}
 		})
@@ -122,10 +118,6 @@ func Test_initFileConnections(t *testing.T) {
 }
 
 func Test_initLoggerFromConfig(t *testing.T) {
-	fileStorage := &storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
 	type args struct {
 		loggerType    string
 		wantSetLogger logger.Logger
@@ -140,7 +132,7 @@ func Test_initLoggerFromConfig(t *testing.T) {
 			wantErr: false,
 			args: args{
 				loggerType:    "",
-				wantSetLogger: logger.NewStorageLogger(fileStorage),
+				wantSetLogger: logger.NewStorageLogger(),
 			},
 		},
 		{
@@ -156,7 +148,7 @@ func Test_initLoggerFromConfig(t *testing.T) {
 			wantErr: false,
 			args: args{
 				loggerType:    envconst.TypeStorageLogger,
-				wantSetLogger: logger.NewStorageLogger(fileStorage),
+				wantSetLogger: logger.NewStorageLogger(),
 			},
 		},
 		{
@@ -165,7 +157,7 @@ func Test_initLoggerFromConfig(t *testing.T) {
 				loggerType: envconst.TypeCombinedLogger,
 				wantSetLogger: logger.NewCombinedLogger(
 					logger.NewConsoleLogger(),
-					logger.NewStorageLogger(fileStorage),
+					logger.NewStorageLogger(),
 				),
 			},
 			wantErr: false,
