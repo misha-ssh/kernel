@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-	"github.com/stretchr/testify/assert"
 )
 
 func FuzzStorage_Write(f *testing.F) {
@@ -13,9 +12,17 @@ func FuzzStorage_Write(f *testing.F) {
 		fileName := "test"
 
 		err := storage.Write(direction, fileName, value)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Errorf("write failed: %v", err)
+		}
 
 		got, err := storage.Get(direction, fileName)
-		assert.Equal(t, value, got)
+		if err != nil {
+			t.Errorf("Get failed: %v", err)
+		}
+
+		if got != value {
+			t.Errorf("got %q != want %q", got, value)
+		}
 	})
 }

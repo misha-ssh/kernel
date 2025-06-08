@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/config"
-	"github.com/stretchr/testify/assert"
 )
 
 func FuzzConfig_Set(f *testing.F) {
@@ -14,8 +13,8 @@ func FuzzConfig_Set(f *testing.F) {
 		err := config.Set(key, value)
 		got := config.Get(key)
 
-		if err == nil {
-			assert.Equal(t, value, got)
+		if err == nil && got != value {
+			t.Errorf("got %q != want %q", got, value)
 		}
 	})
 }

@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
-	"github.com/stretchr/testify/assert"
 )
 
 func FuzzCrypto_Encrypt(f *testing.F) {
@@ -12,6 +11,8 @@ func FuzzCrypto_Encrypt(f *testing.F) {
 
 	f.Fuzz(func(t *testing.T, ciphertext string) {
 		_, err := crypto.Encrypt(ciphertext, key)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Errorf("encrypt failed: %v", err)
+		}
 	})
 }

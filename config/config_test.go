@@ -26,7 +26,7 @@ func Test_Init(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
 				if r := recover(); r != nil {
-					t.Errorf("Init() is panicked: %v", r)
+					t.Error("Init() is panicked")
 				}
 			}()
 
