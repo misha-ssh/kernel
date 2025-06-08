@@ -14,24 +14,22 @@ import (
 const FileName = envconst.FilenameLogger
 
 var (
+	DirectionApp = storage.GetAppDir()
+
 	ErrGetStorageInfo = errors.New("err get info use log - storage")
 	ErrCreateStorage  = errors.New("err at created log file")
 	ErrGetOpenFile    = errors.New("err get open log file")
 )
 
-type StorageLogger struct {
-	Storage storage.Storage
-}
+type StorageLogger struct{}
 
-func NewStorageLogger(storage storage.Storage) *StorageLogger {
-	return &StorageLogger{
-		Storage: storage,
-	}
+func NewStorageLogger() *StorageLogger {
+	return &StorageLogger{}
 }
 
 func (sl *StorageLogger) createLogFile() error {
-	if !sl.Storage.Exists(FileName) {
-		err := sl.Storage.Create(FileName)
+	if !storage.Exists(DirectionApp, FileName) {
+		err := storage.Create(DirectionApp, FileName)
 		if err != nil {
 			return err
 		}
@@ -53,7 +51,7 @@ func (sl *StorageLogger) log(value any, status StatusLog) error {
 
 	logInfo := fmt.Sprintf("|%v| file: %s, line: %v, message: %#v", status, calledFile, line, value)
 
-	openLogFile, err := sl.Storage.GetOpenFile(FileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	openLogFile, err := storage.GetOpenFile(DirectionApp, FileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
 	defer func(openLogFile *os.File) {
 		err = openLogFile.Close()
 	}(openLogFile)

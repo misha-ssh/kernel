@@ -4,7 +4,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,13 +23,7 @@ func TestStorageLogger_Error(t *testing.T) {
 		},
 	}
 
-	localStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	storageLogger := StorageLogger{
-		Storage: &localStorage,
-	}
+	storageLogger := NewStorageLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -57,13 +50,7 @@ func TestStorageLogger_Warn(t *testing.T) {
 		},
 	}
 
-	localStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	storageLogger := StorageLogger{
-		Storage: &localStorage,
-	}
+	storageLogger := NewStorageLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -90,13 +77,7 @@ func TestStorageLogger_Info(t *testing.T) {
 		},
 	}
 
-	localStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	storageLogger := StorageLogger{
-		Storage: &localStorage,
-	}
+	storageLogger := NewStorageLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -123,13 +104,7 @@ func TestStorageLogger_Debug(t *testing.T) {
 		},
 	}
 
-	localStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	storageLogger := StorageLogger{
-		Storage: &localStorage,
-	}
+	storageLogger := NewStorageLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -168,13 +143,7 @@ func TestStorageLogger_log(t *testing.T) {
 		},
 	}
 
-	localStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	storageLogger := StorageLogger{
-		Storage: &localStorage,
-	}
+	storageLogger := NewStorageLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

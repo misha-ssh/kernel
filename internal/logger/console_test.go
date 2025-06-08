@@ -23,7 +23,7 @@ func TestConsoleLogger_Error(t *testing.T) {
 		},
 	}
 
-	consoleLogger := ConsoleLogger{}
+	consoleLogger := NewConsoleLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -50,7 +50,7 @@ func TestConsoleLogger_Warn(t *testing.T) {
 		},
 	}
 
-	consoleLogger := ConsoleLogger{}
+	consoleLogger := NewConsoleLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -77,7 +77,7 @@ func TestConsoleLogger_Info(t *testing.T) {
 		},
 	}
 
-	consoleLogger := ConsoleLogger{}
+	consoleLogger := NewConsoleLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -104,7 +104,7 @@ func TestConsoleLogger_Debug(t *testing.T) {
 		},
 	}
 
-	consoleLogger := ConsoleLogger{}
+	consoleLogger := NewConsoleLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -143,7 +143,7 @@ func TestConsoleLogger_log(t *testing.T) {
 		},
 	}
 
-	consoleLogger := ConsoleLogger{}
+	consoleLogger := NewConsoleLogger()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

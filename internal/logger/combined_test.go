@@ -4,7 +4,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +23,7 @@ func TestCombinedLogger_Debug(t *testing.T) {
 			name: "console logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
+					NewConsoleLogger(),
 				},
 			},
 			args: args{
@@ -32,14 +31,10 @@ func TestCombinedLogger_Debug(t *testing.T) {
 			},
 		},
 		{
-			name: "storage logger(local)",
+			name: "storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -47,15 +42,11 @@ func TestCombinedLogger_Debug(t *testing.T) {
 			},
 		},
 		{
-			name: "console logger + storage logger(local)",
+			name: "console + storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewConsoleLogger(),
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -65,9 +56,7 @@ func TestCombinedLogger_Debug(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cl := &CombinedLogger{
-				loggers: tt.fields.loggers,
-			}
+			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			assert.NotPanics(t, func() {
 				cl.Debug(tt.args.value)
@@ -92,7 +81,7 @@ func TestCombinedLogger_Error(t *testing.T) {
 			name: "console logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
+					NewConsoleLogger(),
 				},
 			},
 			args: args{
@@ -100,14 +89,10 @@ func TestCombinedLogger_Error(t *testing.T) {
 			},
 		},
 		{
-			name: "storage logger(local)",
+			name: "storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -115,15 +100,11 @@ func TestCombinedLogger_Error(t *testing.T) {
 			},
 		},
 		{
-			name: "console logger + storage logger(local)",
+			name: "console + storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewConsoleLogger(),
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -133,9 +114,7 @@ func TestCombinedLogger_Error(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cl := &CombinedLogger{
-				loggers: tt.fields.loggers,
-			}
+			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			assert.NotPanics(t, func() {
 				cl.Error(tt.args.value)
@@ -160,7 +139,7 @@ func TestCombinedLogger_Info(t *testing.T) {
 			name: "console logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
+					NewConsoleLogger(),
 				},
 			},
 			args: args{
@@ -168,14 +147,10 @@ func TestCombinedLogger_Info(t *testing.T) {
 			},
 		},
 		{
-			name: "storage logger(local)",
+			name: "storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -183,15 +158,11 @@ func TestCombinedLogger_Info(t *testing.T) {
 			},
 		},
 		{
-			name: "console logger + storage logger(local)",
+			name: "console + storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewConsoleLogger(),
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -201,9 +172,7 @@ func TestCombinedLogger_Info(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			cl := &CombinedLogger{
-				loggers: tt.fields.loggers,
-			}
+			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			assert.NotPanics(t, func() {
 				cl.Info(tt.args.value)
@@ -228,7 +197,7 @@ func TestCombinedLogger_Warn(t *testing.T) {
 			name: "console logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
+					NewConsoleLogger(),
 				},
 			},
 			args: args{
@@ -236,14 +205,10 @@ func TestCombinedLogger_Warn(t *testing.T) {
 			},
 		},
 		{
-			name: "storage logger(local)",
+			name: "storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewStorageLogger(),
 				},
 			},
 			args: args{
@@ -251,15 +216,11 @@ func TestCombinedLogger_Warn(t *testing.T) {
 			},
 		},
 		{
-			name: "console logger + storage logger(local)",
+			name: "console + storage logger",
 			fields: fields{
 				loggers: []Logger{
-					&ConsoleLogger{},
-					&StorageLogger{
-						Storage: &storage.FileStorage{
-							Direction: t.TempDir(),
-						},
-					},
+					NewConsoleLogger(),
+					NewStorageLogger(),
 				},
 			},
 			args: args{
