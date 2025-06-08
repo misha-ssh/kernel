@@ -12,7 +12,9 @@ import (
 )
 
 const (
-	Filename = envconst.FilenameConfig
+	Filename      = envconst.FilenameConfig
+	FileFlagWrite = os.O_WRONLY | os.O_APPEND | os.O_CREATE
+	FileFlagRead  = os.O_RDWR
 
 	CharNewLine = "\n"
 	EmptyValue  = ""
@@ -20,6 +22,8 @@ const (
 )
 
 var (
+	DirectionApp = storage.GetAppDir()
+
 	ErrWriteDataToOpenFile = errors.New("write data to open file error")
 	ErrGetKeyValueData     = errors.New("get value data error")
 	ErrKeyOfNonLetters     = errors.New("key of non letters error")
@@ -50,11 +54,7 @@ func Set(key, value string) error {
 		return nil
 	}
 
-	FileStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	openConfigFile, err := FileStorage.GetOpenFile(Filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	openConfigFile, err := storage.GetOpenFile(DirectionApp, Filename, FileFlagWrite)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
 	}(openConfigFile)
@@ -81,11 +81,7 @@ func Get(key string) string {
 		return EmptyValue
 	}
 
-	FileStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	openConfigFile, err := FileStorage.GetOpenFile(Filename, os.O_RDWR)
+	openConfigFile, err := storage.GetOpenFile(DirectionApp, Filename, FileFlagRead)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
 	}(openConfigFile)
@@ -127,11 +123,7 @@ func Exists(key string) bool {
 		return false
 	}
 
-	FileStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	got, err := FileStorage.Get(Filename)
+	got, err := storage.Get(DirectionApp, Filename)
 	if err != nil {
 		logger.Error(err.Error())
 		return false
@@ -141,11 +133,7 @@ func Exists(key string) bool {
 }
 
 func rewrite(key, value string) error {
-	FileStorage := storage.FileStorage{
-		Direction: storage.GetHomeDir(),
-	}
-
-	openConfigFile, err := FileStorage.GetOpenFile(Filename, os.O_RDWR)
+	openConfigFile, err := storage.GetOpenFile(DirectionApp, Filename, FileFlagRead)
 	defer func(openConfigFile *os.File) {
 		err = openConfigFile.Close()
 	}(openConfigFile)
