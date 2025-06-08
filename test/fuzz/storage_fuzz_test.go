@@ -7,18 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func FuzzLocalStorage_Write(f *testing.F) {
+func FuzzStorage_Write(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value string) {
-		s := storage.FileStorage{
-			Direction: t.TempDir(),
-		}
-
+		direction := t.TempDir()
 		fileName := "test"
 
-		err := s.Write(fileName, value)
+		err := storage.Write(direction, fileName, value)
 		assert.NoError(t, err)
 
-		got, err := s.Get(fileName)
+		got, err := storage.Get(direction, fileName)
 		assert.Equal(t, value, got)
 	})
 }

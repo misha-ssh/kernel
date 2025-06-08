@@ -7,12 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func FuzzStorageCrypto_Encrypt(f *testing.F) {
-	se := &crypto.StorageCrypto{}
-	key, _ := se.GenerateKey()
+func FuzzCrypto_Encrypt(f *testing.F) {
+	key, _ := crypto.GenerateKey()
 
 	f.Fuzz(func(t *testing.T, ciphertext string) {
-		_, err := se.Encrypt(ciphertext, key)
+		_, err := crypto.Encrypt(ciphertext, key)
 		assert.NoError(t, err)
 	})
 }

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func FuzzStorageLogger_LocStorageErr(f *testing.F) {
+func FuzzLogger_Error(f *testing.F) {
 	f.Fuzz(func(t *testing.T, value []uint8) {
 		assert.NotPanics(t, func() {
 			logger.Error(value)
