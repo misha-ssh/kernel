@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	FileConnections = envconst.FilenameConnection
+	FileConnections = envconst.FilenameConnections
 )
 
 var (

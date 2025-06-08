@@ -28,7 +28,7 @@ var (
 )
 
 func initFileConnections() error {
-	filename := envconst.FilenameConnection
+	filename := envconst.FilenameConnections
 	direction := storage.GetAppDir()
 
 	if !storage.Exists(direction, filename) {

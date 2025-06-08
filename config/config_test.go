@@ -110,7 +110,7 @@ func Test_initFileConnections(t *testing.T) {
 
 			direction := storage.GetAppDir()
 
-			if !storage.Exists(direction, envconst.FilenameConnection) {
+			if !storage.Exists(direction, envconst.FilenameConnections) {
 				t.Error("initFileConnections() dont create file")
 			}
 		})
