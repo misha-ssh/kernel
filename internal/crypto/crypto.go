@@ -80,7 +80,7 @@ func GenerateKey() (string, error) {
 
 	_, err := rand.Read(key)
 	if err != nil {
-		logger.Error(err)
+		logger.Error(err.Error())
 		return "", ErrGenerateKey
 	}
 
