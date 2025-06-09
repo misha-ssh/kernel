@@ -3,8 +3,6 @@ package logger
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestStorageLogger_Error(t *testing.T) {
@@ -27,9 +25,13 @@ func TestStorageLogger_Error(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				storageLogger.Error(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Error() is panicked")
+				}
+			}()
+
+			storageLogger.Error(tt.value)
 		})
 	}
 }
@@ -54,9 +56,13 @@ func TestStorageLogger_Warn(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				storageLogger.Warn(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Warn() is panicked")
+				}
+			}()
+
+			storageLogger.Warn(tt.value)
 		})
 	}
 }
@@ -81,9 +87,13 @@ func TestStorageLogger_Info(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				storageLogger.Info(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Info() is panicked")
+				}
+			}()
+
+			storageLogger.Info(tt.value)
 		})
 	}
 }
@@ -108,9 +118,13 @@ func TestStorageLogger_Debug(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				storageLogger.Debug(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Debug() is panicked")
+				}
+			}()
+
+			storageLogger.Debug(tt.value)
 		})
 	}
 }
@@ -148,7 +162,9 @@ func TestStorageLogger_log(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := storageLogger.log(tt.value, tt.status)
-			assert.NoError(t, err)
+			if err != nil {
+				t.Errorf("log() error = %v", err)
+			}
 		})
 	}
 }

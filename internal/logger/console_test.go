@@ -3,8 +3,6 @@ package logger
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConsoleLogger_Error(t *testing.T) {
@@ -27,9 +25,13 @@ func TestConsoleLogger_Error(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				consoleLogger.Error(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Error() is panicked")
+				}
+			}()
+
+			consoleLogger.Error(tt.value)
 		})
 	}
 }
@@ -54,9 +56,13 @@ func TestConsoleLogger_Warn(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				consoleLogger.Warn(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Warn() is panicked")
+				}
+			}()
+
+			consoleLogger.Warn(tt.value)
 		})
 	}
 }
@@ -81,9 +87,13 @@ func TestConsoleLogger_Info(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				consoleLogger.Info(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Info() is panicked")
+				}
+			}()
+
+			consoleLogger.Info(tt.value)
 		})
 	}
 }
@@ -108,9 +118,13 @@ func TestConsoleLogger_Debug(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				consoleLogger.Debug(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Debug() is panicked")
+				}
+			}()
+
+			consoleLogger.Debug(tt.value)
 		})
 	}
 }
@@ -148,7 +162,9 @@ func TestConsoleLogger_log(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := consoleLogger.log(tt.value, tt.status)
-			assert.NoError(t, err)
+			if err != nil {
+				t.Errorf("log error: %v", err)
+			}
 		})
 	}
 }

@@ -1,10 +1,6 @@
 package config
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
+import "testing"
 
 func TestStorage_Set(t *testing.T) {
 	tests := []struct {
@@ -103,13 +99,14 @@ func TestStorage_Set(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Set(tt.key, tt.value)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Set() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-				got := Get(tt.key)
-				assert.Equal(t, tt.value, got)
+			got := Get(tt.key)
+
+			if (got != tt.value) != tt.wantErr {
+				t.Errorf("got: %v != want: %v", got, tt.wantErr)
 			}
 		})
 	}
@@ -164,11 +161,15 @@ func TestStorage_Get(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isSetValue {
 				err := Set(tt.key, tt.want)
-				assert.NoError(t, err)
+				if err != nil {
+					t.Errorf("Set() error = %v", err)
+				}
 			}
 
 			got := Get(tt.key)
-			assert.Equal(t, tt.want, got)
+			if got != tt.want {
+				t.Errorf("got: %v != want: %v", got, tt.want)
+			}
 		})
 	}
 }
@@ -210,11 +211,15 @@ func TestStorage_Exists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateKey {
 				err := Set(tt.key, "test")
-				assert.NoError(t, err)
+				if err != nil {
+					t.Errorf("Set() error = %v", err)
+				}
 			}
 
 			got := Exists(tt.key)
-			assert.Equal(t, tt.want, got)
+			if got != tt.want {
+				t.Errorf("got: %v != want: %v", got, tt.want)
+			}
 		})
 	}
 }

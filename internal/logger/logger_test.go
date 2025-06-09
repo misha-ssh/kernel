@@ -3,8 +3,6 @@ package logger
 import (
 	"math/rand"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestLogger_Error(t *testing.T) {
@@ -25,9 +23,13 @@ func TestLogger_Error(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				Error(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Error() is panicked")
+				}
+			}()
+
+			Error(tt.value)
 		})
 	}
 }
@@ -50,9 +52,13 @@ func TestLogger_Debug(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				Debug(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Debug() is panicked")
+				}
+			}()
+
+			Debug(tt.value)
 		})
 	}
 }
@@ -75,9 +81,13 @@ func TestLogger_Warn(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				Warn(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Warn() is panicked")
+				}
+			}()
+
+			Warn(tt.value)
 		})
 	}
 }
@@ -100,9 +110,13 @@ func TestLogger_Info(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.NotPanics(t, func() {
-				Info(tt.value)
-			})
+			defer func() {
+				if r := recover(); r != nil {
+					t.Error("Info() is panicked")
+				}
+			}()
+
+			Info(tt.value)
 		})
 	}
 }

@@ -1,10 +1,6 @@
 package crypto
 
-import (
-	"testing"
-
-	"github.com/stretchr/testify/assert"
-)
+import "testing"
 
 func TestStorage_Decrypt(t *testing.T) {
 	type args struct {
@@ -70,11 +66,12 @@ func TestStorage_Decrypt(t *testing.T) {
 			cryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
 			got, err := Decrypt(cryptText, tt.args.key)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Decrypt() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if (got != tt.want) != tt.wantErr {
+				t.Errorf("got: %v != want %v", got, tt.want)
 			}
 		})
 	}
@@ -144,11 +141,12 @@ func TestStorage_Encrypt(t *testing.T) {
 			encryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
 			got, err := Decrypt(encryptText, tt.args.key)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Decrypt() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if (got != tt.want) != tt.wantErr {
+				t.Errorf("got: %v != want %v", got, tt.want)
 			}
 		})
 	}

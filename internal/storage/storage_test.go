@@ -7,7 +7,6 @@ import (
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCreate(t *testing.T) {
@@ -49,10 +48,8 @@ func TestCreate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Create(tt.args.direction, tt.args.filename)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -92,15 +89,14 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateFile {
 				err := Create(tt.args.direction, tt.args.filename)
-				assert.NoError(t, err)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+				}
 			}
 
 			err := Delete(tt.args.direction, tt.args.filename)
-
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}
@@ -140,11 +136,15 @@ func TestExists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateFile {
 				err := Create(tt.args.direction, tt.args.filename)
-				assert.Nil(t, err)
+				if err != nil {
+					t.Errorf("Create() error = %v", err)
+				}
 			}
 
 			got := Exists(tt.args.direction, tt.args.filename)
-			assert.Equal(t, tt.want, got)
+			if got != tt.want {
+				t.Errorf("got: %v != want: %v", got, tt.want)
+			}
 		})
 	}
 }
@@ -196,19 +196,24 @@ func TestGet(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateFile {
 				err := Create(tt.args.direction, tt.args.filename)
-				assert.NoError(t, err)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+				}
 
 				err = Write(tt.args.direction, tt.args.filename, tt.want)
-				assert.NoError(t, err)
+				if (err != nil) != tt.wantErr {
+					t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
+				}
 			}
 
 			got, err := Get(tt.args.direction, tt.args.filename)
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.Equal(t, tt.want, got)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if got != tt.want {
+				t.Errorf("got: %v != want: %v", got, tt.want)
 			}
 		})
 	}
@@ -221,10 +226,10 @@ func TestWrite(t *testing.T) {
 		data      string
 	}
 	tests := []struct {
-		name        string
-		args        args
-		wantErr     bool
-		wantContent string
+		name    string
+		args    args
+		wantErr bool
+		want    string
 	}{
 		{
 			name: "write to new file",
@@ -233,8 +238,8 @@ func TestWrite(t *testing.T) {
 				filename:  "test.txt",
 				data:      "Hello, World!",
 			},
-			wantErr:     false,
-			wantContent: "Hello, World!",
+			wantErr: false,
+			want:    "Hello, World!",
 		},
 		{
 			name: "write to existing file (overwrite)",
@@ -243,8 +248,8 @@ func TestWrite(t *testing.T) {
 				filename:  "test.txt",
 				data:      "New content",
 			},
-			wantErr:     false,
-			wantContent: "New content",
+			wantErr: false,
+			want:    "New content",
 		},
 		{
 			name: "write empty data to new file",
@@ -253,8 +258,8 @@ func TestWrite(t *testing.T) {
 				filename:  "empty.txt",
 				data:      "",
 			},
-			wantErr:     false,
-			wantContent: "",
+			wantErr: false,
+			want:    "",
 		},
 		{
 			name: "write to invalid filename",
@@ -263,23 +268,24 @@ func TestWrite(t *testing.T) {
 				filename:  "",
 				data:      "Invalid",
 			},
-			wantErr:     true,
-			wantContent: "",
+			wantErr: true,
+			want:    "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Write(tt.args.direction, tt.args.filename, tt.args.data)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
+			got, err := Get(tt.args.direction, tt.args.filename)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-				content, err := Get(tt.args.direction, tt.args.filename)
-				assert.NoError(t, err)
-
-				assert.Equal(t, tt.wantContent, content)
+			if got != tt.want {
+				t.Errorf("got: %v != want: %v", got, tt.want)
 			}
 		})
 	}
@@ -316,22 +322,24 @@ func TestGetOpenFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			flags := os.O_WRONLY | os.O_APPEND | os.O_CREATE
 			got, err := GetOpenFile(tt.args.direction, tt.args.filename, flags)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("GetOpenFile() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-			if tt.wantErr {
-				assert.Error(t, err)
-				assert.Nil(t, got)
-			} else {
-				assert.NoError(t, err)
-				assert.NotNil(t, got)
+			_, err = got.Write([]byte("test"))
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-				_, err = got.Write([]byte("test"))
-				assert.NoError(t, err)
+			err = got.Close()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Close() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
-				err = got.Close()
-				assert.NoError(t, err)
+			fileIsExists := Exists(tt.args.direction, tt.args.filename)
 
-				fileIsExists := Exists(tt.args.direction, tt.args.filename)
-				assert.True(t, fileIsExists)
+			if !fileIsExists != tt.wantErr {
+				t.Errorf("file not exists")
 			}
 		})
 	}
@@ -359,7 +367,11 @@ func TestGetAppDir(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			want := tt.want()
-			assert.Equalf(t, want, GetAppDir(), "GetAppDir()")
+			got := GetAppDir()
+
+			if got != want {
+				t.Errorf("got: %v != want: %v", got, want)
+			}
 		})
 	}
 }
