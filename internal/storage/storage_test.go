@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 )
 
 func TestCreate(t *testing.T) {

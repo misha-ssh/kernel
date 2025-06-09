@@ -7,7 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 )
 
 func GetAppDir() string {

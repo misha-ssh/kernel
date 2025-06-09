@@ -1,14 +1,13 @@
-package config
+package setup
 
 import (
 	"encoding/json"
 	"errors"
 	"os/user"
 
-	fileConfig "github.com/ssh-connection-manager/kernel/v2/internal/config"
-
-	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/config/envname"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envname"
+	"github.com/ssh-connection-manager/kernel/v2/internal/config"
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
@@ -18,7 +17,7 @@ import (
 
 var (
 	ErrCreateFileConnection = errors.New("err create file connection")
-	ErrSetLoggerFromConfig  = errors.New("err set logger from config")
+	ErrSetLoggerFromConfig  = errors.New("err set logger from configs")
 	ErrSetDefaultValue      = errors.New("err set default value")
 	ErrMarshalJson          = errors.New("failed to marshal json")
 	ErrWriteJson            = errors.New("failed to write json")
@@ -89,8 +88,8 @@ func initFileConfig() error {
 	}
 
 	for key, value := range defaultValues {
-		if !fileConfig.Exists(key) {
-			err := fileConfig.Set(key, value)
+		if !config.Exists(key) {
+			err := config.Set(key, value)
 			if err != nil {
 				return ErrSetDefaultValue
 			}
@@ -128,7 +127,7 @@ func initCryptKey() error {
 }
 
 func initLoggerFromConfig() error {
-	loggerType := fileConfig.Get(envname.Logger)
+	loggerType := config.Get(envname.Logger)
 
 	switch loggerType {
 	case envconst.TypeConsoleLogger:

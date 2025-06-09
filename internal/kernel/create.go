@@ -5,11 +5,11 @@ import (
 	"errors"
 	"os/user"
 
-	"github.com/ssh-connection-manager/kernel/v2/config"
-	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
+	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/zalando/go-keyring"
 )
@@ -34,7 +34,7 @@ var (
 func Create(connection *connect.Connect) error {
 	var connections connect.Connections
 
-	config.Init()
+	setup.Init()
 
 	encryptedConnections, err := storage.Get(DirectionApp, FileConnections)
 	if err != nil {

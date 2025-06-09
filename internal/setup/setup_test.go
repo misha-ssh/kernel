@@ -1,12 +1,12 @@
-package config
+package setup
 
 import (
 	"os/user"
 	"reflect"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/config/envname"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envname"
 	"github.com/ssh-connection-manager/kernel/v2/internal/config"
 	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
@@ -73,7 +73,7 @@ func Test_initFileConfig(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "success created file config",
+			name:    "success created file configs",
 			wantErr: false,
 		},
 	}
@@ -163,7 +163,7 @@ func Test_initLoggerFromConfig(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "bad arg logger in config",
+			name: "bad arg logger in configs",
 			args: args{
 				loggerType:    "badTypeLogger",
 				wantSetLogger: logger.NewConsoleLogger(),
@@ -191,7 +191,7 @@ func Test_initLoggerFromConfig(t *testing.T) {
 				loggerSetting := logger.Get()
 
 				if reflect.TypeOf(loggerSetting).String() != reflect.TypeOf(tt.args.wantSetLogger).String() {
-					t.Errorf("logger from config: %v != %v", loggerSetting, tt.args.wantSetLogger)
+					t.Errorf("logger from configs: %v != %v", loggerSetting, tt.args.wantSetLogger)
 				}
 			}
 		})

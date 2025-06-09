@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/ssh-connection-manager/kernel/v2/config/envconst"
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 )

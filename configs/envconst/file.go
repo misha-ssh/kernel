@@ -2,6 +2,6 @@ package envconst
 
 const (
 	FilenameConnections = "connection.json"
-	FilenameConfig      = "config"
+	FilenameConfig      = "configs"
 	FilenameLogger      = "log.log"
 )
