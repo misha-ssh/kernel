@@ -1,3 +1,0 @@
-package kernel
-
-func Update(){}
