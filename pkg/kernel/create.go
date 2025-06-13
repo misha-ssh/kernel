@@ -10,43 +10,33 @@ import (
 )
 
 var (
-	ErrConnectionByAliasExists = errors.New("connection by alias exists")
-	ErrGetConnection           = errors.New("err get connection")
-	ErrSetConnection           = errors.New("err set connection")
+	ErrConnectionByAliasExistsAtCreate = errors.New("connection by alias exists")
+	ErrGetConnectionAtCreate           = errors.New("err get connection")
+	ErrSetConnectionAtCreate           = errors.New("err set connection")
 )
-
-func validateConnection(connections *connect.Connections, connection *connect.Connect) error {
-	for _, savedConnection := range connections.Connects {
-		if savedConnection.Alias == connection.Alias {
-			logger.Error(ErrConnectionByAliasExists.Error())
-			return ErrConnectionByAliasExists
-		}
-	}
-
-	return nil
-}
 
 func Create(connection *connect.Connect) error {
 	setup.Init()
 
 	connections, err := store.GetConnections()
 	if err != nil {
-		logger.Error(ErrGetConnection.Error())
-		return ErrGetConnection
+		logger.Error(ErrGetConnectionAtCreate.Error())
+		return ErrGetConnectionAtCreate
 	}
 
-	err = validateConnection(connections, connection)
-	if err != nil {
-		logger.Error(err.Error())
-		return err
+	for _, savedConnection := range connections.Connects {
+		if savedConnection.Alias == connection.Alias {
+			logger.Error(ErrConnectionByAliasExistsAtCreate.Error())
+			return ErrConnectionByAliasExistsAtCreate
+		}
 	}
 
 	connections.Connects = append(connections.Connects, *connection)
 
 	err = store.SetConnections(connections)
 	if err != nil {
-		logger.Error(ErrSetConnection.Error())
-		return ErrSetConnection
+		logger.Error(ErrSetConnectionAtCreate.Error())
+		return ErrSetConnectionAtCreate
 	}
 
 	return nil
