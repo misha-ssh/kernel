@@ -19,24 +19,7 @@ func TestCreate(t *testing.T) {
 		isDeleteFileConnection bool
 	}{
 		{
-			name: "create connection with random alias",
-			args: args{
-				connect: &connect.Connect{
-					Alias:      t.TempDir(),
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: nil,
-				},
-			},
-			wantErr:                false,
-			isDeleteFileConnection: true,
-		},
-		{
-			name: "create connection with test alias",
+			name: "success create connection",
 			args: args{
 				connect: &connect.Connect{
 					Alias:      "test",
@@ -50,7 +33,7 @@ func TestCreate(t *testing.T) {
 				},
 			},
 			wantErr:                false,
-			isDeleteFileConnection: false,
+			isDeleteFileConnection: true,
 		},
 		{
 			name: "create connection with test alias - get err",
@@ -74,8 +57,7 @@ func TestCreate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isDeleteFileConnection {
-				err := storage.Delete(storage.GetAppDir(), envconst.FilenameConnections)
-				if err != nil {
+				if err := storage.Delete(storage.GetAppDir(), envconst.FilenameConnections); (err != nil) != tt.wantErr {
 					t.Errorf("failed to delete connection %v", err)
 				}
 			}
