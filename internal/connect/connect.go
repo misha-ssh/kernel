@@ -8,7 +8,6 @@ type ConnectionType string
 
 const (
 	TypeSSH ConnectionType = "ssh"
-	TypeRDP ConnectionType = "rdp"
 	TypeFTP ConnectionType = "ftp"
 )
 
