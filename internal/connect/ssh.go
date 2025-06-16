@@ -25,6 +25,10 @@ const (
 
 type SshConnect struct{}
 
+func NewSshConnect() *SshConnect {
+	return &SshConnect{}
+}
+
 func auth(connection *Connect) []ssh.AuthMethod {
 	if connection.SshOptions.PrivateKey {
 		return []ssh.AuthMethod{
