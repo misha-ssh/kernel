@@ -15,13 +15,12 @@ const FileConnections = envconst.FilenameConnections
 var (
 	DirectionApp = storage.GetAppDir()
 
-	ErrEncryptData        = errors.New("err encrypt data")
-	ErrMarshalJson        = errors.New("failed to marshal json")
-	ErrWriteJson          = errors.New("failed to write json")
-	ErrUnmarshalJson      = errors.New("failed to unmarshal json")
-	ErrGetConnection      = errors.New("failed to get connection")
-	ErrDecryptData        = errors.New("failed to decrypt data")
-	ErrGetEmptyConnection = errors.New("failed to get empty connection")
+	ErrEncryptData   = errors.New("err encrypt data")
+	ErrMarshalJson   = errors.New("failed to marshal json")
+	ErrWriteJson     = errors.New("failed to write json")
+	ErrUnmarshalJson = errors.New("failed to unmarshal json")
+	ErrGetConnection = errors.New("failed to get connection")
+	ErrDecryptData   = errors.New("failed to decrypt data")
 )
 
 func GetConnections() (*connect.Connections, error) {
