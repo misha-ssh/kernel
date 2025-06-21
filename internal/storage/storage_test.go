@@ -2,11 +2,7 @@ package storage
 
 import (
 	"os"
-	"os/user"
-	"path/filepath"
 	"testing"
-
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 )
 
 func TestCreate(t *testing.T) {
@@ -340,37 +336,6 @@ func TestGetOpenFile(t *testing.T) {
 
 			if !fileIsExists != tt.wantErr {
 				t.Errorf("file not exists")
-			}
-		})
-	}
-}
-
-func TestGetAppDir(t *testing.T) {
-	tests := []struct {
-		name string
-		want func() string
-	}{
-		{
-			name: "get success app dir",
-			want: func() string {
-				usr, err := user.Current()
-				if err != nil {
-					panic(err)
-				}
-
-				hiddenDir := "." + envconst.AppName
-
-				return filepath.Join(usr.HomeDir, hiddenDir)
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			want := tt.want()
-			got := GetAppDir()
-
-			if got != want {
-				t.Errorf("got: %v != want: %v", got, want)
 			}
 		})
 	}
