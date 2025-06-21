@@ -22,6 +22,7 @@ down-ssh-port:
 # build and start ssh server with generated key
 up-ssh-key:
 	ssh-keygen -b 4096 -t rsa -f dockerkey
+	ssh-keygen -R localhost
 	docker build -f ./build/ssh/key/Dockerfile -t ssh-host .
 	docker run -d --name ssh-key -p 22:22 ssh-host
 
