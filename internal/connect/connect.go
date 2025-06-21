@@ -6,10 +6,7 @@ type Connector interface {
 
 type ConnectionType string
 
-const (
-	TypeSSH ConnectionType = "ssh"
-	TypeFTP ConnectionType = "ftp"
-)
+const TypeSSH ConnectionType = "ssh"
 
 type Connections struct {
 	Connects []Connect `json:"connects"`
@@ -28,6 +25,6 @@ type Connect struct {
 }
 
 type SshOptions struct {
-	Port       int  `json:"port"`
-	PrivateKey bool `json:"private_key"`
+	Port       int    `json:"port"`
+	PrivateKey string `json:"private_key"`
 }
