@@ -1,10 +1,11 @@
 package store
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
-	"github.com/zalando/go-keyring"
 	"os/user"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
+	"github.com/zalando/go-keyring"
 )
 
 func TestGetCryptKey(t *testing.T) {
