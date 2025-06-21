@@ -4,22 +4,8 @@ import (
 	"errors"
 	"io"
 	"os"
-	"os/user"
 	"path/filepath"
-
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 )
-
-func GetAppDir() string {
-	usr, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
-
-	hiddenDir := "." + envconst.AppName
-
-	return filepath.Join(usr.HomeDir, hiddenDir)
-}
 
 func Create(path string, filename string) error {
 	file := filepath.Join(path, filename)
