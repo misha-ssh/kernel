@@ -30,3 +30,6 @@ coverage.out
 coverage.html
 
 vendor
+
+dockerkey
+dockerkey.pub
