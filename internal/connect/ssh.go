@@ -30,7 +30,7 @@ func NewSshConnect() *SshConnect {
 }
 
 func auth(connection *Connect) []ssh.AuthMethod {
-	if connection.SshOptions.PrivateKey {
+	if len(connection.SshOptions.PrivateKey) == 0 {
 		return []ssh.AuthMethod{
 			ssh.Password(connection.Password),
 		}
