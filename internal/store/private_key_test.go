@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -138,6 +139,11 @@ func TestDeletePrivateKey(t *testing.T) {
 			}
 		})
 	}
+
+	err = os.RemoveAll(storage.GetPrivateKeysDir())
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestGetPrivateKey(t *testing.T) {
@@ -252,6 +258,11 @@ func TestGetPrivateKey(t *testing.T) {
 				}
 			}
 		})
+	}
+
+	err = os.RemoveAll(storage.GetPrivateKeysDir())
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 
@@ -382,6 +393,11 @@ func TestSavePrivateKey(t *testing.T) {
 			}
 		})
 	}
+
+	err = os.RemoveAll(storage.GetPrivateKeysDir())
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func Test_validatePrivateKey(t *testing.T) {
@@ -434,5 +450,10 @@ func Test_validatePrivateKey(t *testing.T) {
 				t.Errorf("validatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
+	}
+
+	err = os.RemoveAll(storage.GetPrivateKeysDir())
+	if err != nil {
+		t.Fatal(err)
 	}
 }
