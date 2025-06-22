@@ -23,3 +23,12 @@ func GetPrivateKeysDir() string {
 
 	return filepath.Join(appDir, envconst.DirectionPrivateKeys)
 }
+
+func GetDirectionAndFilename(fullPath string) (string, string) {
+	return filepath.Dir(fullPath),
+		filepath.Base(fullPath)
+}
+
+func GetFullPath(direction string, filename string) string {
+	return filepath.Join(direction, filename)
+}
