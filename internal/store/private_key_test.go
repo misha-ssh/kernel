@@ -31,15 +31,15 @@ func createPrivateKey(direction string) (string, error) {
 		return "", err
 	}
 
-	privDER := x509.MarshalPKCS1PrivateKey(privateKey)
+	privateDER := x509.MarshalPKCS1PrivateKey(privateKey)
 
-	privBlock := pem.Block{
+	privateBlock := pem.Block{
 		Type:    "RSA PRIVATE KEY",
 		Headers: nil,
-		Bytes:   privDER,
+		Bytes:   privateDER,
 	}
 
-	privatePEM := pem.EncodeToMemory(&privBlock)
+	privatePEM := pem.EncodeToMemory(&privateBlock)
 
 	err = storage.Write(direction, filenameKey, string(privatePEM))
 	if err != nil {
