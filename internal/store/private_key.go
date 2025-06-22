@@ -16,12 +16,12 @@ import (
 var (
 	DirectionKeys = storage.GetPrivateKeysDir()
 
-	ErrGetCryptKeyAtSavePrivateKey = errors.New("err get crypt key")
-	ErrWriteToFilePrivateKey       = errors.New("err write to file private key")
-	ErrCreateFilePrivateKey        = errors.New("err create file private key")
-	ErrNotValidPrivateKey          = errors.New("private key is not valid")
-	ErrGetDataPrivateKey           = errors.New("private key get data error")
-	ErrEncryptPrivateKey           = errors.New("err encrypt private key")
+	ErrGetCryptKeyAtPrivateKey = errors.New("err get crypt key")
+	ErrWriteToFilePrivateKey   = errors.New("err write to file private key")
+	ErrCreateFilePrivateKey    = errors.New("err create file private key")
+	ErrNotValidPrivateKey      = errors.New("private key is not valid")
+	ErrGetDataPrivateKey       = errors.New("private key get data error")
+	ErrEncryptPrivateKey       = errors.New("err encrypt private key")
 )
 
 func validatePrivateKey(privateKey string) error {
@@ -66,8 +66,8 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 
 	cryptKey, err := GetCryptKey()
 	if err != nil {
-		logger.Error(ErrGetCryptKeyAtSavePrivateKey.Error())
-		return "", ErrGetCryptKeyAtSavePrivateKey
+		logger.Error(ErrGetCryptKeyAtPrivateKey.Error())
+		return "", ErrGetCryptKeyAtPrivateKey
 	}
 
 	encryptDataPrivateKey, err := crypto.Encrypt(dataPrivateKey, cryptKey)
@@ -95,10 +95,28 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 	return savedPrivateKey, nil
 }
 
-func GetPrivateKey(connection *connect.Connect) error {
-	return nil
+func GetPrivateKey(connection *connect.Connect) (string, error) {
+	directionPrivateKey := storage.GetPrivateKeysDir()
+	filenamePrivateKey := connection.Alias
+
+	encryptDataPrivateKey, err := storage.Get(directionPrivateKey, filenamePrivateKey)
+	if err != nil {
+		logger.Error(ErrGetDataPrivateKey.Error())
+		return "", ErrGetDataPrivateKey
+	}
+
+	cryptKey, err := GetCryptKey()
+	if err != nil {
+		logger.Error(ErrGetCryptKeyAtPrivateKey.Error())
+		return "", ErrGetCryptKeyAtPrivateKey
+	}
+
+	return crypto.Decrypt(encryptDataPrivateKey, cryptKey)
 }
 
 func DeletePrivateKey(connection *connect.Connect) error {
-	return nil
+	directionPrivateKey := storage.GetPrivateKeysDir()
+	filenamePrivateKey := connection.Alias
+
+	return storage.Delete(directionPrivateKey, filenamePrivateKey)
 }
