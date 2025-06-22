@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -29,35 +30,45 @@ func NewSshConnect() *SshConnect {
 	return &SshConnect{}
 }
 
-func auth(connection *Connect) []ssh.AuthMethod {
+func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	if len(connection.SshOptions.PrivateKey) == 0 {
 		return []ssh.AuthMethod{
 			ssh.Password(connection.Password),
-		}
+		}, nil
+	}
+
+	direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
+	dataPrivateKey, err := storage.Get(direction, filename)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	key, err := ssh.ParsePrivateKey([]byte(dataPrivateKey))
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
 	}
 
 	return []ssh.AuthMethod{
-		ssh.Password(connection.Password),
-	}
-
-	//todo доделать авторизацию через ключ
-	//key := ssh.ParsePrivateKey(connection.SshOptions.PrivateKey)
-	//
-	//return []ssh.AuthMethod{
-	//	ssh.PublicKeys(connection.SshOptions.PrivateKey),
-	//}
+		ssh.PublicKeys(key),
+	}, nil
 }
 
-func getClientConfig(connection *Connect) *ssh.ClientConfig {
+func getClientConfig(connection *Connect) (*ssh.ClientConfig, error) {
 	callback := ssh.InsecureIgnoreHostKey()
-	sshAuth := auth(connection)
+	sshAuth, err := auth(connection)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
 
 	return &ssh.ClientConfig{
 		Timeout:         Timeout,
 		User:            connection.Login,
 		Auth:            sshAuth,
 		HostKeyCallback: callback,
-	}
+	}, nil
 }
 
 func createTerminalSession(session *ssh.Session) error {
@@ -99,8 +110,13 @@ func getSession(client *ssh.Client) (*ssh.Session, error) {
 	return session, nil
 }
 
-func (s *SshConnect) Connect(connection *Connect) error {
-	config := getClientConfig(connection)
+func (s *SshConnect) Connect(connection *Connect) (*ssh.Session, error) {
+	config, err := getClientConfig(connection)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
 	hostWithPort := net.JoinHostPort(
 		connection.Address,
 		fmt.Sprint(connection.SshOptions.Port),
@@ -109,14 +125,14 @@ func (s *SshConnect) Connect(connection *Connect) error {
 	client, err := getClient(hostWithPort, config)
 	if err != nil {
 		logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
 	session, err := getSession(client)
 	if err != nil {
 		client.Close()
 		logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
 	err = createTerminalSession(session)
@@ -124,24 +140,8 @@ func (s *SshConnect) Connect(connection *Connect) error {
 		client.Close()
 		session.Close()
 		logger.Error(err.Error())
-		return err
+		return nil, err
 	}
 
-	err = session.Shell()
-	if err != nil {
-		session.Close()
-		client.Close()
-		logger.Error(err.Error())
-		return err
-	}
-
-	err = session.Wait()
-	if err != nil {
-		client.Close()
-		session.Close()
-		logger.Error(err.Error())
-		return err
-	}
-
-	return nil
+	return session, nil
 }
