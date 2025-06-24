@@ -10,9 +10,9 @@ import (
 )
 
 var (
+	ErrNotFoundConnectionAtDelete = errors.New("err found connection")
 	ErrGetConnectionAtDelete      = errors.New("err get connection")
 	ErrSetConnectionAtDelete      = errors.New("err set connection")
-	ErrNotFoundConnectionAtDelete = errors.New("err found connection")
 )
 
 func Delete(connection *connect.Connect) error {
@@ -34,7 +34,9 @@ func Delete(connection *connect.Connect) error {
 				return ErrSetConnectionAtDelete
 			}
 
-			return nil
+			if len(connection.SshOptions.PrivateKey) != 0 {
+				return store.DeletePrivateKey(connection)
+			}
 		}
 	}
 

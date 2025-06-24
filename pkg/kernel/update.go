@@ -26,6 +26,12 @@ func Update(connection *connect.Connect, oldAlias string) error {
 
 	for _, savedConnection := range connections.Connects {
 		if savedConnection.Alias == oldAlias {
+			connection.SshOptions.PrivateKey, err = store.UpdatePrivateKey(connection)
+			if err != nil {
+				logger.Error(ErrSavePrivateKeyAtCreate.Error())
+				return ErrSavePrivateKeyAtCreate
+			}
+
 			connections.Connects = append(connections.Connects, *connection)
 
 			err = store.SetConnections(connections)

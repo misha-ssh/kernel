@@ -11,6 +11,8 @@ import (
 
 var (
 	ErrConnectionByAliasExistsAtCreate = errors.New("connection by alias exists")
+	ErrDeletePrivateKeyAtCreate        = errors.New("err delete private key")
+	ErrSavePrivateKeyAtCreate          = errors.New("err save private key")
 	ErrGetConnectionAtCreate           = errors.New("err get connection")
 	ErrSetConnectionAtCreate           = errors.New("err set connection")
 )
@@ -31,10 +33,26 @@ func Create(connection *connect.Connect) error {
 		}
 	}
 
+	if len(connection.SshOptions.PrivateKey) != 0 {
+		connection.SshOptions.PrivateKey, err = store.SavePrivateKey(connection)
+		if err != nil {
+			logger.Error(ErrSavePrivateKeyAtCreate.Error())
+			return ErrSavePrivateKeyAtCreate
+		}
+	}
+
 	connections.Connects = append(connections.Connects, *connection)
 
 	err = store.SetConnections(connections)
 	if err != nil {
+		if len(connection.SshOptions.PrivateKey) != 0 {
+			errDeleteKey := store.DeletePrivateKey(connection)
+			if errDeleteKey != nil {
+				logger.Error(ErrDeletePrivateKeyAtCreate.Error())
+				return ErrDeletePrivateKeyAtCreate
+			}
+		}
+
 		logger.Error(ErrSetConnectionAtCreate.Error())
 		return ErrSetConnectionAtCreate
 	}
