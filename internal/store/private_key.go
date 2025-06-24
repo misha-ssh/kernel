@@ -5,10 +5,10 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
-
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"reflect"
 )
 
 var (
@@ -80,4 +80,41 @@ func DeletePrivateKey(connection *connect.Connect) error {
 	filenamePrivateKey := connection.Alias
 
 	return storage.Delete(directionPrivateKey, filenamePrivateKey)
+}
+
+func UpdatePrivateKey(connection *connect.Connect) (string, error) {
+	existFilenamePrivateKey := connection.Alias
+
+	if !storage.Exists(DirectionKeys, existFilenamePrivateKey) {
+		if len(connection.SshOptions.PrivateKey) == 0 {
+			return "", nil
+		}
+
+		return SavePrivateKey(connection)
+	}
+
+	existDataPrivateKey, err := storage.Get(DirectionKeys, existFilenamePrivateKey)
+	if err != nil {
+		logger.Error(ErrGetDataPrivateKey.Error())
+		return "", ErrGetDataPrivateKey
+	}
+
+	direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
+	dataPrivateKey, err := storage.Get(direction, filename)
+	if err != nil {
+		logger.Error(ErrGetDataPrivateKey.Error())
+		return "", ErrGetDataPrivateKey
+	}
+
+	if !reflect.DeepEqual(existDataPrivateKey, dataPrivateKey) {
+		err = DeletePrivateKey(connection)
+		if err != nil {
+			logger.Error(err.Error())
+			return "", err
+		}
+
+		return SavePrivateKey(connection)
+	}
+
+	return storage.GetFullPath(DirectionKeys, existFilenamePrivateKey), nil
 }
