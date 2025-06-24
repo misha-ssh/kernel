@@ -1,63 +1,80 @@
 package store
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"encoding/pem"
 	"os"
 	"reflect"
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 
-func createInvalidPrivateKey(direction string) (string, error) {
-	filenameInvalidKey := "invalid"
-	err := storage.Write(direction, filenameInvalidKey, "")
+func Test_validatePrivateKey(t *testing.T) {
+	tempDir := t.TempDir()
+
+	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
 	if err != nil {
-		return "", err
+		t.Fatal(err)
 	}
 
-	return storage.GetFullPath(direction, filenameInvalidKey), nil
-}
-
-func createPrivateKey(direction string) (string, error) {
-	filenameKey := "key"
-
-	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
+	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
 	if err != nil {
-		return "", err
+		t.Fatal(err)
 	}
 
-	privateDER := x509.MarshalPKCS1PrivateKey(privateKey)
+	type args struct {
+		privateKey string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "successful validate data private key",
+			args: args{
+				privateKey: pathToPrivateKey,
+			},
+			wantErr: false,
+		},
+		{
+			name: "invalid data private key",
+			args: args{
+				privateKey: pathToInvalidKey,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			direction, filename := storage.GetDirectionAndFilename(tt.args.privateKey)
+			privateKey, err := storage.Get(direction, filename)
+			if err != nil {
+				t.Errorf("Get() error = %v", err)
+			}
 
-	privateBlock := pem.Block{
-		Type:    "RSA PRIVATE KEY",
-		Headers: nil,
-		Bytes:   privateDER,
+			if err := validatePrivateKey(privateKey); (err != nil) != tt.wantErr {
+				t.Errorf("validatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
 	}
 
-	privatePEM := pem.EncodeToMemory(&privateBlock)
-
-	err = storage.Write(direction, filenameKey, string(privatePEM))
+	err = os.RemoveAll(storage.GetPrivateKeysDir())
 	if err != nil {
-		return "", err
+		t.Fatal(err)
 	}
-
-	return storage.GetFullPath(direction, filenameKey), nil
 }
 
 func TestDeletePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
-	pathToPrivateKey, err := createPrivateKey(tempDir)
+	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pathToInvalidKey, err := createInvalidPrivateKey(tempDir)
+	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -147,12 +164,12 @@ func TestDeletePrivateKey(t *testing.T) {
 func TestSavePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
-	pathToPrivateKey, err := createPrivateKey(tempDir)
+	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pathToInvalidKey, err := createInvalidPrivateKey(tempDir)
+	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -264,21 +281,26 @@ func TestSavePrivateKey(t *testing.T) {
 	}
 }
 
-func Test_validatePrivateKey(t *testing.T) {
+func TestUpdatePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
-	pathToPrivateKey, err := createPrivateKey(tempDir)
+	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	pathToInvalidKey, err := createInvalidPrivateKey(tempDir)
+	pathToExtraPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	type args struct {
-		privateKey string
+		connection *connect.Connect
 	}
 	tests := []struct {
 		name    string
@@ -286,30 +308,93 @@ func Test_validatePrivateKey(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "successful validate data private key",
+			name: "successful update - save private key",
 			args: args{
-				privateKey: pathToPrivateKey,
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKey,
+					},
+				},
 			},
 			wantErr: false,
 		},
 		{
-			name: "invalid data private key",
+			name: "dont save private key - invalid key",
 			args: args{
-				privateKey: pathToInvalidKey,
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToInvalidKey,
+					},
+				},
 			},
 			wantErr: true,
+		},
+		{
+			name: "successful update - get current path private key",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKey,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "successful update - get current path but updated private key",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToExtraPrivateKey,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "successful update - delete and set empty private key",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: "",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "update empty key - get empty path",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test2",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: "",
+					},
+				},
+			},
+			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			direction, filename := storage.GetDirectionAndFilename(tt.args.privateKey)
-			privateKey, err := storage.Get(direction, filename)
-			if err != nil {
-				t.Errorf("Get() error = %v", err)
+			got, err := UpdatePrivateKey(tt.args.connection)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("UpdatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 
-			if err := validatePrivateKey(privateKey); (err != nil) != tt.wantErr {
-				t.Errorf("validatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
+			want := storage.GetFullPath(
+				storage.GetPrivateKeysDir(),
+				tt.args.connection.Alias,
+			)
+
+			if got != want {
+				t.Errorf("UpdatePrivateKey() got = %v, want %v", got, want)
 			}
 		})
 	}
