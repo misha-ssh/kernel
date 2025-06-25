@@ -306,6 +306,7 @@ func TestUpdatePrivateKey(t *testing.T) {
 		name    string
 		args    args
 		wantErr bool
+		want    func() string
 	}{
 		{
 			name: "successful update - save private key",
@@ -317,10 +318,16 @@ func TestUpdatePrivateKey(t *testing.T) {
 					},
 				},
 			},
+			want: func() string {
+				return storage.GetFullPath(
+					storage.GetPrivateKeysDir(),
+					"test",
+				)
+			},
 			wantErr: false,
 		},
 		{
-			name: "dont save private key - invalid key",
+			name: "fail update - dont save invalid key",
 			args: args{
 				connection: &connect.Connect{
 					Alias: "test",
@@ -328,6 +335,9 @@ func TestUpdatePrivateKey(t *testing.T) {
 						PrivateKey: pathToInvalidKey,
 					},
 				},
+			},
+			want: func() string {
+				return pathToInvalidKey
 			},
 			wantErr: true,
 		},
@@ -341,6 +351,12 @@ func TestUpdatePrivateKey(t *testing.T) {
 					},
 				},
 			},
+			want: func() string {
+				return storage.GetFullPath(
+					storage.GetPrivateKeysDir(),
+					"test",
+				)
+			},
 			wantErr: false,
 		},
 		{
@@ -352,6 +368,12 @@ func TestUpdatePrivateKey(t *testing.T) {
 						PrivateKey: pathToExtraPrivateKey,
 					},
 				},
+			},
+			want: func() string {
+				return storage.GetFullPath(
+					storage.GetPrivateKeysDir(),
+					"test",
+				)
 			},
 			wantErr: false,
 		},
@@ -365,10 +387,13 @@ func TestUpdatePrivateKey(t *testing.T) {
 					},
 				},
 			},
+			want: func() string {
+				return ""
+			},
 			wantErr: false,
 		},
 		{
-			name: "update empty key - get empty path",
+			name: "successful update - update not exists key, get empty path",
 			args: args{
 				connection: &connect.Connect{
 					Alias: "test2",
@@ -377,25 +402,44 @@ func TestUpdatePrivateKey(t *testing.T) {
 					},
 				},
 			},
+			want: func() string {
+				return ""
+			},
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := UpdatePrivateKey(tt.args.connection)
+			pathOldPrivateKey := tt.args.connection.SshOptions.PrivateKey
+
+			pathCreatedKey, err := UpdatePrivateKey(tt.args.connection)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("UpdatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 
-			want := storage.GetFullPath(
-				storage.GetPrivateKeysDir(),
-				tt.args.connection.Alias,
-			)
-
-			if got != want {
-				t.Errorf("UpdatePrivateKey() got = %v, want %v", got, want)
+			if (pathCreatedKey != tt.want()) != tt.wantErr {
+				t.Errorf("UpdatePrivateKey() got = %v, want %v", pathCreatedKey, tt.want())
 			}
+
+			if len(pathOldPrivateKey) != 0 && len(pathCreatedKey) != 0 {
+				directionOldKey, filenameOldKey := storage.GetDirectionAndFilename(pathOldPrivateKey)
+				dataOldKey, err := storage.Get(directionOldKey, filenameOldKey)
+				if err != nil {
+					t.Error("old key Get() error = ", err)
+				}
+
+				directionCreatedKey, filenameCreatedKey := storage.GetDirectionAndFilename(pathCreatedKey)
+				dataCreatedKey, err := storage.Get(directionCreatedKey, filenameCreatedKey)
+				if err != nil {
+					t.Error("old key Get() error = ", err)
+				}
+
+				if !reflect.DeepEqual(dataOldKey, dataCreatedKey) {
+					t.Errorf("data old key: %v != data created key: %v", pathOldPrivateKey, dataCreatedKey)
+				}
+			}
+
 		})
 	}
 
