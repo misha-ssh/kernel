@@ -5,6 +5,7 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
+	"os"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 )
@@ -43,4 +44,8 @@ func CreatePrivateKey(direction string) (string, error) {
 	}
 
 	return storage.GetFullPath(direction, filenameKey), nil
+}
+
+func RemoveDirectionPrivateKey() error {
+	return os.RemoveAll(storage.GetPrivateKeysDir())
 }
