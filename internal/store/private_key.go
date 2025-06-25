@@ -93,6 +93,16 @@ func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 		return SavePrivateKey(connection)
 	}
 
+	if len(connection.SshOptions.PrivateKey) == 0 {
+		err := DeletePrivateKey(connection)
+		if err != nil {
+			logger.Error(err.Error())
+			return "", err
+		}
+
+		return "", nil
+	}
+
 	existDataPrivateKey, err := storage.Get(DirectionKeys, existFilenamePrivateKey)
 	if err != nil {
 		logger.Error(ErrGetDataPrivateKey.Error())
