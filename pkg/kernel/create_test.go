@@ -1,25 +1,38 @@
 package kernel
 
 import (
+	"os"
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 
 func TestCreate(t *testing.T) {
+	tempDir := t.TempDir()
+
+	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	type args struct {
 		connect *connect.Connect
 	}
 	tests := []struct {
-		name                   string
-		args                   args
-		wantErr                bool
-		isDeleteFileConnection bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
-			name: "success create connection",
+			name: "success - create connection",
 			args: args{
 				connect: &connect.Connect{
 					Alias:      "test",
@@ -29,14 +42,13 @@ func TestCreate(t *testing.T) {
 					Type:       connect.TypeSSH,
 					CreatedAt:  "time",
 					UpdatedAt:  "time",
-					SshOptions: nil,
+					SshOptions: &connect.SshOptions{},
 				},
 			},
-			wantErr:                false,
-			isDeleteFileConnection: true,
+			wantErr: false,
 		},
 		{
-			name: "create connection with test alias - get err",
+			name: "fail - exist alias",
 			args: args{
 				connect: &connect.Connect{
 					Alias:      "test",
@@ -46,25 +58,93 @@ func TestCreate(t *testing.T) {
 					Type:       connect.TypeSSH,
 					CreatedAt:  "time",
 					UpdatedAt:  "time",
-					SshOptions: nil,
+					SshOptions: &connect.SshOptions{},
 				},
 			},
-			wantErr:                true,
-			isDeleteFileConnection: false,
+			wantErr: true,
 		},
+		{
+			name: "success - add ssh options",
+			args: args{
+				connect: &connect.Connect{
+					Alias:     "test2",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: "time",
+					UpdatedAt: "time",
+					SshOptions: &connect.SshOptions{
+						Port:       22,
+						PrivateKey: "",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "success - save private key",
+			args: args{
+				connect: &connect.Connect{
+					Alias:     "test3",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: "time",
+					UpdatedAt: "time",
+					SshOptions: &connect.SshOptions{
+						Port:       22,
+						PrivateKey: pathToPrivateKey,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "fail - dont valid private key",
+			args: args{
+				connect: &connect.Connect{
+					Alias:     "test4",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: "time",
+					UpdatedAt: "time",
+					SshOptions: &connect.SshOptions{
+						Port:       22,
+						PrivateKey: pathToInvalidKey,
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+
+	if storage.Exists(storage.GetAppDir(), envconst.FilenameConnections) {
+		if err = storage.Delete(storage.GetAppDir(), envconst.FilenameConnections); err != nil {
+			t.Errorf("failed to delete connection %v", err)
+		}
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isDeleteFileConnection {
-				if err := storage.Delete(storage.GetAppDir(), envconst.FilenameConnections); (err != nil) != tt.wantErr {
-					t.Errorf("failed to delete connection %v", err)
-				}
-			}
-
 			if err := Create(tt.args.connect); (err != nil) != tt.wantErr {
 				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 			}
+
+			if len(tt.args.connect.SshOptions.PrivateKey) != 0 {
+				direction, filename := storage.GetDirectionAndFilename(tt.args.connect.SshOptions.PrivateKey)
+				if !storage.Exists(direction, filename) {
+					t.Errorf("failed to check connection %v", err)
+				}
+			}
 		})
+	}
+
+	err = os.RemoveAll(storage.GetPrivateKeysDir())
+	if err != nil {
+		t.Fatal(err)
 	}
 }
