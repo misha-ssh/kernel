@@ -1,10 +1,8 @@
 package kernel
 
 import (
-	"os"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/ssh-connection-manager/kernel/v2/testutil"
@@ -122,10 +120,8 @@ func TestCreate(t *testing.T) {
 		},
 	}
 
-	if storage.Exists(storage.GetAppDir(), envconst.FilenameConnections) {
-		if err = storage.Delete(storage.GetAppDir(), envconst.FilenameConnections); err != nil {
-			t.Errorf("failed to delete connection %v", err)
-		}
+	if err = testutil.RemoveFileConnections(); err != nil {
+		t.Fatal(err)
 	}
 
 	for _, tt := range tests {
@@ -143,8 +139,7 @@ func TestCreate(t *testing.T) {
 		})
 	}
 
-	err = os.RemoveAll(storage.GetPrivateKeysDir())
-	if err != nil {
+	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
 		t.Fatal(err)
 	}
 }

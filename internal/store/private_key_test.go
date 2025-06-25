@@ -1,7 +1,6 @@
 package store
 
 import (
-	"os"
 	"reflect"
 	"testing"
 
@@ -60,8 +59,7 @@ func Test_validatePrivateKey(t *testing.T) {
 		})
 	}
 
-	err = os.RemoveAll(storage.GetPrivateKeysDir())
-	if err != nil {
+	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -155,8 +153,7 @@ func TestDeletePrivateKey(t *testing.T) {
 		})
 	}
 
-	err = os.RemoveAll(storage.GetPrivateKeysDir())
-	if err != nil {
+	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -275,8 +272,7 @@ func TestSavePrivateKey(t *testing.T) {
 		})
 	}
 
-	err = os.RemoveAll(storage.GetPrivateKeysDir())
-	if err != nil {
+	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -443,8 +439,7 @@ func TestUpdatePrivateKey(t *testing.T) {
 		})
 	}
 
-	err = os.RemoveAll(storage.GetPrivateKeysDir())
-	if err != nil {
+	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
 		t.Fatal(err)
 	}
 }
