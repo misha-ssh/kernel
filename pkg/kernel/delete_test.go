@@ -1,6 +1,7 @@
 package kernel
 
 import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
@@ -114,6 +115,13 @@ func TestDelete(t *testing.T) {
 
 			if err := Delete(tt.args.connection); (err != nil) != tt.wantErr {
 				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if len(tt.args.connection.SshOptions.PrivateKey) != 0 {
+				direction, filename := storage.GetDirectionAndFilename(tt.args.connection.SshOptions.PrivateKey)
+				if storage.Exists(direction, filename) {
+					t.Errorf("failed to check connection %v", err)
+				}
 			}
 		})
 	}
