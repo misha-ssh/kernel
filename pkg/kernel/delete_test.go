@@ -1,10 +1,10 @@
 package kernel
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"testing"
 
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
+	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 
@@ -29,16 +29,14 @@ func TestDelete(t *testing.T) {
 			name: "success - delete connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test",
-					Login:     "test",
-					Address:   "test",
-					Password:  "test",
-					Type:      connect.TypeSSH,
-					CreatedAt: "time",
-					UpdatedAt: "time",
-					SshOptions: &connect.SshOptions{
-						PrivateKey: "",
-					},
+					Alias:      "test",
+					Login:      "test",
+					Address:    "test",
+					Password:   "test",
+					Type:       connect.TypeSSH,
+					CreatedAt:  "time",
+					UpdatedAt:  "time",
+					SshOptions: &connect.SshOptions{},
 				},
 			},
 			wantErr:            false,
