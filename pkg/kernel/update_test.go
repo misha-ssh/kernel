@@ -3,23 +3,27 @@ package kernel
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 
 func TestUpdate(t *testing.T) {
+	tempDir := t.TempDir()
+
+	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	type args struct {
 		connection *connect.Connect
 		oldAlias   string
 	}
-
 	tests := []struct {
-		name                   string
-		args                   args
-		wantErr                bool
-		isCreateConnection     bool
-		isDeleteFileConnection bool
+		name               string
+		args               args
+		wantErr            bool
+		isCreateConnection bool
 	}{
 		{
 			name: "success update - update on default old value",
@@ -36,9 +40,8 @@ func TestUpdate(t *testing.T) {
 				},
 				oldAlias: "test",
 			},
-			wantErr:                false,
-			isCreateConnection:     true,
-			isDeleteFileConnection: true,
+			wantErr:            false,
+			isCreateConnection: true,
 		},
 		{
 			name: "not found connection - get exist connect and get not exists old alias",
@@ -55,9 +58,8 @@ func TestUpdate(t *testing.T) {
 				},
 				oldAlias: "notFoundAlias",
 			},
-			wantErr:                true,
-			isCreateConnection:     false,
-			isDeleteFileConnection: false,
+			wantErr:            true,
+			isCreateConnection: false,
 		},
 		{
 			name: "update values by exist connection",
@@ -74,20 +76,31 @@ func TestUpdate(t *testing.T) {
 				},
 				oldAlias: "test",
 			},
-			wantErr:                false,
-			isCreateConnection:     false,
-			isDeleteFileConnection: false,
+			wantErr:            false,
+			isCreateConnection: false,
+		},
+		{
+			name: "a",
+			args: args{
+				connection: &connect.Connect{
+					Alias:      "update",
+					Login:      "update",
+					Address:    "update",
+					Password:   "update",
+					Type:       connect.TypeSSH,
+					CreatedAt:  "update",
+					UpdatedAt:  "update",
+					SshOptions: &connect.SshOptions{PrivateKey: pathToPrivateKey},
+				},
+				oldAlias: "test",
+			},
+			wantErr:            false,
+			isCreateConnection: false,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isDeleteFileConnection {
-				if err := storage.Delete(storage.GetAppDir(), envconst.FilenameConnections); (err != nil) != tt.wantErr {
-					t.Errorf("failed to delete connection %v", err)
-				}
-			}
-
 			if tt.isCreateConnection {
 				if err := Create(tt.args.connection); (err != nil) != tt.wantErr {
 					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
