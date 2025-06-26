@@ -37,6 +37,8 @@ func Delete(connection *connect.Connect) error {
 			if len(connection.SshOptions.PrivateKey) != 0 {
 				return store.DeletePrivateKey(connection)
 			}
+
+			return nil
 		}
 	}
 
