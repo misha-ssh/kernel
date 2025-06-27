@@ -18,21 +18,14 @@ func main() {
 		},
 	}
 
-	sshConnect := connect.NewSshConnect()
-	session, err := sshConnect.Connect(connection)
+	sshConnect := connect.NewSshConnector()
+	session, err := sshConnect.NewSession(connection)
 	if err != nil {
 		panic(err)
 	}
 
-	err = session.Shell()
+	err = sshConnect.Connect(session)
 	if err != nil {
 		panic(err)
 	}
-
-	err = session.Wait()
-	if err != nil {
-		panic(err)
-	}
-
-	defer session.Close()
 }
