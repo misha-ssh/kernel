@@ -24,10 +24,64 @@ const (
 	WidthTerminal  = 40
 )
 
-type SshConnect struct{}
+type SshConnector struct{}
 
-func NewSshConnect() *SshConnect {
-	return &SshConnect{}
+func NewSshConnector() *SshConnector {
+	return &SshConnector{}
+}
+
+func (s *SshConnector) NewSession(connection *Connect) (*ssh.Session, error) {
+	config, err := getClientConfig(connection)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	hostWithPort := net.JoinHostPort(
+		connection.Address,
+		fmt.Sprint(connection.SshOptions.Port),
+	)
+
+	client, err := getClient(hostWithPort, config)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	session, err := getSession(client)
+	if err != nil {
+		client.Close()
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	err = createTerminalSession(session)
+	if err != nil {
+		client.Close()
+		session.Close()
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	return session, nil
+}
+
+func (s *SshConnector) Connect(session *ssh.Session) error {
+	defer session.Close()
+
+	err := session.Shell()
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	err = session.Wait()
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+
+	return nil
 }
 
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
@@ -103,42 +157,6 @@ func getClient(hostWithPort string, config *ssh.ClientConfig) (*ssh.Client, erro
 func getSession(client *ssh.Client) (*ssh.Session, error) {
 	session, err := client.NewSession()
 	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return session, nil
-}
-
-func (s *SshConnect) Connect(connection *Connect) (*ssh.Session, error) {
-	config, err := getClientConfig(connection)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	hostWithPort := net.JoinHostPort(
-		connection.Address,
-		fmt.Sprint(connection.SshOptions.Port),
-	)
-
-	client, err := getClient(hostWithPort, config)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	session, err := getSession(client)
-	if err != nil {
-		client.Close()
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	err = createTerminalSession(session)
-	if err != nil {
-		client.Close()
-		session.Close()
 		logger.Error(err.Error())
 		return nil, err
 	}
