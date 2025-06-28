@@ -20,12 +20,10 @@ func CreateInvalidPrivateKey(direction string) (string, error) {
 	return storage.GetFullPath(direction, filenameInvalidKey), nil
 }
 
-func CreatePrivateKey(direction string) (string, error) {
-	filenameKey := "key"
-
+func GeneratePrivateKey() ([]byte, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	privateDER := x509.MarshalPKCS1PrivateKey(privateKey)
@@ -37,6 +35,17 @@ func CreatePrivateKey(direction string) (string, error) {
 	}
 
 	privatePEM := pem.EncodeToMemory(&privateBlock)
+
+	return privatePEM, nil
+}
+
+func CreatePrivateKey(direction string) (string, error) {
+	privatePEM, err := GeneratePrivateKey()
+	if err != nil {
+		return "", err
+	}
+
+	filenameKey := "key"
 
 	err = storage.Write(direction, filenameKey, string(privatePEM))
 	if err != nil {
