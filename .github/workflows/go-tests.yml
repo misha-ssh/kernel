@@ -10,8 +10,8 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22.x'
+          go-version: '1.24.x'
       - name: Install dependencies
         run: go get ./...
       - name: Test with the Go CLI
-        run: go test ./... -test.v -tags module
+        run: go test ./... -test.v
