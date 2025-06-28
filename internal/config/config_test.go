@@ -1,6 +1,9 @@
 package config
 
-import "testing"
+import (
+	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
+	"testing"
+)
 
 func TestStorage_Set(t *testing.T) {
 	tests := []struct {
@@ -94,6 +97,8 @@ func TestStorage_Set(t *testing.T) {
 			wantErr: false,
 		},
 	}
+
+	setup.Init()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
