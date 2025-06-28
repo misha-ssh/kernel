@@ -2,31 +2,38 @@ package kernel
 
 import (
 	"errors"
-
 	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
-	"golang.org/x/crypto/ssh"
 )
 
 var (
+	ErrSshSession  = errors.New("err ssh session")
 	ErrSshConnect  = errors.New("err ssh connect")
 	ErrTypeConnect = errors.New("err type connect")
 )
 
-func Connect(connection *connect.Connect) (*ssh.Session, error) {
+func Connect(connection *connect.Connect) error {
 	setup.Init()
 
 	switch connection.Type {
 	case connect.TypeSSH:
-		sshConnect := connect.NewSshConnect()
-		session, err := sshConnect.Connect(connection)
+		sshConnector := connect.NewSshConnector()
+
+		session, err := sshConnector.NewSession(connection)
+		if err != nil {
+			logger.Error(ErrSshSession.Error())
+			return ErrSshSession
+		}
+
+		err = sshConnector.Connect(session)
 		if err != nil {
 			logger.Error(ErrSshConnect.Error())
-			return nil, ErrSshConnect
+			return ErrSshConnect
 		}
-		return session, nil
 	default:
-		return nil, ErrTypeConnect
+		return ErrTypeConnect
 	}
+
+	return nil
 }
