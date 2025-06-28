@@ -1,37 +1,33 @@
 package store
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
-	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
 	"reflect"
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
+	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
+	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 
 func TestGetConnections(t *testing.T) {
 	tests := []struct {
-		name                   string
-		want                   *connect.Connections
-		wantErr                bool
-		isDeleteFileConnection bool
+		name    string
+		want    *connect.Connections
+		wantErr bool
 	}{
 		{
-			name:                   "get empty connections",
-			want:                   &connect.Connections{},
-			wantErr:                false,
-			isDeleteFileConnection: true,
+			name:    "get empty connections",
+			want:    &connect.Connections{},
+			wantErr: false,
 		},
 	}
+
+	if err := testutil.RemoveFileConnections(); err != nil {
+		t.Fatal(err)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isDeleteFileConnection {
-				err := storage.Delete(storage.GetAppDir(), envconst.FilenameConnections)
-				if err != nil {
-					t.Errorf("failed to delete connection %v", err)
-				}
-			}
-
 			setup.Init()
 
 			got, err := GetConnections()
