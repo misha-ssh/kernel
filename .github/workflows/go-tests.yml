@@ -11,7 +11,14 @@ jobs:
         uses: actions/setup-go@v5
         with:
           go-version: '1.24.x'
-      - name: Install dependencies
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y gnome-keyring build-essential ca-certificates
+          mkdir -p /github/home/.cache/
+          mkdir -p /github/home/.local/share/keyrings/
+          chmod 700 -R /github/home/.local/
+      - name: Get dependencies
         run: go get ./...
       - name: Test with the Go CLI
         run: go test ./... -test.v
