@@ -2,6 +2,8 @@ package config
 
 import (
 	"testing"
+
+	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 
 func TestStorage_Set(t *testing.T) {
@@ -97,6 +99,11 @@ func TestStorage_Set(t *testing.T) {
 		},
 	}
 
+	err := testutil.CreateFileConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Set(tt.key, tt.value)
@@ -159,6 +166,11 @@ func TestStorage_Get(t *testing.T) {
 		},
 	}
 
+	err := testutil.CreateFileConfig()
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isSetValue {
@@ -207,6 +219,11 @@ func TestStorage_Exists(t *testing.T) {
 			isCreateKey: false,
 			want:        false,
 		},
+	}
+
+	err := testutil.CreateFileConfig()
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	for _, tt := range tests {
