@@ -10,8 +10,7 @@ func validateOnEmptyString(value string) error {
 		return ErrValueIsInvalid
 	}
 
-	runes := []rune(value)
-	for _, r := range runes {
+	for _, r := range value {
 		if unicode.IsSpace(r) {
 			return ErrValueIsInvalid
 		}

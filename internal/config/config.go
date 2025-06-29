@@ -129,7 +129,7 @@ func Exists(key string) bool {
 		return false
 	}
 
-	return strings.Index(got, strings.ToUpper(key)) != -1
+	return strings.Contains(got, strings.ToUpper(key))
 }
 
 func rewrite(key, value string) error {
