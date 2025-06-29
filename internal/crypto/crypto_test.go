@@ -61,11 +61,17 @@ func TestStorage_Decrypt(t *testing.T) {
 
 			if tt.generateKey {
 				tt.args.key, err = GenerateKey()
+				if err != nil {
+					t.Errorf("GenerateKey() error = %v", err)
+				}
 			}
 
 			cryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
-			got, err := Decrypt(cryptText, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Encrypt() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
+			got, err := Decrypt(cryptText, tt.args.key)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Decrypt() error = %v, wantErr %v", err, tt.wantErr)
 			}
@@ -136,11 +142,17 @@ func TestStorage_Encrypt(t *testing.T) {
 
 			if tt.generateKey {
 				tt.args.key, err = GenerateKey()
+				if err != nil {
+					t.Errorf("GenerateKey() error = %v", err)
+				}
 			}
 
 			encryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
-			got, err := Decrypt(encryptText, tt.args.key)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Encrypt() error = %v, wantErr %v", err, tt.wantErr)
+			}
 
+			got, err := Decrypt(encryptText, tt.args.key)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Decrypt() error = %v, wantErr %v", err, tt.wantErr)
 			}

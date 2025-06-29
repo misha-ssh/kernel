@@ -180,7 +180,11 @@ func Test_initLoggerFromConfig(t *testing.T) {
 				}
 
 				// set default type logger before completed test
-				defer config.Set(envname.Logger, envconst.TypeStorageLogger)
+				defer func() {
+					if err = config.Set(envname.Logger, envconst.TypeStorageLogger); err != nil {
+						t.Errorf("Set() error = %v", err)
+					}
+				}()
 			}
 
 			if err := initLoggerFromConfig(); (err != nil) != tt.wantErr {

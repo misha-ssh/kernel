@@ -50,15 +50,26 @@ func (s *SshConnector) NewSession(connection *Connect) (*ssh.Session, error) {
 
 	session, err := getSession(client)
 	if err != nil {
-		client.Close()
+		if errClient := client.Close(); errClient != nil {
+			logger.Error(errClient.Error())
+			return nil, errClient
+		}
+
 		logger.Error(err.Error())
 		return nil, err
 	}
 
 	err = createTerminalSession(session)
 	if err != nil {
-		client.Close()
-		session.Close()
+		if errClient := client.Close(); errClient != nil {
+			logger.Error(errClient.Error())
+			return nil, errClient
+		}
+		if errSession := session.Close(); errSession != nil {
+			logger.Error(errSession.Error())
+			return nil, errSession
+		}
+
 		logger.Error(err.Error())
 		return nil, err
 	}
@@ -67,7 +78,12 @@ func (s *SshConnector) NewSession(connection *Connect) (*ssh.Session, error) {
 }
 
 func (s *SshConnector) Connect(session *ssh.Session) error {
-	defer session.Close()
+	defer func() {
+		if err := session.Close(); err != nil {
+			logger.Error(err.Error())
+			panic(err)
+		}
+	}()
 
 	err := session.Shell()
 	if err != nil {
