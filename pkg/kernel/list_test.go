@@ -31,7 +31,7 @@ func TestList(t *testing.T) {
 			name: "list connections - create empty connections",
 			want: &connect.Connections{
 				Connects: []connect.Connect{
-					connect.Connect{
+					{
 						Alias:      "test",
 						Login:      "test",
 						Address:    "test",
@@ -41,7 +41,7 @@ func TestList(t *testing.T) {
 						UpdatedAt:  "time",
 						SshOptions: &connect.SshOptions{},
 					},
-					connect.Connect{
+					{
 						Alias:      "test 2",
 						Login:      "test",
 						Address:    "test",
@@ -51,7 +51,7 @@ func TestList(t *testing.T) {
 						UpdatedAt:  "time",
 						SshOptions: &connect.SshOptions{},
 					},
-					connect.Connect{
+					{
 						Alias:      "test 3",
 						Login:      "test",
 						Address:    "test",
