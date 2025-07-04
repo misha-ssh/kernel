@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrNotFoundConnectionAtUpdate = errors.New("err not found connection")
+	ErrSavePrivateKeyAtUpdate     = errors.New("err save private key")
 	ErrGetConnectionAtUpdate      = errors.New("err get connection")
 	ErrSetConnectionAtUpdate      = errors.New("err set connection")
 )
@@ -24,15 +25,15 @@ func Update(connection *connect.Connect, oldAlias string) error {
 		return ErrGetConnectionAtUpdate
 	}
 
-	for _, savedConnection := range connections.Connects {
+	for i, savedConnection := range connections.Connects {
 		if savedConnection.Alias == oldAlias {
 			connection.SshOptions.PrivateKey, err = store.UpdatePrivateKey(connection)
 			if err != nil {
-				logger.Error(ErrSavePrivateKeyAtCreate.Error())
-				return ErrSavePrivateKeyAtCreate
+				logger.Error(ErrSavePrivateKeyAtUpdate.Error())
+				return ErrSavePrivateKeyAtUpdate
 			}
 
-			connections.Connects = append(connections.Connects, *connection)
+			connections.Connects[i] = *connection
 
 			err = store.SetConnections(connections)
 			if err != nil {
