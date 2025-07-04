@@ -1,58 +1,43 @@
 package connect
 
-import (
-	"errors"
-	"fmt"
-	"os"
-	"os/exec"
+import "golang.org/x/crypto/ssh"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/json"
-)
-
-func Ssh(c *json.Connections, alias string, fl file.File) error {
-	data, err := fl.ReadFile()
-	if err != nil {
-		logger.Danger(err.Error())
-		return err
-	}
-
-	err = c.SerializationJson(data)
-	if err != nil {
-		logger.Danger(err.Error())
-		return err
-	}
-
-	err = c.SetDecryptData()
-	if err != nil {
-		logger.Danger(err.Error())
-		return err
-	}
-
-	for _, v := range c.Connects {
-		if v.Alias == alias {
-			sshConnect(v.Address, v.Login, v.Password)
-			return nil
-		}
-	}
-
-	errText := "alias not found"
-
-	logger.Danger(errText)
-	return errors.New(errText)
+type Connector interface {
+	Connect(session *ssh.Session) error
+	NewSession(connection *Connect) (*ssh.Session, error)
 }
 
-func sshConnect(address, login, password string) {
-	sshCommand := "sshpass -p '" + password + "' ssh -o StrictHostKeyChecking=no -t " + login + "@" + address
-	sshCmd := exec.Command("bash", "-c", sshCommand)
+type ConnectionType string
 
-	sshCmd.Stdout = os.Stdout
-	sshCmd.Stderr = os.Stderr
-	sshCmd.Stdin = os.Stdin
+// TypeSSH type for ssh connection
+const TypeSSH ConnectionType = "ssh"
 
-	if err := sshCmd.Run(); err != nil {
-		logger.Danger(err.Error())
-		fmt.Println("Error while executing the command:", err)
-	}
+type Connections struct {
+	Connects []Connect `json:"connects"`
+}
+
+// Connect represents a single connection configuration
+type Connect struct {
+	// Alias is a user-defined name for the connection
+	Alias     string `json:"alias"`
+	Login     string `json:"login"`
+	Address   string `json:"address"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+
+	// Type specifies the connection protocol (e.g., "ssh")
+	Type ConnectionType `json:"type"`
+
+	// SshOptions contains SSH-specific configuration options
+	SshOptions *SshOptions `json:"ssh_options,omitempty"`
+}
+
+// SshOptions contains configuration options specific to SSH connections
+type SshOptions struct {
+	// Port specifies the SSH port (default is 22 if not specified)
+	Port int `json:"port"`
+
+	// PrivateKey contains the PEM-encoded private key for authentication
+	PrivateKey string `json:"private_key"`
 }

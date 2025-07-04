@@ -1,17 +1,36 @@
 name: Tests
-on: [push]
+on: [ push ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ubuntu:latest
+      options: --privileged
+      env:
+        DEBIAN_FRONTEND: noninteractive
 
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22.x'
-      - name: Install dependencies
-        run: go get ./...
-      - name: Test with the Go CLI
-        run: go test ./... -test.v -tags module
+          go-version: '1.24.x'
+
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y gnome-keyring build-essential ca-certificates
+          mkdir -p /github/home/.cache/
+          mkdir -p /github/home/.local/share/keyrings/
+          chmod 700 -R /github/home/.local/
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Test
+        run: |
+          echo 'somecredstorepass' | gnome-keyring-daemon --unlock
+          go test -v ./...
+        shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}

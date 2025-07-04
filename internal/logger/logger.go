@@ -1,62 +1,41 @@
 package logger
 
-import (
-	"log"
-	"os"
-	"path/filepath"
-	"runtime"
-	"strconv"
-
-	"github.com/ssh-connection-manager/kernel/v2/pkg/file"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/output"
-)
-
-const Skip = 1
-
-func GenerateFile(fl file.File) error {
-	SetFile(fl)
-	logFile := GetFile()
-
-	if !logFile.IsExistFile() {
-		err := logFile.CreateFile()
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
+// Logger interface defines standard logging methods
+type Logger interface {
+	Error(value any) // Logs error messages
+	Debug(value any) // Logs debug information
+	Info(value any)  // Logs general information
+	Warn(value any)  // Logs warning messages
 }
 
-// TODO переписать логику на пакет file
-func getOpenLogFile(fl file.File) (*os.File, error) {
-	path := filepath.Join(fl.Path, fl.Name)
+const SkipUseLevel = 3
 
-	logFile, err := os.OpenFile(path, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0644)
-	if err != nil {
-		return nil, err
+var defaultLogger Logger
+
+func Get() Logger {
+	if defaultLogger == nil {
+		defaultLogger = NewConsoleLogger()
 	}
-	return logFile, nil
+
+	return defaultLogger
 }
 
-func Danger(message string) {
-	logFile := GetFile()
-	openLogFile, err := getOpenLogFile(logFile)
-	if err != nil {
-		output.GetOutError("dont open log file")
-	}
+func Set(logger Logger) {
+	defaultLogger = logger
+}
 
-	defer func(openLogFile *os.File) {
-		err := openLogFile.Close()
-		if err != nil {
-			output.GetOutError("dont close opened log file")
-		}
-	}(openLogFile)
+func Error(value any) {
+	Get().Error(value)
+}
 
-	_, calledFile, line, ok := runtime.Caller(Skip)
-	if ok {
-		message = "file: " + calledFile + ", line: " + strconv.Itoa(line) + ", message: " + message
-	}
+func Debug(value any) {
+	Get().Debug(value)
+}
 
-	errorLog := log.New(openLogFile, "[error] ", log.LstdFlags|log.Lmicroseconds)
-	errorLog.Println(message)
+func Info(value any) {
+	Get().Info(value)
+}
+
+func Warn(value any) {
+	Get().Warn(value)
 }
