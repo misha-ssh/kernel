@@ -11,6 +11,7 @@ import (
 
 var ErrGetCryptKey = errors.New("err get crypt key")
 
+// GetCryptKey get master key from keyring
 func GetCryptKey() (string, error) {
 	currentUser, err := user.Current()
 	if err != nil {

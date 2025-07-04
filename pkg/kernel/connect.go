@@ -14,6 +14,7 @@ var (
 	ErrTypeConnect = errors.New("err type connect")
 )
 
+// Connect from connection by type connection
 func Connect(connection *connect.Connect) error {
 	setup.Init()
 

@@ -17,6 +17,7 @@ var (
 	ErrSetConnectionAtCreate           = errors.New("err set connection")
 )
 
+// Create add connection in file
 func Create(connection *connect.Connect) error {
 	setup.Init()
 

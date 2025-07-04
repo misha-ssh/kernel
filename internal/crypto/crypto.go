@@ -35,6 +35,10 @@ func getGcm(key string) (cipher.AEAD, error) {
 	return gcm, nil
 }
 
+// Encrypt securely encrypts plaintext using AES-GCM with:
+// - Provided encryption key
+// - Random nonce generation
+// Returns ciphertext or error if encryption fails
 func Encrypt(plaintext string, key string) (string, error) {
 	gcm, err := getGcm(key)
 	if err != nil {
@@ -54,6 +58,10 @@ func Encrypt(plaintext string, key string) (string, error) {
 	return encryptData, nil
 }
 
+// Decrypt authenticates and decrypts ciphertext using:
+// - Same key used for encryption
+// - Embedded nonce from ciphertext
+// Returns plaintext or error if decryption/authentication fails
 func Decrypt(ciphertext string, key string) (string, error) {
 	ciphertextToByte := []byte(ciphertext)
 
@@ -75,6 +83,10 @@ func Decrypt(ciphertext string, key string) (string, error) {
 	return string(plaintext), nil
 }
 
+// GenerateKey creates a cryptographically secure:
+// - 256-bit (32-byte) random key
+// - Suitable for AES-256 encryption
+// Returns key or error if random generation fails
 func GenerateKey() (string, error) {
 	key := make([]byte, SizeKey)
 

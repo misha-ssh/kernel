@@ -24,6 +24,7 @@ var (
 	ErrDecryptData   = errors.New("failed to decrypt data")
 )
 
+// GetConnections get connection from file
 func GetConnections() (*connect.Connections, error) {
 	var connections connect.Connections
 
@@ -54,6 +55,7 @@ func GetConnections() (*connect.Connections, error) {
 	return &connections, nil
 }
 
+// SetConnections save connection in file
 func SetConnections(connections *connect.Connections) error {
 	cryptKey, err := GetCryptKey()
 	if err != nil {

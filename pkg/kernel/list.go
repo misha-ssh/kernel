@@ -11,6 +11,7 @@ import (
 
 var ErrGetConnectionAtList = errors.New("err get connections")
 
+// List get list with connections from file
 func List() (*connect.Connections, error) {
 	setup.Init()
 

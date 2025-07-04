@@ -45,6 +45,7 @@ func validatePrivateKey(privateKey string) error {
 	return nil
 }
 
+// SavePrivateKey create private key for connection in spec dir
 func SavePrivateKey(connection *connect.Connect) (string, error) {
 	direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
 	dataPrivateKey, err := storage.Get(direction, filename)
@@ -76,6 +77,7 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 	return storage.GetFullPath(DirectionKeys, filenamePrivateKey), nil
 }
 
+// DeletePrivateKey delete key from dir for current connection
 func DeletePrivateKey(connection *connect.Connect) error {
 	directionPrivateKey := storage.GetPrivateKeysDir()
 	filenamePrivateKey := connection.Alias
@@ -83,6 +85,7 @@ func DeletePrivateKey(connection *connect.Connect) error {
 	return storage.Delete(directionPrivateKey, filenamePrivateKey)
 }
 
+// UpdatePrivateKey update data private key
 func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 	existFilenamePrivateKey := connection.Alias
 

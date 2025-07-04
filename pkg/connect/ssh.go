@@ -30,6 +30,13 @@ func NewSshConnector() *Ssh {
 	return &Ssh{}
 }
 
+// NewSession establishes a new SSH session with the remote server.
+// It handles the complete connection lifecycle including:
+// - Authentication (password or private key)
+// - Client creation
+// - Terminal setup
+// - Error handling and resource cleanup
+// Returns an active SSH session or error if any step fails.
 func (s *Ssh) NewSession(connection *Connect) (*ssh.Session, error) {
 	config, err := getClientConfig(connection)
 	if err != nil {
@@ -77,6 +84,9 @@ func (s *Ssh) NewSession(connection *Connect) (*ssh.Session, error) {
 	return session, nil
 }
 
+// Connect starts an interactive shell session using the established SSH connection.
+// It manages the session lifecycle including proper cleanup on exit.
+// Returns error if shell startup or session wait fails.
 func (s *Ssh) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {

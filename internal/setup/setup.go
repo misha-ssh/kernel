@@ -26,6 +26,11 @@ var (
 	ErrEncryptData          = errors.New("err encrypt data")
 )
 
+// initFileConnections initializes the connections file with:
+// - Creates file if not exists
+// - Sets default empty connections
+// - Encrypts data using system keyring
+// Returns error if any step fails
 func initFileConnections() error {
 	filename := envconst.FilenameConnections
 	direction := storage.GetAppDir()
@@ -71,6 +76,10 @@ func initFileConnections() error {
 	return nil
 }
 
+// initFileConfig initializes the config file with:
+// - Creates file if not exists
+// - Sets default values (theme, logger type)
+// Returns error if creation or config setting fails
 func initFileConfig() error {
 	filename := envconst.FilenameConfig
 	direction := storage.GetAppDir()
@@ -99,6 +108,11 @@ func initFileConfig() error {
 	return nil
 }
 
+// initCryptKey handles encryption key setup:
+// - Gets current OS user
+// - Generates new key if none exists
+// - Stores key in system keyring
+// Returns error if key generation/storage fails
 func initCryptKey() error {
 	currentUser, err := user.Current()
 	if err != nil {
@@ -126,6 +140,9 @@ func initCryptKey() error {
 	return nil
 }
 
+// initLoggerFromConfig configures logger based on:
+// - Stored config value (console/storage/combined)
+// Returns error if invalid logger type specified
 func initLoggerFromConfig() error {
 	loggerType := config.Get(envname.Logger)
 
@@ -146,6 +163,12 @@ func initLoggerFromConfig() error {
 	return nil
 }
 
+// Init performs complete application initialization:
+// 1. Config file setup
+// 2. Logger configuration
+// 3. Crypt key initialization
+// 4. Connections file setup
+// Panics if any initialization fails
 func Init() {
 	var err error
 

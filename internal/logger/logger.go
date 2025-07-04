@@ -1,10 +1,11 @@
 package logger
 
+// Logger interface defines standard logging methods
 type Logger interface {
-	Error(value any)
-	Debug(value any)
-	Info(value any)
-	Warn(value any)
+	Error(value any) // Logs error messages
+	Debug(value any) // Logs debug information
+	Info(value any)  // Logs general information
+	Warn(value any)  // Logs warning messages
 }
 
 const SkipUseLevel = 3

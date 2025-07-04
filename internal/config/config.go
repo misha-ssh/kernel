@@ -31,6 +31,11 @@ var (
 	ErrGetOpenFile         = errors.New("get open file error")
 )
 
+// Set writes or updates a configuration value:
+// - Validates key (letters only) and value
+// - Creates new entry or updates existing one
+// - Automatically converts keys to uppercase
+// Returns error if validation or write fails
 func Set(key, value string) error {
 	err := validateKey(key)
 	if err != nil {
@@ -74,6 +79,10 @@ func Set(key, value string) error {
 	return nil
 }
 
+// Get retrieves a configuration value:
+// - Case-insensitive key lookup (converts to uppercase)
+// - Returns empty string if key not found
+// - Validates key before lookup
 func Get(key string) string {
 	err := validateKey(key)
 	if err != nil {
@@ -116,6 +125,10 @@ func Get(key string) string {
 	return EmptyValue
 }
 
+// Exists checks if a configuration key is present:
+// - Case-insensitive check
+// - Returns false for invalid keys
+// - Uses simple string contains check
 func Exists(key string) bool {
 	err := validateKey(key)
 	if err != nil {

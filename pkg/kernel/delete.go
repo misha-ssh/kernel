@@ -15,6 +15,7 @@ var (
 	ErrSetConnectionAtDelete      = errors.New("err set connection")
 )
 
+// Delete remove connection from file
 func Delete(connection *connect.Connect) error {
 	setup.Init()
 

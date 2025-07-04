@@ -16,6 +16,7 @@ var (
 	ErrSetConnectionAtUpdate      = errors.New("err set connection")
 )
 
+// Update change connection by alias
 func Update(connection *connect.Connect, oldAlias string) error {
 	setup.Init()
 
