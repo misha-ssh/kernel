@@ -4,8 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
 	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 

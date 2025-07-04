@@ -3,8 +3,8 @@ package kernel
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
 	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
 	"github.com/ssh-connection-manager/kernel/v2/testutil"
 )
 

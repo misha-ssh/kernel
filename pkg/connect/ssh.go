@@ -24,13 +24,13 @@ const (
 	WidthTerminal  = 40
 )
 
-type SshConnector struct{}
+type Ssh struct{}
 
-func NewSshConnector() *SshConnector {
-	return &SshConnector{}
+func NewSshConnector() *Ssh {
+	return &Ssh{}
 }
 
-func (s *SshConnector) NewSession(connection *Connect) (*ssh.Session, error) {
+func (s *Ssh) NewSession(connection *Connect) (*ssh.Session, error) {
 	config, err := getClientConfig(connection)
 	if err != nil {
 		logger.Error(err.Error())
@@ -77,7 +77,7 @@ func (s *SshConnector) NewSession(connection *Connect) (*ssh.Session, error) {
 	return session, nil
 }
 
-func (s *SshConnector) Connect(session *ssh.Session) error {
+func (s *Ssh) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {
 			logger.Error(err.Error())

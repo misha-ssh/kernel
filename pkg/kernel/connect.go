@@ -2,9 +2,10 @@ package kernel
 
 import (
 	"errors"
-	"github.com/ssh-connection-manager/kernel/v2/internal/connect"
+
 	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
 	"github.com/ssh-connection-manager/kernel/v2/internal/setup"
+	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
 )
 
 var (
