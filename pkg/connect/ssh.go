@@ -81,7 +81,6 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {
 			logger.Error(err.Error())
-			panic(err)
 		}
 	}()
 
