@@ -20,17 +20,16 @@ func Connect(connection *connect.Connect) error {
 
 	switch connection.Type {
 	case connect.TypeSSH:
-		sshConnector := connect.NewSshConnector()
-
-		session, err := sshConnector.NewSession(connection)
+		sshConnector := &connect.Ssh{}
+		session, err := sshConnector.Session(connection)
 		if err != nil {
-			logger.Error(ErrSshSession.Error())
+			logger.Error(ErrSshSession)
 			return ErrSshSession
 		}
 
 		err = sshConnector.Connect(session)
 		if err != nil {
-			logger.Error(ErrSshConnect.Error())
+			logger.Error(ErrSshConnect)
 			return ErrSshConnect
 		}
 	default:

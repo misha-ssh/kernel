@@ -4,7 +4,7 @@ import "golang.org/x/crypto/ssh"
 
 type Connector interface {
 	Connect(session *ssh.Session) error
-	NewSession(connection *Connect) (*ssh.Session, error)
+	Session(connection *Connect) (*ssh.Session, error)
 }
 
 type ConnectionType string

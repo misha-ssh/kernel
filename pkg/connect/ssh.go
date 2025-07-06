@@ -26,18 +26,14 @@ const (
 
 type Ssh struct{}
 
-func NewSshConnector() *Ssh {
-	return &Ssh{}
-}
-
-// NewSession establishes a new SSH session with the remote server.
+// Session establishes a new SSH session with the remote server.
 // It handles the complete connection lifecycle including:
 // - Authentication (password or private key)
 // - Client creation
 // - Terminal setup
 // - Error handling and resource cleanup
 // Returns an active SSH session or error if any step fails.
-func (s *Ssh) NewSession(connection *Connect) (*ssh.Session, error) {
+func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
 	config, err := getClientConfig(connection)
 	if err != nil {
 		logger.Error(err.Error())
