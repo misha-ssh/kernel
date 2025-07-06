@@ -18,13 +18,13 @@ func main() {
 		},
 	}
 
-	sshConnect := connect.NewSshConnector()
-	session, err := sshConnect.NewSession(connection)
+	sshConnector := &connect.Ssh{}
+	session, err := sshConnector.Session(connection)
 	if err != nil {
 		panic(err)
 	}
 
-	err = sshConnect.Connect(session)
+	err = sshConnector.Connect(session)
 	if err != nil {
 		panic(err)
 	}
