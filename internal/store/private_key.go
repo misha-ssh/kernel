@@ -5,11 +5,10 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"github.com/ssh-connection-manager/kernel/internal/logger"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
+	"github.com/ssh-connection-manager/kernel/pkg/connect"
 	"reflect"
-
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
 )
 
 var (
@@ -77,14 +76,6 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 	return storage.GetFullPath(DirectionKeys, filenamePrivateKey), nil
 }
 
-// DeletePrivateKey delete key from dir for current connection
-func DeletePrivateKey(connection *connect.Connect) error {
-	directionPrivateKey := storage.GetPrivateKeysDir()
-	filenamePrivateKey := connection.Alias
-
-	return storage.Delete(directionPrivateKey, filenamePrivateKey)
-}
-
 // UpdatePrivateKey update data private key
 func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 	existFilenamePrivateKey := connection.Alias
@@ -131,4 +122,12 @@ func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 	}
 
 	return storage.GetFullPath(DirectionKeys, existFilenamePrivateKey), nil
+}
+
+// DeletePrivateKey delete key from dir for current connection
+func DeletePrivateKey(connection *connect.Connect) error {
+	directionPrivateKey := storage.GetPrivateKeysDir()
+	filenamePrivateKey := connection.Alias
+
+	return storage.Delete(directionPrivateKey, filenamePrivateKey)
 }

@@ -3,7 +3,7 @@ package fuzz
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
 )
 
 func FuzzStorage_Write(f *testing.F) {

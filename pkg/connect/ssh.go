@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/internal/logger"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
 	"golang.org/x/crypto/ssh"
 )
 

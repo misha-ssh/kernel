@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/kernel"
+	"github.com/ssh-connection-manager/kernel/pkg/connect"
+	"github.com/ssh-connection-manager/kernel/pkg/kernel"
 )
 
 // kernel.Update It will completely update the connection using the old alias

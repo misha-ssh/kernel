@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
-	"github.com/ssh-connection-manager/kernel/v2/testutil"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
+	"github.com/ssh-connection-manager/kernel/pkg/connect"
+	"github.com/ssh-connection-manager/kernel/testutil"
 )
 
 func Test_validatePrivateKey(t *testing.T) {

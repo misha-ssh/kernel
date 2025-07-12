@@ -7,8 +7,8 @@ import (
 	"os"
 	"runtime"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
 )
 
 const FileName = envconst.FilenameLogger

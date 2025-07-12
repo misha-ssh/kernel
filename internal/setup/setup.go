@@ -5,13 +5,13 @@ import (
 	"errors"
 	"os/user"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/configs/envname"
-	"github.com/ssh-connection-manager/kernel/v2/internal/config"
-	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
+	"github.com/ssh-connection-manager/kernel/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/configs/envname"
+	"github.com/ssh-connection-manager/kernel/internal/config"
+	"github.com/ssh-connection-manager/kernel/internal/crypto"
+	"github.com/ssh-connection-manager/kernel/internal/logger"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
+	"github.com/ssh-connection-manager/kernel/pkg/connect"
 	"github.com/zalando/go-keyring"
 )
 

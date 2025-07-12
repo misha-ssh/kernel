@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/pkg/connect"
-	"github.com/ssh-connection-manager/kernel/v2/pkg/kernel"
+	"github.com/ssh-connection-manager/kernel/pkg/connect"
+	"github.com/ssh-connection-manager/kernel/pkg/kernel"
 )
 
 // kernel.Create It will record the connection in a file with connections

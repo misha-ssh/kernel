@@ -4,8 +4,8 @@ import (
 	"errors"
 	"os/user"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
+	"github.com/ssh-connection-manager/kernel/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/internal/logger"
 	"github.com/zalando/go-keyring"
 )
 
