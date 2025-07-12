@@ -4,7 +4,7 @@ import (
 	"os/user"
 	"path/filepath"
 
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/configs/envconst"
 )
 
 const CharHidden = "."

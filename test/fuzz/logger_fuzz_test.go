@@ -3,7 +3,7 @@ package fuzz
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/logger"
+	"github.com/ssh-connection-manager/kernel/internal/logger"
 )
 
 func FuzzLogger_Error(f *testing.F) {

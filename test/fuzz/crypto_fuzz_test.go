@@ -3,7 +3,7 @@ package fuzz
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/crypto"
+	"github.com/ssh-connection-manager/kernel/internal/crypto"
 )
 
 func FuzzCrypto_Encrypt(f *testing.F) {

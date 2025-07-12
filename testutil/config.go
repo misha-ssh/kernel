@@ -1,8 +1,8 @@
 package testutil
 
 import (
-	"github.com/ssh-connection-manager/kernel/v2/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/configs/envconst"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
 )
 
 // CreateFileConfig create file config for kernel

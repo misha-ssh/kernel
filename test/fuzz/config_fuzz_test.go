@@ -3,7 +3,7 @@ package fuzz
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/config"
+	"github.com/ssh-connection-manager/kernel/internal/config"
 )
 
 func FuzzConfig_Set(f *testing.F) {

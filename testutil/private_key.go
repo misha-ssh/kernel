@@ -7,7 +7,7 @@ import (
 	"encoding/pem"
 	"os"
 
-	"github.com/ssh-connection-manager/kernel/v2/internal/storage"
+	"github.com/ssh-connection-manager/kernel/internal/storage"
 )
 
 // CreateInvalidPrivateKey create invalid key for tests
