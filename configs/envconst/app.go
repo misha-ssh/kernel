@@ -1,7 +1,7 @@
 package envconst
 
 const (
-	AppName = "ssh+"
+	AppName = "misha"
 	Theme   = "default"
 
 	DirectionPrivateKeys = "private_keys"
