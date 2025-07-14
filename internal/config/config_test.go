@@ -3,7 +3,7 @@ package config
 import (
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/testutil"
+	"github.com/misha-ssh/kernel/testutil"
 )
 
 func TestStorage_Set(t *testing.T) {

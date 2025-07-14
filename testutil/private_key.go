@@ -7,7 +7,7 @@ import (
 	"encoding/pem"
 	"os"
 
-	"github.com/ssh-connection-manager/kernel/internal/storage"
+	"github.com/misha-ssh/kernel/internal/storage"
 )
 
 // CreateInvalidPrivateKey create invalid key for tests

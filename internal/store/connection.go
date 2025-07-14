@@ -4,11 +4,11 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/ssh-connection-manager/kernel/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/internal/crypto"
-	"github.com/ssh-connection-manager/kernel/internal/logger"
-	"github.com/ssh-connection-manager/kernel/internal/storage"
-	"github.com/ssh-connection-manager/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/internal/crypto"
+	"github.com/misha-ssh/kernel/internal/logger"
+	"github.com/misha-ssh/kernel/internal/storage"
+	"github.com/misha-ssh/kernel/pkg/connect"
 )
 
 const FileConnections = envconst.FilenameConnections

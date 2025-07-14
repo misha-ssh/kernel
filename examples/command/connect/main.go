@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/ssh-connection-manager/kernel/pkg/connect"
-	"github.com/ssh-connection-manager/kernel/pkg/kernel"
+	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/pkg/kernel"
 )
 
 // main for success connect start make command: up-ssh
