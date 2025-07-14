@@ -1,6 +1,6 @@
 package main
 
-import "github.com/ssh-connection-manager/kernel/pkg/connect"
+import "github.com/misha-ssh/kernel/pkg/connect"
 
 // main for success connect start make command: up-ssh-port
 func main() {

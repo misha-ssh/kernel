@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/internal/setup"
-	"github.com/ssh-connection-manager/kernel/pkg/connect"
-	"github.com/ssh-connection-manager/kernel/testutil"
+	"github.com/misha-ssh/kernel/internal/setup"
+	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/testutil"
 )
 
 func TestGetConnections(t *testing.T) {

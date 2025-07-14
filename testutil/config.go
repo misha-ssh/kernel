@@ -1,8 +1,8 @@
 package testutil
 
 import (
-	"github.com/ssh-connection-manager/kernel/configs/envconst"
-	"github.com/ssh-connection-manager/kernel/internal/storage"
+	"github.com/misha-ssh/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/internal/storage"
 )
 
 // CreateFileConfig create file config for kernel

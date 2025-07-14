@@ -1,4 +1,4 @@
-module github.com/ssh-connection-manager/kernel
+module github.com/misha-ssh/kernel
 
 go 1.24.2
 

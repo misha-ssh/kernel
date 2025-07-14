@@ -4,7 +4,7 @@ import (
 	"os/user"
 	"testing"
 
-	"github.com/ssh-connection-manager/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/zalando/go-keyring"
 )
 

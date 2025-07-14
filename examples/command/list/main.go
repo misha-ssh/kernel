@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ssh-connection-manager/kernel/pkg/kernel"
+	"github.com/misha-ssh/kernel/pkg/kernel"
 )
 
 // kernel.List outputs the connection from the file

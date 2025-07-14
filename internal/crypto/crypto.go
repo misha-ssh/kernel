@@ -6,7 +6,7 @@ import (
 	"crypto/rand"
 	"errors"
 
-	"github.com/ssh-connection-manager/kernel/internal/logger"
+	"github.com/misha-ssh/kernel/internal/logger"
 )
 
 const (
