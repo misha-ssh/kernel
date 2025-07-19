@@ -5,10 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"reflect"
+
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
-	"reflect"
+	"golang.org/x/crypto/ssh"
 )
 
 var (
@@ -24,6 +26,10 @@ func validatePrivateKey(privateKey string) error {
 	block, _ := pem.Decode([]byte(privateKey))
 	if block == nil {
 		return ErrNotValidPrivateKey
+	}
+
+	if _, err := ssh.ParseRawPrivateKey([]byte(privateKey)); err == nil {
+		return nil
 	}
 
 	_, err := x509.ParsePKCS1PrivateKey(block.Bytes)
