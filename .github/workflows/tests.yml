@@ -1,18 +1,14 @@
 name: Tests
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: [ push ]
 
 jobs:
   build:
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, macos-latest ]
-
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:latest
+      options: --privileged
+      env:
+        DEBIAN_FRONTEND: noninteractive
 
     steps:
       - uses: actions/checkout@v4
@@ -38,3 +34,27 @@ jobs:
           echo 'somecredstorepass' | gnome-keyring-daemon --unlock
           go test -v ./...
         shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
+
+  build-other:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ macOS-latest, windows-latest ]
+
+    steps:
+      - name: Check out code into $GITHUB_WORKSPACE directory
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Test
+        run: |
+          go test -v ./...
