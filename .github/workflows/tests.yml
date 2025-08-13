@@ -2,20 +2,20 @@ name: Tests
 on: [ push ]
 
 jobs:
-  build:
+  tests-ubuntu:
+    name: Test on Ubuntu latest
     runs-on: ubuntu-latest
     container:
       image: ubuntu:latest
       options: --privileged
       env:
         DEBIAN_FRONTEND: noninteractive
-
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.24.2'
+          go-version-file: "go.mod"
 
       - name: Install Dependencies
         run: |
@@ -34,3 +34,23 @@ jobs:
           echo 'somecredstorepass' | gnome-keyring-daemon --unlock
           go test -v ./...
         shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
+
+  tests-macos:
+    name: Test on Mac latest
+    runs-on: macOS-latest
+    steps:
+      - name: Check out code into $GITHUB_WORKSPACE directory
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Test
+        run: |
+          go test -v ./...
