@@ -9,6 +9,7 @@ import (
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/term"
 )
 
 const (
@@ -16,10 +17,15 @@ const (
 
 	Timeout = 20 * time.Second
 
-	DisableEcho = 0
-	IgnoreCR    = 1
+	EnableMod = 1
+	ICRNLMod  = 1
+	INLCRMod  = 1
+	ISIGMod   = 1
 
-	TypeTerm       = "vt100"
+	ISPEED = 115200
+	OSPEED = 115200
+
+	TypeTerm       = "xterm-256color"
 	HeightTerminal = 80
 	WidthTerminal  = 40
 )
@@ -90,7 +96,20 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 		}
 	}()
 
-	err := session.Shell()
+	fd := int(os.Stdin.Fd())
+
+	oldState, err := term.MakeRaw(fd)
+	if err != nil {
+		logger.Error(err.Error())
+		return err
+	}
+	defer func() {
+		if err = term.Restore(fd, oldState); err != nil {
+			logger.Error(err.Error())
+		}
+	}()
+
+	err = session.Shell()
 	if err != nil {
 		logger.Error(err.Error())
 		return err
@@ -147,13 +166,23 @@ func getClientConfig(connection *Connect) (*ssh.ClientConfig, error) {
 }
 
 func createTerminalSession(session *ssh.Session) error {
-	modes := ssh.TerminalModes{
-		ssh.ECHO:  DisableEcho,
-		ssh.IGNCR: IgnoreCR,
+	fd := int(os.Stdin.Fd())
+	width, height, err := term.GetSize(fd)
+	if err != nil {
+		width = WidthTerminal
+		height = HeightTerminal
 	}
 
-	err := session.RequestPty(TypeTerm, HeightTerminal, WidthTerminal, modes)
-	if err != nil {
+	modes := ssh.TerminalModes{
+		ssh.ECHO:          EnableMod,
+		ssh.ICRNL:         ICRNLMod,
+		ssh.INLCR:         INLCRMod,
+		ssh.ISIG:          ISIGMod,
+		ssh.TTY_OP_ISPEED: ISPEED,
+		ssh.TTY_OP_OSPEED: OSPEED,
+	}
+
+	if err = session.RequestPty(TypeTerm, height, width, modes); err != nil {
 		logger.Error(err.Error())
 		return err
 	}
