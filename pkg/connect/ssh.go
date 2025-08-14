@@ -103,7 +103,11 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 		logger.Error(err.Error())
 		return err
 	}
-	defer term.Restore(fd, oldState)
+	defer func() {
+		if err = term.Restore(fd, oldState); err != nil {
+			logger.Error(err.Error())
+		}
+	}()
 
 	err = session.Shell()
 	if err != nil {
