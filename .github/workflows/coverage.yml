@@ -36,7 +36,11 @@ jobs:
           go get -v -t -d ./...
 
       - name: generate test coverage
-        run: go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+        run:  |
+          echo 'somecredstorepass' | gnome-keyring-daemon --unlock
+          go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+
+        shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
 
       - name: check test coverage
         uses: vladopajic/go-test-coverage@v2
