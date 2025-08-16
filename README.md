@@ -35,7 +35,7 @@ install this package in your repository
 go get github.com/misha-ssh/kernel
 ```
 
-## Examples
+## Examples & Usage
 
 You will be provided with a list of commands that you can use in your projects
 
@@ -165,13 +165,16 @@ func main() {
 This structure describes our connection
 
 We pass this structure to the commands:
+
 - Connect
 - Create
 - Update
 - Delete
 
 Description of fields:
-* ``Alias`` - unique name (we use it when selecting an exception from the list and create unique connections to identify them)
+
+* ``Alias`` - unique name (we use it when selecting an exception from the list and create unique connections to identify
+  them)
 * ``Login`` - the user's login on the remote device
 * ``Password`` - if you have a password connection, then fill in this field, if with a key, then leave an empty line.
 * ``Address`` - the address of the remote device
@@ -230,6 +233,7 @@ make down-ssh
 ```
 
 Server accesses:
+
 * ``login`` - root
 * ``address`` - localhost
 * ``password`` - password
@@ -239,21 +243,67 @@ Server accesses:
 
 to run, write the command:
 
+```bash
+make up-ssh-key
+```
+
 to install and remove the server:
+
+```bash
+make down-ssh-key
+```
+
+Server accesses:
+
+* ``login`` - root
+* ``address`` - localhost
+* ``private key`` - ./dockerkey
+* ``port`` - 2222
 
 3) connecting via a non-standard port
 
 to run, write the command:
 
+```bash
+make up-ssh-port
+```
+
 to install and remove the server:
+
+```bash
+make down-ssh-port
+```
+
+Server accesses:
+
+* ``login`` - root
+* ``address`` - localhost
+* ``password`` - password
+* ``port`` - 2222
 
 ### Description variable
 
-App dir -
+The variables that the application uses are located here:
 
-Name files -
+* App values - [link](configs/envconst)
+* Config keys - [link](configs/envconst)
 
-Type Logging -
+App values (the values that are used in the application and also in the config):
+
+* ``AppName`` - project name & project directory
+* ``Theme`` - The theme is an application, there is no implementation at this stage.
+* ``DirectionPrivateKeys`` - the name of the directory where the keys will be saved
+* ``FilenameConnections`` - the name of the connection file
+* ``FilenameConfig`` - the name of the file with the application configs
+* ``NameServiceCryptKey`` - the names of the service that will store the private key for encryption
+* ``TypeConsoleLogger`` - type for console logging
+* ``TypeStorageLogger`` - the type for logging to a file
+* ``TypeCombinedLogger`` - type for all types of logging
+
+Config keys (these keys are located in the application configuration):
+
+* ``Theme`` - stores the application's theme, in this case there is no implementation
+* ``Logger`` - stores the type of application logging
 
 ## 🧪 Testing
 
