@@ -19,13 +19,11 @@ Made using data from packages:
 
 ## 📝 Features
 
-- **Multi-Model:** choose from a wide range of LLMs or add your own via OpenAI- or Anthropic-compatible APIs
-- **Flexible:** switch LLMs mid-session while preserving context
-- **Session-Based:** maintain multiple work sessions and contexts per project
-- **LSP-Enhanced:** Crush uses LSPs for additional context, just like you do
-- **Extensible:** add capabilities via MCPs (`http`, `stdio`, and `sse`)
-- **Works Everywhere:** first-class support in every terminal on macOS, Linux, Windows (PowerShell and WSL), FreeBSD,
-  OpenBSD, and NetBSD
+- **Connection Management:** Commands for creating, connecting, deleting, and updating your connection
+- **Data encryption:** Your connection is securely encrypted
+- **Configurations:** Possibility of connection configuration
+- **The local environment** There is an environment for testing the connection
+- **Flexibility** The ability to embed in any client on go
 
 ## Install
 
@@ -286,7 +284,7 @@ Server accesses:
 The variables that the application uses are located here:
 
 * App values - [link](configs/envconst)
-* Config keys - [link](configs/envconst)
+* Config keys - [link](configs/envname)
 
 App values (the values that are used in the application and also in the config):
 
