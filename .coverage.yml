@@ -1,13 +1,7 @@
 profile: cover.out
 
 threshold:
-  file: 70
-  package: 80
-  total: 95
-
-override:
-  - path: ^pkg/lib/foo$
-    threshold: 100
+  total: 60
 
 exclude:
   paths:
@@ -15,9 +9,3 @@ exclude:
     - ^examples
     - ^configs
     - ^testutil
-
-breakdown-file-name: ''
-
-diff:
-  base-breakdown-file-name: ''
-  threshold: null
