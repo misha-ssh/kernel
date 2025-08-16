@@ -48,3 +48,13 @@ down-ssh-key:
 # use linter for formatted code
 lint:
 	docker run -t --rm -v $$(pwd):/app -w /app golangci/golangci-lint:v2.1.6 golangci-lint run
+
+# use tests for check tests cases
+tests:
+	go test -v ./...
+
+# use test-coverage for verify coverage
+test-coverage:
+	go install github.com/vladopajic/go-test-coverage/v2@latest
+	go test ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./... \
+	&& go-test-coverage --config=./.coverage.yml
