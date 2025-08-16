@@ -9,8 +9,6 @@
 
 This package acts as the core for an ssh client written in go
 
-Documentation package - [link](https://pkg.go.dev/github.com/misha-ssh/kernel)
-
 Made using data from packages:
 
 * [crypto](https://pkg.go.dev/golang.org/x/crypto)
@@ -25,7 +23,7 @@ Made using data from packages:
 - **The local environment** There is an environment for testing the connection
 - **Flexibility** The ability to embed in any client on go
 
-## Install
+## ✨ Install
 
 install this package in your repository
 
@@ -33,13 +31,13 @@ install this package in your repository
 go get github.com/misha-ssh/kernel
 ```
 
-## Examples & Usage
+## 📖 Examples & Usage
 
 You will be provided with a list of commands that you can use in your projects
 
 The code with the commands will be on the way - [link](./examples/command)
 
-### Connect
+### 🔌 Connect
 
 The command to connect to the remote server
 
@@ -61,7 +59,7 @@ func main() {
 }
 ```
 
-### Create
+### ✍️ Create
 
 The command to create a connection
 
@@ -85,7 +83,7 @@ func main() {
 }
 ```
 
-### Update
+### 🪄 Update
 
 The command to update the connection
 
@@ -109,7 +107,7 @@ func main() {
 }
 ```
 
-### Delete
+### 🆑 Delete
 
 The command to delete the connection
 
@@ -133,7 +131,7 @@ func main() {
 }
 ```
 
-### List
+### 📝 List
 
 The command to get a list of connections
 
@@ -158,7 +156,7 @@ func main() {
 }
 ```
 
-### Struct Connection
+### 🖥 Struct Connection
 
 This structure describes our connection
 
@@ -212,7 +210,7 @@ func main() {
 }
 ```
 
-### Run ssh server
+### 🤖 Run ssh server
 
 for local testing, you can raise your ssh servers - there are three types of them.
 
@@ -279,7 +277,7 @@ Server accesses:
 * ``password`` - password
 * ``port`` - 2222
 
-### Description variable
+### 🔖 Description variable
 
 The variables that the application uses are located here:
 
