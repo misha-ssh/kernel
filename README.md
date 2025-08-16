@@ -309,7 +309,7 @@ Config keys (these keys are located in the application configuration):
 
 You can run the command for testing after the step with local installation
 
-Run Lint and Analyze code(phpstan/rector/phpcs):
+The command to launch the linter:
 
 ```bash
 make lint
@@ -318,19 +318,7 @@ make lint
 Run Unit tests:
 
 ```bash
-make test
-```
-
-Run mutation tests:
-
-```bash
-make test-mutation
-```
-
-Run test coverage:
-
-```bash
-make test-coverage
+make tests
 ```
 
 Run test coverage:
