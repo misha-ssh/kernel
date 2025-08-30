@@ -106,6 +106,26 @@ func TestUpdate(t *testing.T) {
 			isCreateConnection: false,
 		},
 		{
+			name: "success - add saved private key",
+			args: args{
+				connection: &connect.Connect{
+					Alias:     "test2",
+					Login:     "test2",
+					Address:   "test2",
+					Password:  "test2",
+					Type:      connect.TypeSSH,
+					CreatedAt: "test2",
+					UpdatedAt: "test2",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKey,
+					},
+				},
+				oldAlias: "test2",
+			},
+			wantErr:            false,
+			isCreateConnection: false,
+		},
+		{
 			name: "fail - invalid private key",
 			args: args{
 				connection: &connect.Connect{
