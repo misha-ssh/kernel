@@ -53,4 +53,5 @@ jobs:
 
       - name: Test
         run: |
+          chmod -R 777 /usr/bin/security
           make tests
