@@ -37,7 +37,7 @@ jobs:
 
   tests-macos:
     name: Test on Mac latest
-    runs-on: macos-26
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - name: Set up Go
