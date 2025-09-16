@@ -37,11 +37,9 @@ jobs:
 
   tests-macos:
     name: Test on Mac latest
-    runs-on: macOS-latest
+    runs-on: macos-26
     steps:
-      - name: Check out code into $GITHUB_WORKSPACE directory
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
