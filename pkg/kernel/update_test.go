@@ -21,15 +21,25 @@ func TestUpdate(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	createdConnection := &connect.Connect{
+		Alias:      "test",
+		Login:      "test",
+		Address:    "test",
+		Password:   "test",
+		Type:       connect.TypeSSH,
+		CreatedAt:  "time",
+		UpdatedAt:  "time",
+		SshOptions: &connect.SshOptions{},
+	}
+
 	type args struct {
 		connection *connect.Connect
 		oldAlias   string
 	}
 	tests := []struct {
-		name               string
-		args               args
-		wantErr            bool
-		isCreateConnection bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "success - update on default old value",
@@ -44,10 +54,9 @@ func TestUpdate(t *testing.T) {
 					UpdatedAt:  "time",
 					SshOptions: &connect.SshOptions{},
 				},
-				oldAlias: "test",
+				oldAlias: createdConnection.Alias,
 			},
-			wantErr:            false,
-			isCreateConnection: true,
+			wantErr: false,
 		},
 		{
 			name: "fail - get exist connect and get not exists old alias",
@@ -64,14 +73,13 @@ func TestUpdate(t *testing.T) {
 				},
 				oldAlias: "notFoundAlias",
 			},
-			wantErr:            true,
-			isCreateConnection: false,
+			wantErr: true,
 		},
 		{
 			name: "success - update values by exist connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "test2",
+					Alias:      "test",
 					Login:      "test2",
 					Address:    "test2",
 					Password:   "test2",
@@ -80,16 +88,15 @@ func TestUpdate(t *testing.T) {
 					UpdatedAt:  "test2",
 					SshOptions: &connect.SshOptions{},
 				},
-				oldAlias: "test",
+				oldAlias: createdConnection.Alias,
 			},
-			wantErr:            false,
-			isCreateConnection: false,
+			wantErr: false,
 		},
 		{
 			name: "success - add private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test2",
+					Alias:     "test",
 					Login:     "test2",
 					Address:   "test2",
 					Password:  "test2",
@@ -100,36 +107,15 @@ func TestUpdate(t *testing.T) {
 						PrivateKey: pathToPrivateKey,
 					},
 				},
-				oldAlias: "test2",
+				oldAlias: createdConnection.Alias,
 			},
-			wantErr:            false,
-			isCreateConnection: false,
-		},
-		{
-			name: "success - add saved private key",
-			args: args{
-				connection: &connect.Connect{
-					Alias:     "test2",
-					Login:     "test2",
-					Address:   "test2",
-					Password:  "test2",
-					Type:      connect.TypeSSH,
-					CreatedAt: "test2",
-					UpdatedAt: "test2",
-					SshOptions: &connect.SshOptions{
-						PrivateKey: pathToPrivateKey,
-					},
-				},
-				oldAlias: "test2",
-			},
-			wantErr:            false,
-			isCreateConnection: false,
+			wantErr: false,
 		},
 		{
 			name: "fail - invalid private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test2",
+					Alias:     "test",
 					Login:     "test2",
 					Address:   "test2",
 					Password:  "test2",
@@ -140,16 +126,15 @@ func TestUpdate(t *testing.T) {
 						PrivateKey: pathToInvalidKey,
 					},
 				},
-				oldAlias: "test2",
+				oldAlias: createdConnection.Alias,
 			},
-			wantErr:            true,
-			isCreateConnection: false,
+			wantErr: true,
 		},
 		{
 			name: "success - delete private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test2",
+					Alias:     "test",
 					Login:     "test2",
 					Address:   "test2",
 					Password:  "test2",
@@ -160,10 +145,9 @@ func TestUpdate(t *testing.T) {
 						PrivateKey: "",
 					},
 				},
-				oldAlias: "test2",
+				oldAlias: createdConnection.Alias,
 			},
-			wantErr:            false,
-			isCreateConnection: false,
+			wantErr: false,
 		},
 	}
 
@@ -171,14 +155,12 @@ func TestUpdate(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	if err = Create(createdConnection); err != nil {
+		t.Errorf("Create connection error = %v", err)
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isCreateConnection {
-				if err = Create(tt.args.connection); (err != nil) != tt.wantErr {
-					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
-				}
-			}
-
 			if err = Update(tt.args.connection, tt.args.oldAlias); (err != nil) != tt.wantErr {
 				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
 			}

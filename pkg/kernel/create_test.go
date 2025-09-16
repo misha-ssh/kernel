@@ -24,6 +24,18 @@ func TestCreate(t *testing.T) {
 	type args struct {
 		connect *connect.Connect
 	}
+
+	createdConnection := &connect.Connect{
+		Alias:      "created",
+		Login:      "test",
+		Address:    "test",
+		Password:   "test",
+		Type:       connect.TypeSSH,
+		CreatedAt:  "time",
+		UpdatedAt:  "time",
+		SshOptions: &connect.SshOptions{},
+	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -49,7 +61,7 @@ func TestCreate(t *testing.T) {
 			name: "fail - exist alias",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      "test",
+					Alias:      createdConnection.Alias,
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -122,6 +134,10 @@ func TestCreate(t *testing.T) {
 
 	if err = testutil.RemoveFileConnections(); err != nil {
 		t.Fatal(err)
+	}
+
+	if err = Create(createdConnection); err != nil {
+		t.Errorf("Create connection error = %v", err)
 	}
 
 	for _, tt := range tests {
