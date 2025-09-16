@@ -3,6 +3,7 @@
 # address - localhost
 # password - password
 # port - 22
+# test
 up-ssh:
 	docker build -f ./build/ssh/default/Dockerfile -t ssh-host .
 	docker run -d --name ssh-default -p 22:22 ssh-host
