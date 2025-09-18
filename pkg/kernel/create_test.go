@@ -150,8 +150,4 @@ func TestCreate(t *testing.T) {
 			}
 		})
 	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
-	}
 }

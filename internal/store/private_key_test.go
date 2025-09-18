@@ -58,10 +58,6 @@ func Test_validatePrivateKey(t *testing.T) {
 			}
 		})
 	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
-	}
 }
 
 func TestDeletePrivateKey(t *testing.T) {
@@ -151,10 +147,6 @@ func TestDeletePrivateKey(t *testing.T) {
 				t.Errorf("SavePrivateKey() dont create file error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
-	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
 	}
 }
 
@@ -270,10 +262,6 @@ func TestSavePrivateKey(t *testing.T) {
 				}
 			}
 		})
-	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
 	}
 }
 
@@ -437,9 +425,5 @@ func TestUpdatePrivateKey(t *testing.T) {
 			}
 
 		})
-	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
 	}
 }
