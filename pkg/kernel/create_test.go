@@ -26,7 +26,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      "created",
+		Alias:      t.TempDir(),
 		Login:      "test",
 		Address:    "test",
 		Password:   "test",
@@ -45,7 +45,7 @@ func TestCreate(t *testing.T) {
 			name: "success - create connection",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      "test",
+					Alias:      t.TempDir(),
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -77,7 +77,7 @@ func TestCreate(t *testing.T) {
 			name: "success - add ssh options",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     "test2",
+					Alias:     t.TempDir(),
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -96,7 +96,7 @@ func TestCreate(t *testing.T) {
 			name: "success - save private key",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     "test3",
+					Alias:     t.TempDir(),
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -115,7 +115,7 @@ func TestCreate(t *testing.T) {
 			name: "fail - dont valid private key",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     "test4",
+					Alias:     t.TempDir(),
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -130,10 +130,6 @@ func TestCreate(t *testing.T) {
 			},
 			wantErr: true,
 		},
-	}
-
-	if err = testutil.RemoveFileConnections(); err != nil {
-		t.Fatal(err)
 	}
 
 	if err = Create(createdConnection); err != nil {

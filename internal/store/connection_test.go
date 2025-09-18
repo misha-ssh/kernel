@@ -6,7 +6,6 @@ import (
 
 	"github.com/misha-ssh/kernel/internal/setup"
 	"github.com/misha-ssh/kernel/pkg/connect"
-	"github.com/misha-ssh/kernel/testutil"
 )
 
 func TestGetConnections(t *testing.T) {
@@ -20,10 +19,6 @@ func TestGetConnections(t *testing.T) {
 			want:    &connect.Connections{},
 			wantErr: false,
 		},
-	}
-
-	if err := testutil.RemoveFileConnections(); err != nil {
-		t.Fatal(err)
 	}
 
 	for _, tt := range tests {

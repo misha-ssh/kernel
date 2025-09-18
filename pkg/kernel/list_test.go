@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/misha-ssh/kernel/pkg/connect"
-	"github.com/misha-ssh/kernel/testutil"
 )
 
 func TestList(t *testing.T) {
@@ -32,7 +31,7 @@ func TestList(t *testing.T) {
 			want: &connect.Connections{
 				Connects: []connect.Connect{
 					{
-						Alias:      "test",
+						Alias:      t.TempDir(),
 						Login:      "test",
 						Address:    "test",
 						Password:   "test",
@@ -42,7 +41,7 @@ func TestList(t *testing.T) {
 						SshOptions: &connect.SshOptions{},
 					},
 					{
-						Alias:      "test 2",
+						Alias:      t.TempDir(),
 						Login:      "test",
 						Address:    "test",
 						Password:   "test",
@@ -52,7 +51,7 @@ func TestList(t *testing.T) {
 						SshOptions: &connect.SshOptions{},
 					},
 					{
-						Alias:      "test 3",
+						Alias:      t.TempDir(),
 						Login:      "test",
 						Address:    "test",
 						Password:   "test",
@@ -66,10 +65,6 @@ func TestList(t *testing.T) {
 			wantErr:            false,
 			isCreateConnection: true,
 		},
-	}
-
-	if err := testutil.RemoveFileConnections(); err != nil {
-		t.Fatal(err)
 	}
 
 	for _, tt := range tests {
