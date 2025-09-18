@@ -52,7 +52,7 @@ lint:
 
 # use tests for check tests cases
 tests:
-	go test -v ./...
+	GO_TESTING=true go test -v ./...
 
 # use test-coverage for verify coverage
 test-coverage:
