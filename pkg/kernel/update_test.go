@@ -22,7 +22,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      "test",
+		Alias:      tempDir,
 		Login:      "test",
 		Address:    "test",
 		Password:   "test",
@@ -45,7 +45,7 @@ func TestUpdate(t *testing.T) {
 			name: "success - update on default old value",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "test",
+					Alias:      createdConnection.Alias,
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -62,7 +62,7 @@ func TestUpdate(t *testing.T) {
 			name: "fail - get exist connect and get not exists old alias",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "test",
+					Alias:      createdConnection.Alias,
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -79,7 +79,7 @@ func TestUpdate(t *testing.T) {
 			name: "success - update values by exist connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "test",
+					Alias:      createdConnection.Alias,
 					Login:      "test2",
 					Address:    "test2",
 					Password:   "test2",
@@ -96,7 +96,7 @@ func TestUpdate(t *testing.T) {
 			name: "success - add private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test",
+					Alias:     createdConnection.Alias,
 					Login:     "test2",
 					Address:   "test2",
 					Password:  "test2",
@@ -115,7 +115,7 @@ func TestUpdate(t *testing.T) {
 			name: "fail - invalid private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test",
+					Alias:     createdConnection.Alias,
 					Login:     "test2",
 					Address:   "test2",
 					Password:  "test2",
@@ -134,7 +134,7 @@ func TestUpdate(t *testing.T) {
 			name: "success - delete private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test",
+					Alias:     createdConnection.Alias,
 					Login:     "test2",
 					Address:   "test2",
 					Password:  "test2",
@@ -149,10 +149,6 @@ func TestUpdate(t *testing.T) {
 			},
 			wantErr: false,
 		},
-	}
-
-	if err = testutil.RemoveFileConnections(); err != nil {
-		t.Fatal(err)
 	}
 
 	if err = Create(createdConnection); err != nil {
@@ -179,9 +175,5 @@ func TestUpdate(t *testing.T) {
 				}
 			}
 		})
-	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
 	}
 }

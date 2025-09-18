@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"os"
 	"os/user"
 	"path/filepath"
 
@@ -17,6 +18,10 @@ func GetAppDir() string {
 	}
 
 	hiddenDir := CharHidden + envconst.AppName
+
+	if os.Getenv("GO_TESTING") == "true" {
+		return filepath.Join(os.TempDir(), hiddenDir)
+	}
 
 	return filepath.Join(usr.HomeDir, hiddenDir)
 }

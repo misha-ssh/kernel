@@ -18,18 +18,19 @@ func TestDelete(t *testing.T) {
 
 	type args struct {
 		connection *connect.Connect
+		isCreate   bool
 	}
+
 	tests := []struct {
-		name               string
-		args               args
-		wantErr            bool
-		isCreateConnection bool
+		name    string
+		args    args
+		wantErr bool
 	}{
 		{
 			name: "success - delete connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "test",
+					Alias:      tempDir,
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -38,15 +39,15 @@ func TestDelete(t *testing.T) {
 					UpdatedAt:  "time",
 					SshOptions: &connect.SshOptions{},
 				},
+				isCreate: true,
 			},
-			wantErr:            false,
-			isCreateConnection: true,
+			wantErr: false,
 		},
 		{
 			name: "fail - not found connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "test",
+					Alias:      "notFoundAlias",
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -55,15 +56,15 @@ func TestDelete(t *testing.T) {
 					UpdatedAt:  "time",
 					SshOptions: &connect.SshOptions{},
 				},
+				isCreate: false,
 			},
-			wantErr:            true,
-			isCreateConnection: false,
+			wantErr: true,
 		},
 		{
 			name: "success - delete connection with private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test",
+					Alias:     tempDir,
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -74,15 +75,15 @@ func TestDelete(t *testing.T) {
 						PrivateKey: pathToPrivateKey,
 					},
 				},
+				isCreate: true,
 			},
-			wantErr:            false,
-			isCreateConnection: true,
+			wantErr: false,
 		},
 		{
 			name: "success - delete connection with empty private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     "test",
+					Alias:     tempDir,
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -93,21 +94,17 @@ func TestDelete(t *testing.T) {
 						PrivateKey: "",
 					},
 				},
+				isCreate: true,
 			},
-			wantErr:            false,
-			isCreateConnection: true,
+			wantErr: false,
 		},
-	}
-
-	if err = testutil.RemoveFileConnections(); err != nil {
-		t.Fatal(err)
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isCreateConnection {
-				if err := Create(tt.args.connection); err != nil {
-					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.args.isCreate {
+				if err = Create(tt.args.connection); err != nil {
+					t.Errorf("Create connection error = %v", err)
 				}
 			}
 
@@ -122,9 +119,5 @@ func TestDelete(t *testing.T) {
 				}
 			}
 		})
-	}
-
-	if err = testutil.RemoveDirectionPrivateKey(); err != nil {
-		t.Fatal(err)
 	}
 }

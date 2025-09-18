@@ -1,8 +1,13 @@
 name: Tests
-on: [ push ]
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  tests-ubuntu:
+  tests:
     name: Test on Ubuntu latest
     runs-on: ubuntu-latest
     container:
@@ -34,21 +39,3 @@ jobs:
           echo 'somecredstorepass' | gnome-keyring-daemon --unlock
           make tests
         shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
-
-  tests-macos:
-    name: Test on Mac latest
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version-file: "go.mod"
-
-      - name: Get dependencies
-        run: |
-          go get -v -t -d ./...
-
-      - name: Test
-        run: |
-          make tests

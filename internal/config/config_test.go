@@ -3,7 +3,8 @@ package config
 import (
 	"testing"
 
-	"github.com/misha-ssh/kernel/testutil"
+	"github.com/misha-ssh/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/internal/storage"
 )
 
 func TestStorage_Set(t *testing.T) {
@@ -99,9 +100,14 @@ func TestStorage_Set(t *testing.T) {
 		},
 	}
 
-	err := testutil.CreateFileConfig()
-	if err != nil {
-		t.Fatal(err)
+	filename := envconst.FilenameConfig
+	direction := storage.GetAppDir()
+
+	if !storage.Exists(direction, filename) {
+		err := storage.Create(direction, filename)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	for _, tt := range tests {
@@ -166,9 +172,14 @@ func TestStorage_Get(t *testing.T) {
 		},
 	}
 
-	err := testutil.CreateFileConfig()
-	if err != nil {
-		t.Fatal(err)
+	filename := envconst.FilenameConfig
+	direction := storage.GetAppDir()
+
+	if !storage.Exists(direction, filename) {
+		err := storage.Create(direction, filename)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	for _, tt := range tests {
@@ -221,9 +232,14 @@ func TestStorage_Exists(t *testing.T) {
 		},
 	}
 
-	err := testutil.CreateFileConfig()
-	if err != nil {
-		t.Fatal(err)
+	filename := envconst.FilenameConfig
+	direction := storage.GetAppDir()
+
+	if !storage.Exists(direction, filename) {
+		err := storage.Create(direction, filename)
+		if err != nil {
+			t.Fatal(err)
+		}
 	}
 
 	for _, tt := range tests {
