@@ -5,21 +5,9 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/pem"
-	"os"
 
 	"github.com/misha-ssh/kernel/internal/storage"
 )
-
-// CreateInvalidPrivateKey create invalid key for tests
-func CreateInvalidPrivateKey(direction string) (string, error) {
-	filenameInvalidKey := "invalid"
-	err := storage.Write(direction, filenameInvalidKey, "")
-	if err != nil {
-		return "", err
-	}
-
-	return storage.GetFullPath(direction, filenameInvalidKey), nil
-}
 
 // GeneratePrivateKey generate private key for ssh connect
 func GeneratePrivateKey() ([]byte, error) {
@@ -58,7 +46,13 @@ func CreatePrivateKey(direction string) (string, error) {
 	return storage.GetFullPath(direction, filenameKey), nil
 }
 
-// RemoveDirectionPrivateKey delete dir with private keys
-func RemoveDirectionPrivateKey() error {
-	return os.RemoveAll(storage.GetPrivateKeysDir())
+// CreateInvalidPrivateKey create invalid key for tests
+func CreateInvalidPrivateKey(direction string) (string, error) {
+	filenameInvalidKey := "invalid"
+	err := storage.Write(direction, filenameInvalidKey, "")
+	if err != nil {
+		return "", err
+	}
+
+	return storage.GetFullPath(direction, filenameInvalidKey), nil
 }
