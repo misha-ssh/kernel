@@ -9,7 +9,7 @@ import (
 	"github.com/misha-ssh/kernel/testutil"
 )
 
-func Test_validatePrivateKey(t *testing.T) {
+func TestValidatePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
