@@ -14,7 +14,7 @@ import (
 	"github.com/zalando/go-keyring"
 )
 
-func Test_Init(t *testing.T) {
+func TestInit(t *testing.T) {
 	tests := []struct {
 		name string
 	}{
@@ -35,7 +35,7 @@ func Test_Init(t *testing.T) {
 	}
 }
 
-func Test_initCryptKey(t *testing.T) {
+func TestInitCryptKey(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -67,7 +67,7 @@ func Test_initCryptKey(t *testing.T) {
 	}
 }
 
-func Test_initFileConfig(t *testing.T) {
+func TestInitFileConfig(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -92,7 +92,7 @@ func Test_initFileConfig(t *testing.T) {
 	}
 }
 
-func Test_initFileConnections(t *testing.T) {
+func TestInitFileConnections(t *testing.T) {
 	tests := []struct {
 		name    string
 		wantErr bool
@@ -117,7 +117,7 @@ func Test_initFileConnections(t *testing.T) {
 	}
 }
 
-func Test_initLoggerFromConfig(t *testing.T) {
+func TestInitLoggerFromConfig(t *testing.T) {
 	type args struct {
 		loggerType    string
 		wantSetLogger logger.Logger
