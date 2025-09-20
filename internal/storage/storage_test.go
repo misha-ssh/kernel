@@ -1,7 +1,9 @@
 package storage
 
 import (
+	"bytes"
 	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -146,63 +148,70 @@ func TestExists(t *testing.T) {
 }
 
 func TestGet(t *testing.T) {
-	type args struct {
+	tempDir := t.TempDir()
+
+	testFiles := map[string][]byte{
+		"test.txt":         []byte("test data"),
+		"empty.txt":        []byte(""),
+		"large.txt":        make([]byte, 1024*1024),
+		"large-repeat.txt": bytes.Repeat([]byte("x"), 1024*1024),
+	}
+
+	for filename, data := range testFiles {
+		filePath := filepath.Join(tempDir, filename)
+		err := os.WriteFile(filePath, data, 0644)
+		if err != nil {
+			t.Fatalf("WriteFile() %s: error: %v", filename, err)
+		}
+	}
+
+	tests := []struct {
+		name      string
 		direction string
 		filename  string
-	}
-	tests := []struct {
-		name         string
-		args         args
-		want         string
-		isCreateFile bool
-		wantErr      bool
+		want      string
+		wantErr   bool
 	}{
 		{
-			name: "get dont empty file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "test.txt",
-			},
-			want:         "test data",
-			isCreateFile: true,
-			wantErr:      false,
+			name:      "success - read test file",
+			direction: tempDir,
+			filename:  "test.txt",
+			want:      string(testFiles["test.txt"]),
+			wantErr:   false,
 		},
 		{
-			name: "get empty file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "nonexistent.txt",
-			},
-			want:         "",
-			isCreateFile: true,
-			wantErr:      false,
+			name:      "success - read empty file",
+			direction: tempDir,
+			filename:  "empty.txt",
+			want:      string(testFiles["empty.txt"]),
+			wantErr:   false,
 		},
 		{
-			name: "get dont created file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "nonexistent.txt",
-			},
-			want:         "",
-			isCreateFile: false,
-			wantErr:      true,
+			name:      "success - read large file",
+			direction: tempDir,
+			filename:  "large.txt",
+			want:      string(testFiles["large.txt"]),
+			wantErr:   false,
+		},
+		{
+			name:      "success - read large file",
+			direction: tempDir,
+			filename:  "large-repeat.txt",
+			want:      string(testFiles["large-repeat.txt"]),
+			wantErr:   false,
+		},
+		{
+			name:      "fail - non-existent file",
+			direction: tempDir,
+			filename:  "nonexistent.txt",
+			want:      "",
+			wantErr:   true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isCreateFile {
-				err := Create(tt.args.direction, tt.args.filename)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
-				}
-
-				err = Write(tt.args.direction, tt.args.filename, tt.want)
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
-				}
-			}
-
-			got, err := Get(tt.args.direction, tt.args.filename)
+			got, err := Get(tt.direction, tt.filename)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
