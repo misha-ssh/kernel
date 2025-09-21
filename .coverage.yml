@@ -8,4 +8,5 @@ exclude:
     - \.pb\.go$
     - ^examples
     - ^configs
+    - ^build
     - ^testutil
