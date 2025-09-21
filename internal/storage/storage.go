@@ -5,27 +5,33 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+var ErrEmptyDirectory = errors.New("empty directory")
 
 // Create creates a new file at the specified path, including parent directories if needed.
 // Returns error if file creation fails.
 func Create(path string, filename string) error {
-	file := filepath.Join(path, filename)
+	if strings.TrimSpace(path) == "" {
+		return ErrEmptyDirectory
+	}
 
-	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
-		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.Mkdir(path, os.ModePerm)
 		if err != nil {
 			return err
 		}
+	}
 
-		createdFile, err := os.Create(file)
+	if strings.TrimSpace(filename) != "" {
+		file := filepath.Join(path, filename)
+
+		f, err := os.Create(file)
 		if err != nil {
 			return err
 		}
-
-		defer func(createdFile *os.File) {
-			err = createdFile.Close()
-		}(createdFile)
+		defer f.Close()
 	}
 
 	return nil
