@@ -85,7 +85,7 @@ func TestDeletePrivateKey(t *testing.T) {
 			name: "successful delete",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: tempDir,
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToPrivateKey,
 					},
@@ -97,7 +97,7 @@ func TestDeletePrivateKey(t *testing.T) {
 			name: "empty private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: tempDir,
 					SshOptions: &connect.SshOptions{
 						PrivateKey: "",
 					},
@@ -121,7 +121,7 @@ func TestDeletePrivateKey(t *testing.T) {
 			name: "invalid private key - delete key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: tempDir,
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToInvalidKey,
 					},
@@ -143,8 +143,8 @@ func TestDeletePrivateKey(t *testing.T) {
 				t.Errorf("DeletePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if !tt.wantErr && storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias) {
-				t.Errorf("SavePrivateKey() dont create file error = %v, wantErr %v", err, tt.wantErr)
+			if storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias) {
+				t.Errorf("key exists after delete")
 			}
 		})
 	}
