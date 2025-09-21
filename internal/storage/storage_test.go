@@ -109,6 +109,8 @@ func TestDelete(t *testing.T) {
 }
 
 func TestExists(t *testing.T) {
+	tempDir := t.TempDir()
+
 	type args struct {
 		direction string
 		filename  string
@@ -120,19 +122,37 @@ func TestExists(t *testing.T) {
 		want         bool
 	}{
 		{
-			name: "is exist created file",
+			name: "success - is exists",
 			args: args{
-				direction: t.TempDir(),
+				direction: tempDir,
 				filename:  "test.txt",
 			},
 			isCreateFile: true,
 			want:         true,
 		},
 		{
-			name: "is exist dont created file",
+			name: "fail - is not exists",
 			args: args{
-				direction: t.TempDir(),
+				direction: tempDir,
 				filename:  "nonexistent.txt",
+			},
+			isCreateFile: false,
+			want:         false,
+		},
+		{
+			name: "fail - is not exists empty file",
+			args: args{
+				direction: tempDir,
+				filename:  "",
+			},
+			isCreateFile: false,
+			want:         false,
+		},
+		{
+			name: "fail - is not exists empty dir",
+			args: args{
+				direction: "",
+				filename:  "text.txt",
 			},
 			isCreateFile: false,
 			want:         false,

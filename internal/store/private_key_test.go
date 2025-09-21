@@ -85,7 +85,7 @@ func TestDeletePrivateKey(t *testing.T) {
 			name: "successful delete",
 			args: args{
 				connection: &connect.Connect{
-					Alias: tempDir,
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToPrivateKey,
 					},
@@ -97,7 +97,7 @@ func TestDeletePrivateKey(t *testing.T) {
 			name: "empty private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: tempDir,
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: "",
 					},
@@ -121,7 +121,7 @@ func TestDeletePrivateKey(t *testing.T) {
 			name: "invalid private key - delete key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: tempDir,
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToInvalidKey,
 					},
@@ -172,10 +172,10 @@ func TestSavePrivateKey(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "successful save",
+			name: "success - save private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToPrivateKey,
 					},
@@ -184,10 +184,10 @@ func TestSavePrivateKey(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "nonexistent private key",
+			name: "fail - nonexistent private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: storage.GetFullPath(tempDir, "non-existent-key"),
 					},
@@ -196,10 +196,10 @@ func TestSavePrivateKey(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "invalid private key",
+			name: "fail - invalid private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToInvalidKey,
 					},
@@ -208,7 +208,7 @@ func TestSavePrivateKey(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "empty alias",
+			name: "fail - empty alias",
 			args: args{
 				connection: &connect.Connect{
 					Alias: "",
@@ -220,10 +220,10 @@ func TestSavePrivateKey(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "empty private key",
+			name: "fail - empty private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias: t.TempDir(),
+					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: "",
 					},

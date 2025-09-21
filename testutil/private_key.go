@@ -37,7 +37,7 @@ func CreatePrivateKey(direction string) (string, error) {
 	}
 
 	file := filepath.Join(direction, "key")
-	err = os.WriteFile(file, privatePEM, 0644)
+	err = os.WriteFile(file, privatePEM, os.ModePerm)
 	if err != nil {
 		return "", err
 	}
@@ -48,7 +48,7 @@ func CreatePrivateKey(direction string) (string, error) {
 // CreateInvalidPrivateKey create invalid key for tests
 func CreateInvalidPrivateKey(direction string) (string, error) {
 	file := filepath.Join(direction, "invalid")
-	err := os.WriteFile(file, []byte(""), 0644)
+	err := os.WriteFile(file, []byte(""), os.ModePerm)
 	if err != nil {
 		return "", err
 	}

@@ -22,7 +22,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      tempDir,
+		Alias:      "new_update",
 		Login:      "test",
 		Address:    "test",
 		Password:   "test",

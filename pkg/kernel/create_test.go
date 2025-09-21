@@ -26,7 +26,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      t.TempDir(),
+		Alias:      "created_alias",
 		Login:      "test",
 		Address:    "test",
 		Password:   "test",
@@ -45,7 +45,7 @@ func TestCreate(t *testing.T) {
 			name: "success - create connection",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      t.TempDir(),
+					Alias:      "new_alias",
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -77,7 +77,7 @@ func TestCreate(t *testing.T) {
 			name: "success - add ssh options",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     t.TempDir(),
+					Alias:     "new_2_alias",
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -96,7 +96,7 @@ func TestCreate(t *testing.T) {
 			name: "success - save private key",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     t.TempDir(),
+					Alias:     "new_3_alias",
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -115,7 +115,7 @@ func TestCreate(t *testing.T) {
 			name: "fail - dont valid private key",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     t.TempDir(),
+					Alias:     "new_4_alias",
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",

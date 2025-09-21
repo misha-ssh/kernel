@@ -20,7 +20,6 @@ func TestDelete(t *testing.T) {
 		connection *connect.Connect
 		isCreate   bool
 	}
-
 	tests := []struct {
 		name    string
 		args    args
@@ -30,7 +29,7 @@ func TestDelete(t *testing.T) {
 			name: "success - delete connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      tempDir,
+					Alias:      "deleted_alias",
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -64,7 +63,7 @@ func TestDelete(t *testing.T) {
 			name: "success - delete connection with private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     tempDir,
+					Alias:     "deleted_alias",
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -83,7 +82,7 @@ func TestDelete(t *testing.T) {
 			name: "success - delete connection with empty private key",
 			args: args{
 				connection: &connect.Connect{
-					Alias:     tempDir,
+					Alias:     "deleted_alias",
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
