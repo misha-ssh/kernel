@@ -2,30 +2,29 @@ package storage
 
 import (
 	"errors"
-	"io"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+var ErrEmptyDirectory = errors.New("empty directory")
 
 // Create creates a new file at the specified path, including parent directories if needed.
 // Returns error if file creation fails.
 func Create(path string, filename string) error {
-	file := filepath.Join(path, filename)
+	if strings.TrimSpace(path) == "" {
+		return ErrEmptyDirectory
+	}
 
-	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
-		err = os.MkdirAll(filepath.Dir(file), os.ModePerm)
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		err = os.Mkdir(path, os.ModePerm)
 		if err != nil {
 			return err
 		}
+	}
 
-		createdFile, err := os.Create(file)
-		if err != nil {
-			return err
-		}
-
-		defer func(createdFile *os.File) {
-			err = createdFile.Close()
-		}(createdFile)
+	if strings.TrimSpace(filename) != "" {
+		return Write(path, filename, "")
 	}
 
 	return nil
@@ -39,11 +38,8 @@ func Delete(path string, filename string) error {
 // Exists checks if a file exists at the given path and is not a directory.
 // Returns boolean indicating existence.
 func Exists(path string, filename string) bool {
-	filePath := filepath.Join(path, filename)
-
-	info, err := os.Stat(filePath)
-
-	if os.IsNotExist(err) {
+	info, err := os.Stat(filepath.Join(path, filename))
+	if errors.Is(err, os.ErrNotExist) {
 		return false
 	}
 
@@ -53,38 +49,18 @@ func Exists(path string, filename string) bool {
 // Get reads and returns the contents of a file as a string.
 // Returns error if file cannot be read.
 func Get(path string, filename string) (string, error) {
-	file := filepath.Join(path, filename)
-
-	f, err := os.Open(file)
-	if err != nil {
-		return "", err
-	}
-	defer func(f *os.File) {
-		err = f.Close()
-	}(f)
-
-	fContent, err := io.ReadAll(f)
+	data, err := os.ReadFile(filepath.Join(path, filename))
 	if err != nil {
 		return "", err
 	}
 
-	return string(fContent), nil
+	return string(data), nil
 }
 
 // Write saves data to a file, overwriting existing content.
 // Creates file if it doesn't exist. Returns error on failure.
 func Write(path string, filename string, data string) error {
-	file := filepath.Join(path, filename)
-
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	defer func(f *os.File) {
-		err = f.Close()
-	}(f)
-
-	_, err = f.Write([]byte(data))
+	err := os.WriteFile(filepath.Join(path, filename), []byte(data), os.ModePerm)
 	if err != nil {
 		return err
 	}

@@ -1,8 +1,6 @@
 package store
 
 import (
-	"crypto/rsa"
-	"crypto/x509"
 	"encoding/pem"
 	"errors"
 	"reflect"
@@ -28,23 +26,8 @@ func validatePrivateKey(privateKey string) error {
 		return ErrNotValidPrivateKey
 	}
 
-	if _, err := ssh.ParseRawPrivateKey([]byte(privateKey)); err == nil {
-		return nil
-	}
-
-	_, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		key, err := x509.ParsePKCS8PrivateKey(block.Bytes)
-		if err != nil {
-			return ErrNotValidPrivateKey
-		}
-
-		_, ok := key.(*rsa.PrivateKey)
-		if !ok {
-			return ErrNotValidPrivateKey
-		}
-
-		return nil
+	if _, err := ssh.ParseRawPrivateKey([]byte(privateKey)); err != nil {
+		return err
 	}
 
 	return nil

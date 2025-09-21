@@ -2,7 +2,7 @@ package crypto
 
 import "testing"
 
-func TestStorage_Decrypt(t *testing.T) {
+func TestDecrypt(t *testing.T) {
 	type args struct {
 		plaintext string
 		key       string
@@ -83,7 +83,7 @@ func TestStorage_Decrypt(t *testing.T) {
 	}
 }
 
-func TestStorage_Encrypt(t *testing.T) {
+func TestEncrypt(t *testing.T) {
 	type args struct {
 		plaintext string
 		key       string
