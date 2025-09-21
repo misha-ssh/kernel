@@ -25,13 +25,10 @@ func Create(path string, filename string) error {
 	}
 
 	if strings.TrimSpace(filename) != "" {
-		file := filepath.Join(path, filename)
-
-		f, err := os.Create(file)
+		err := os.WriteFile(filepath.Join(path, filename), []byte(""), os.ModePerm)
 		if err != nil {
 			return err
 		}
-		defer f.Close()
 	}
 
 	return nil
@@ -45,11 +42,8 @@ func Delete(path string, filename string) error {
 // Exists checks if a file exists at the given path and is not a directory.
 // Returns boolean indicating existence.
 func Exists(path string, filename string) bool {
-	filePath := filepath.Join(path, filename)
-
-	info, err := os.Stat(filePath)
-
-	if os.IsNotExist(err) {
+	info, err := os.Stat(filepath.Join(path, filename))
+	if errors.Is(err, os.ErrNotExist) {
 		return false
 	}
 
