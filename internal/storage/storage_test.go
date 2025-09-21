@@ -18,7 +18,7 @@ func TestCreate(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "create file with valida data",
+			name: "success - create file",
 			args: args{
 				direction: t.TempDir(),
 				filename:  "test.txt",
@@ -26,15 +26,23 @@ func TestCreate(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "create file with empty filename - create dir",
+			name: "success - create dir",
 			args: args{
-				direction: t.TempDir(),
+				direction: t.TempDir() + "/new_dir",
 				filename:  "",
 			},
 			wantErr: false,
 		},
 		{
-			name: "create file with empty two args",
+			name: "fail - empty dir",
+			args: args{
+				direction: "",
+				filename:  "new.txt",
+			},
+			wantErr: true,
+		},
+		{
+			name: "fail - empty dir and filename",
 			args: args{
 				direction: "",
 				filename:  "",
@@ -65,7 +73,7 @@ func TestDelete(t *testing.T) {
 		wantErr      bool
 	}{
 		{
-			name: "delete existing file",
+			name: "success - delete file",
 			args: args{
 				direction: t.TempDir(),
 				filename:  "test.txt",
@@ -74,7 +82,7 @@ func TestDelete(t *testing.T) {
 			wantErr:      false,
 		},
 		{
-			name: "delete dont created file",
+			name: "fail - delete non exists file",
 			args: args{
 				direction: t.TempDir(),
 				filename:  "nonexistent.txt",
@@ -87,7 +95,7 @@ func TestDelete(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateFile {
 				err := Create(tt.args.direction, tt.args.filename)
-				if (err != nil) != tt.wantErr {
+				if err != nil {
 					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
 				}
 			}
