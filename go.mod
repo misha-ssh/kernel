@@ -1,6 +1,6 @@
 module github.com/misha-ssh/kernel
 
-go 1.25.1
+go 1.24.2
 
 require (
 	github.com/zalando/go-keyring v0.2.6
