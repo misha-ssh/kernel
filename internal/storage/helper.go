@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/misha-ssh/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/configs/envname"
 )
 
 const CharHidden = "."
@@ -19,7 +20,7 @@ func GetAppDir() string {
 
 	hiddenDir := CharHidden + envconst.AppName
 
-	if os.Getenv("GO_TESTING") == "true" {
+	if os.Getenv(envname.Testing) == envconst.IsTesting {
 		return filepath.Join(os.TempDir(), hiddenDir)
 	}
 
