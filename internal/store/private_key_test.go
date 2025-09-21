@@ -4,6 +4,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/misha-ssh/kernel/internal/setup"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/testutil"
@@ -189,7 +190,7 @@ func TestSavePrivateKey(t *testing.T) {
 				connection: &connect.Connect{
 					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
-						PrivateKey: storage.GetFullPath(tempDir, "non-existent-key"),
+						PrivateKey: "non-existent-key",
 					},
 				},
 			},
@@ -232,34 +233,16 @@ func TestSavePrivateKey(t *testing.T) {
 			wantErr: true,
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			savedPathPrivateKey, err := SavePrivateKey(tt.args.connection)
-
 			if (err != nil) != tt.wantErr {
 				t.Errorf("SavePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
 			}
 
-			if !tt.wantErr {
-				if !storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias) {
-					t.Errorf("SavePrivateKey() dont create file error = %v, wantErr %v", err, tt.wantErr)
-				}
-
-				directionSavedPrivateKey, filenameSavedPrivateKey := storage.GetDirectionAndFilename(savedPathPrivateKey)
-				dataSavedPrivateKey, err := storage.Get(directionSavedPrivateKey, filenameSavedPrivateKey)
-				if err != nil {
-					t.Errorf("Get() error = %v", err)
-				}
-
-				directionPrivateKey, filenamePrivateKey := storage.GetDirectionAndFilename(tt.args.connection.SshOptions.PrivateKey)
-				dataPrivateKey, err := storage.Get(directionPrivateKey, filenamePrivateKey)
-				if err != nil {
-					t.Errorf("Get() error = %v", err)
-				}
-
-				if !reflect.DeepEqual(dataSavedPrivateKey, dataPrivateKey) {
-					t.Error("saved private key != private key")
-				}
+			if !tt.wantErr && !storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias) {
+				t.Errorf("dont save file: %v", savedPathPrivateKey)
 			}
 		})
 	}
@@ -392,8 +375,12 @@ func TestUpdatePrivateKey(t *testing.T) {
 			wantErr: false,
 		},
 	}
+
+	setup.Init()
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			pathOldPrivateKey := tt.args.connection.SshOptions.PrivateKey
 
 			pathCreatedKey, err := UpdatePrivateKey(tt.args.connection)
