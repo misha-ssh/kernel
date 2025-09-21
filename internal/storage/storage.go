@@ -2,7 +2,6 @@ package storage
 
 import (
 	"errors"
-	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -25,10 +24,7 @@ func Create(path string, filename string) error {
 	}
 
 	if strings.TrimSpace(filename) != "" {
-		err := os.WriteFile(filepath.Join(path, filename), []byte(""), os.ModePerm)
-		if err != nil {
-			return err
-		}
+		return Write(path, filename, "")
 	}
 
 	return nil
@@ -53,38 +49,18 @@ func Exists(path string, filename string) bool {
 // Get reads and returns the contents of a file as a string.
 // Returns error if file cannot be read.
 func Get(path string, filename string) (string, error) {
-	file := filepath.Join(path, filename)
-
-	f, err := os.Open(file)
-	if err != nil {
-		return "", err
-	}
-	defer func(f *os.File) {
-		err = f.Close()
-	}(f)
-
-	fContent, err := io.ReadAll(f)
+	data, err := os.ReadFile(filepath.Join(path, filename))
 	if err != nil {
 		return "", err
 	}
 
-	return string(fContent), nil
+	return string(data), nil
 }
 
 // Write saves data to a file, overwriting existing content.
 // Creates file if it doesn't exist. Returns error on failure.
 func Write(path string, filename string, data string) error {
-	file := filepath.Join(path, filename)
-
-	f, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_TRUNC, os.ModePerm)
-	if err != nil {
-		return err
-	}
-	defer func(f *os.File) {
-		err = f.Close()
-	}(f)
-
-	_, err = f.Write([]byte(data))
+	err := os.WriteFile(filepath.Join(path, filename), []byte(data), os.ModePerm)
 	if err != nil {
 		return err
 	}
