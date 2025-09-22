@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/testutil"
 )
 
 func TestList(t *testing.T) {
@@ -15,23 +16,23 @@ func TestList(t *testing.T) {
 		isCreateConnection bool
 	}{
 		{
-			name:               "list connections - get empty connections",
+			name:               "success - get empty connections",
 			want:               &connect.Connections{},
 			wantErr:            false,
 			isCreateConnection: false,
 		},
 		{
-			name:               "list connections - create empty connections",
+			name:               "success - create empty connections",
 			want:               &connect.Connections{},
 			wantErr:            false,
 			isCreateConnection: true,
 		},
 		{
-			name: "list connections - create empty connections",
+			name: "success - get exists connections",
 			want: &connect.Connections{
 				Connects: []connect.Connect{
 					{
-						Alias:      t.TempDir(),
+						Alias:      testutil.RandomString(),
 						Login:      "test",
 						Address:    "test",
 						Password:   "test",
@@ -41,7 +42,7 @@ func TestList(t *testing.T) {
 						SshOptions: &connect.SshOptions{},
 					},
 					{
-						Alias:      t.TempDir(),
+						Alias:      testutil.RandomString(),
 						Login:      "test",
 						Address:    "test",
 						Password:   "test",
@@ -51,7 +52,7 @@ func TestList(t *testing.T) {
 						SshOptions: &connect.SshOptions{},
 					},
 					{
-						Alias:      t.TempDir(),
+						Alias:      testutil.RandomString(),
 						Login:      "test",
 						Address:    "test",
 						Password:   "test",
