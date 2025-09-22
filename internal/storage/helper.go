@@ -29,9 +29,7 @@ func GetAppDir() string {
 
 // GetPrivateKeysDir get dir where save private keys
 func GetPrivateKeysDir() string {
-	appDir := GetAppDir()
-
-	return filepath.Join(appDir, envconst.DirectionPrivateKeys)
+	return filepath.Join(GetAppDir(), envconst.DirectionPrivateKeys)
 }
 
 // GetDirectionAndFilename get dir and filename from full path
