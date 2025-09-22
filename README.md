@@ -5,7 +5,6 @@
 [![Release](https://img.shields.io/github/release/misha-ssh/kernel?status.svg)](https://github.com/misha-ssh/kernel/releases)
 [![Action Lint](https://github.com/misha-ssh/kernel/actions/workflows/lint.yml/badge.svg)](https://github.com/misha-ssh/kernel)
 [![Action Tests](https://github.com/misha-ssh/kernel/actions/workflows/tests.yml/badge.svg)](https://github.com/misha-ssh/kernel)
-[![Action Coverage](https://github.com/misha-ssh/kernel/actions/workflows/coverage.yml/badge.svg)](https://github.com/misha-ssh/kernel)
 
 This package acts as the core for an ssh client written in go
 

@@ -34,8 +34,15 @@ jobs:
         run: |
           go get -v -t -d ./...
 
-      - name: Test
+      - name: Tests
         run: |
           echo 'somecredstorepass' | gnome-keyring-daemon --unlock
           make tests
+        shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
+
+      - name: Test coverage
+        run: |
+          echo 'somecredstorepass' | gnome-keyring-daemon --unlock
+          make test-coverage
+
         shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
