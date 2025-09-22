@@ -22,7 +22,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      "new_update",
+		Alias:      testutil.RandomString(),
 		Login:      "test",
 		Address:    "test",
 		Password:   "test",
@@ -148,6 +148,44 @@ func TestUpdate(t *testing.T) {
 				oldAlias: createdConnection.Alias,
 			},
 			wantErr: false,
+		},
+		{
+			name: "fail - alias is empty",
+			args: args{
+				connection: &connect.Connect{
+					Alias:     "",
+					Login:     "test2",
+					Address:   "test2",
+					Password:  "test2",
+					Type:      connect.TypeSSH,
+					CreatedAt: "test2",
+					UpdatedAt: "test2",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: "",
+					},
+				},
+				oldAlias: createdConnection.Alias,
+			},
+			wantErr: true,
+		},
+		{
+			name: "fail - alias is invalid with /",
+			args: args{
+				connection: &connect.Connect{
+					Alias:     "/test/",
+					Login:     "test2",
+					Address:   "test2",
+					Password:  "test2",
+					Type:      connect.TypeSSH,
+					CreatedAt: "test2",
+					UpdatedAt: "test2",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: "",
+					},
+				},
+				oldAlias: createdConnection.Alias,
+			},
+			wantErr: true,
 		},
 	}
 

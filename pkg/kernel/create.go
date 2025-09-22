@@ -21,6 +21,11 @@ var (
 func Create(connection *connect.Connect) error {
 	setup.Init()
 
+	err := connection.Validate()
+	if err != nil {
+		return err
+	}
+
 	connections, err := store.GetConnections()
 	if err != nil {
 		logger.Error(ErrGetConnectionAtCreate.Error())

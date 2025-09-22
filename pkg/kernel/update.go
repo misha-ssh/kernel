@@ -20,6 +20,11 @@ var (
 func Update(connection *connect.Connect, oldAlias string) error {
 	setup.Init()
 
+	err := connection.Validate()
+	if err != nil {
+		return err
+	}
+
 	connections, err := store.GetConnections()
 	if err != nil {
 		logger.Error(ErrGetConnectionAtUpdate.Error())
