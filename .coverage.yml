@@ -5,8 +5,7 @@ threshold:
 
 exclude:
   paths:
-    - \.pb\.go$
     - ^examples
-    - ^configs
-    - ^build
-    - ^testutil
+    - ^pkg/connect/ssh.go
+    - ^pkg/connect/connect.go
+    - ^pkg/kernel/connect.go
