@@ -8,6 +8,7 @@ import (
 )
 
 var ErrEmptyDirectory = errors.New("empty directory")
+var ErrDeleteDirectory = errors.New("get dir, delete only file")
 
 // Create creates a new file at the specified path, including parent directories if needed.
 // Returns error if file creation fails.
@@ -32,6 +33,16 @@ func Create(path string, filename string) error {
 
 // Delete removes the specified file. Returns error if deletion fails.
 func Delete(path string, filename string) error {
+	file := filepath.Join(path, filename)
+	info, err := os.Stat(file)
+	if err != nil {
+		return err
+	}
+
+	if info.IsDir() {
+		return ErrDeleteDirectory
+	}
+
 	return os.Remove(filepath.Join(path, filename))
 }
 
