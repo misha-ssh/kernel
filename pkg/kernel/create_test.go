@@ -26,7 +26,7 @@ func TestCreate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      "created_alias",
+		Alias:      testutil.RandomString(),
 		Login:      "test",
 		Address:    "test",
 		Password:   "test",
@@ -45,7 +45,7 @@ func TestCreate(t *testing.T) {
 			name: "success - create connection",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      "new_alias",
+					Alias:      testutil.RandomString(),
 					Login:      "test",
 					Address:    "test",
 					Password:   "test",
@@ -77,7 +77,7 @@ func TestCreate(t *testing.T) {
 			name: "success - add ssh options",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     "new_2_alias",
+					Alias:     testutil.RandomString(),
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -96,7 +96,7 @@ func TestCreate(t *testing.T) {
 			name: "success - save private key",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     "new_3_alias",
+					Alias:     testutil.RandomString(),
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -115,7 +115,7 @@ func TestCreate(t *testing.T) {
 			name: "fail - dont valid private key",
 			args: args{
 				connect: &connect.Connect{
-					Alias:     "new_4_alias",
+					Alias:     testutil.RandomString(),
 					Login:     "test",
 					Address:   "test",
 					Password:  "test",
@@ -126,6 +126,38 @@ func TestCreate(t *testing.T) {
 						Port:       22,
 						PrivateKey: pathToInvalidKey,
 					},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "fail - empty alias",
+			args: args{
+				connect: &connect.Connect{
+					Alias:      "",
+					Login:      "test",
+					Address:    "test",
+					Password:   "test",
+					Type:       connect.TypeSSH,
+					CreatedAt:  "time",
+					UpdatedAt:  "time",
+					SshOptions: &connect.SshOptions{},
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "fail - alias is invalid with /",
+			args: args{
+				connect: &connect.Connect{
+					Alias:      "test/alias",
+					Login:      "test",
+					Address:    "test",
+					Password:   "test",
+					Type:       connect.TypeSSH,
+					CreatedAt:  "time",
+					UpdatedAt:  "time",
+					SshOptions: &connect.SshOptions{},
 				},
 			},
 			wantErr: true,
