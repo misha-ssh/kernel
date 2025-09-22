@@ -5,7 +5,7 @@ import "math/rand"
 const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 func RandomString() string {
-	b := make([]byte, rand.Intn(10))
+	b := make([]byte, 10)
 
 	for i := range b {
 		b[i] = letterBytes[rand.Intn(len(letterBytes))]
