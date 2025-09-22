@@ -1,12 +1,11 @@
 profile: cover.out
 
 threshold:
-  total: 60
+  total: 70
 
 exclude:
   paths:
-    - \.pb\.go$
     - ^examples
-    - ^configs
-    - ^build
-    - ^testutil
+    - ^pkg/connect/ssh.go
+    - ^pkg/connect/connect.go
+    - ^pkg/kernel/connect.go

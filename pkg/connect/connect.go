@@ -1,12 +1,5 @@
 package connect
 
-import "golang.org/x/crypto/ssh"
-
-type Connector interface {
-	Connect(session *ssh.Session) error
-	Session(connection *Connect) (*ssh.Session, error)
-}
-
 type ConnectionType string
 
 // TypeSSH type for ssh connection
