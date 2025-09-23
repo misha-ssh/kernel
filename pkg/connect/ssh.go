@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"time"
 
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
@@ -15,7 +14,7 @@ import (
 const (
 	TypeConnect = "tcp"
 
-	Timeout = 20 * time.Second
+	Timeout = 0
 
 	EnableMod = 1
 	ICRNLMod  = 1
