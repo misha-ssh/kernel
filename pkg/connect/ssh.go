@@ -39,20 +39,8 @@ type Ssh struct{}
 // - Error handling and resource cleanup
 // Returns an active SSH session or error if any step fails.
 func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
-	config, err := getClientConfig(connection)
+	client, err := s.Client(connection)
 	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	hostWithPort := net.JoinHostPort(
-		connection.Address,
-		fmt.Sprint(connection.SshOptions.Port),
-	)
-
-	client, err := getClient(hostWithPort, config)
-	if err != nil {
-		logger.Error(err.Error())
 		return nil, err
 	}
 
@@ -121,6 +109,27 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 	}
 
 	return nil
+}
+
+func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
+	config, err := getClientConfig(connection)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	hostWithPort := net.JoinHostPort(
+		connection.Address,
+		fmt.Sprint(connection.SshOptions.Port),
+	)
+
+	client, err := getClient(hostWithPort, config)
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, err
+	}
+
+	return client, nil
 }
 
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
