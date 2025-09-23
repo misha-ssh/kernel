@@ -332,3 +332,47 @@ func TestGetSession(t *testing.T) {
 		})
 	}
 }
+
+func TestSshClient(t *testing.T) {
+	tests := []struct {
+		name       string
+		connection *Connect
+		want       *ssh.Client
+		wantErr    bool
+	}{
+		{
+			name: "invalid host",
+			connection: &Connect{
+				Address:  "invalid-host",
+				Login:    "user",
+				Password: "pass",
+				SshOptions: &SshOptions{
+					Port: 22,
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "empty connection data",
+			connection: &Connect{
+				SshOptions: &SshOptions{},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &Ssh{}
+			got, err := s.Client(tt.connection)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Client() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
