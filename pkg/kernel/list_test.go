@@ -3,6 +3,7 @@ package kernel
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/testutil"
@@ -32,34 +33,40 @@ func TestList(t *testing.T) {
 			want: &connect.Connections{
 				Connects: []connect.Connect{
 					{
-						Alias:      testutil.RandomString(),
-						Login:      "test",
-						Address:    "test",
-						Password:   "test",
-						Type:       connect.TypeSSH,
-						CreatedAt:  "time",
-						UpdatedAt:  "time",
-						SshOptions: &connect.SshOptions{},
+						Alias:     testutil.RandomString(),
+						Login:     "test",
+						Address:   "test",
+						Password:  "test",
+						Type:      connect.TypeSSH,
+						CreatedAt: time.Now().Format(time.RFC3339),
+						UpdatedAt: time.Now().Format(time.RFC3339),
+						SshOptions: &connect.SshOptions{
+							Port: 22,
+						},
 					},
 					{
-						Alias:      testutil.RandomString(),
-						Login:      "test",
-						Address:    "test",
-						Password:   "test",
-						Type:       connect.TypeSSH,
-						CreatedAt:  "time",
-						UpdatedAt:  "time",
-						SshOptions: &connect.SshOptions{},
+						Alias:     testutil.RandomString(),
+						Login:     "test",
+						Address:   "test",
+						Password:  "test",
+						Type:      connect.TypeSSH,
+						CreatedAt: time.Now().Format(time.RFC3339),
+						UpdatedAt: time.Now().Format(time.RFC3339),
+						SshOptions: &connect.SshOptions{
+							Port: 22,
+						},
 					},
 					{
-						Alias:      testutil.RandomString(),
-						Login:      "test",
-						Address:    "test",
-						Password:   "test",
-						Type:       connect.TypeSSH,
-						CreatedAt:  "time",
-						UpdatedAt:  "time",
-						SshOptions: &connect.SshOptions{},
+						Alias:     testutil.RandomString(),
+						Login:     "test",
+						Address:   "test",
+						Password:  "test",
+						Type:      connect.TypeSSH,
+						CreatedAt: time.Now().Format(time.RFC3339),
+						UpdatedAt: time.Now().Format(time.RFC3339),
+						SshOptions: &connect.SshOptions{
+							Port: 22,
+						},
 					},
 				},
 			},

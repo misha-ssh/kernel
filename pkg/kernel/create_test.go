@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"testing"
+	"time"
 
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -26,14 +27,16 @@ func TestCreate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      testutil.RandomString(),
-		Login:      "test",
-		Address:    "test",
-		Password:   "test",
-		Type:       connect.TypeSSH,
-		CreatedAt:  "time",
-		UpdatedAt:  "time",
-		SshOptions: &connect.SshOptions{},
+		Alias:     testutil.RandomString(),
+		Login:     "test",
+		Address:   "test",
+		Password:  "test",
+		Type:      connect.TypeSSH,
+		CreatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339),
+		SshOptions: &connect.SshOptions{
+			Port: 22,
+		},
 	}
 
 	tests := []struct {
@@ -45,14 +48,16 @@ func TestCreate(t *testing.T) {
 			name: "success - create connection",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      testutil.RandomString(),
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     testutil.RandomString(),
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 			},
 			wantErr: false,
@@ -61,14 +66,16 @@ func TestCreate(t *testing.T) {
 			name: "fail - exist alias",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      createdConnection.Alias,
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     createdConnection.Alias,
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 			},
 			wantErr: true,
@@ -82,8 +89,8 @@ func TestCreate(t *testing.T) {
 					Address:   "test",
 					Password:  "test",
 					Type:      connect.TypeSSH,
-					CreatedAt: "time",
-					UpdatedAt: "time",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
 						Port:       22,
 						PrivateKey: "",
@@ -101,8 +108,8 @@ func TestCreate(t *testing.T) {
 					Address:   "test",
 					Password:  "test",
 					Type:      connect.TypeSSH,
-					CreatedAt: "time",
-					UpdatedAt: "time",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
 						Port:       22,
 						PrivateKey: pathToPrivateKey,
@@ -120,8 +127,8 @@ func TestCreate(t *testing.T) {
 					Address:   "test",
 					Password:  "test",
 					Type:      connect.TypeSSH,
-					CreatedAt: "time",
-					UpdatedAt: "time",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
 						Port:       22,
 						PrivateKey: pathToInvalidKey,
@@ -134,14 +141,16 @@ func TestCreate(t *testing.T) {
 			name: "fail - empty alias",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      "",
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     "",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 			},
 			wantErr: true,
@@ -150,14 +159,16 @@ func TestCreate(t *testing.T) {
 			name: "fail - alias is invalid with /",
 			args: args{
 				connect: &connect.Connect{
-					Alias:      "test/alias",
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     "test/alias",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 			},
 			wantErr: true,

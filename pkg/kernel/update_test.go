@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"testing"
+	"time"
 
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -22,14 +23,16 @@ func TestUpdate(t *testing.T) {
 	}
 
 	createdConnection := &connect.Connect{
-		Alias:      testutil.RandomString(),
-		Login:      "test",
-		Address:    "test",
-		Password:   "test",
-		Type:       connect.TypeSSH,
-		CreatedAt:  "time",
-		UpdatedAt:  "time",
-		SshOptions: &connect.SshOptions{},
+		Alias:     testutil.RandomString(),
+		Login:     "test",
+		Address:   "test",
+		Password:  "test",
+		Type:      connect.TypeSSH,
+		CreatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339),
+		SshOptions: &connect.SshOptions{
+			Port: 22,
+		},
 	}
 
 	type args struct {
@@ -45,14 +48,16 @@ func TestUpdate(t *testing.T) {
 			name: "success - update on default old value",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      createdConnection.Alias,
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     createdConnection.Alias,
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 				oldAlias: createdConnection.Alias,
 			},
@@ -62,14 +67,16 @@ func TestUpdate(t *testing.T) {
 			name: "fail - get exist connect and get not exists old alias",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      createdConnection.Alias,
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     createdConnection.Alias,
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 				oldAlias: "notFoundAlias",
 			},
@@ -79,14 +86,16 @@ func TestUpdate(t *testing.T) {
 			name: "success - update values by exist connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      createdConnection.Alias,
-					Login:      "test2",
-					Address:    "test2",
-					Password:   "test2",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "test2",
-					UpdatedAt:  "test2",
-					SshOptions: &connect.SshOptions{},
+					Alias:     createdConnection.Alias,
+					Login:     "test2",
+					Address:   "test2",
+					Password:  "test2",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 				oldAlias: createdConnection.Alias,
 			},
@@ -101,9 +110,10 @@ func TestUpdate(t *testing.T) {
 					Address:   "test2",
 					Password:  "test2",
 					Type:      connect.TypeSSH,
-					CreatedAt: "test2",
-					UpdatedAt: "test2",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: pathToPrivateKey,
 					},
 				},
@@ -120,9 +130,10 @@ func TestUpdate(t *testing.T) {
 					Address:   "test2",
 					Password:  "test2",
 					Type:      connect.TypeSSH,
-					CreatedAt: "test2",
-					UpdatedAt: "test2",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: pathToInvalidKey,
 					},
 				},
@@ -139,9 +150,10 @@ func TestUpdate(t *testing.T) {
 					Address:   "test2",
 					Password:  "test2",
 					Type:      connect.TypeSSH,
-					CreatedAt: "test2",
-					UpdatedAt: "test2",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: "",
 					},
 				},
@@ -158,9 +170,10 @@ func TestUpdate(t *testing.T) {
 					Address:   "test2",
 					Password:  "test2",
 					Type:      connect.TypeSSH,
-					CreatedAt: "test2",
-					UpdatedAt: "test2",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: "",
 					},
 				},
@@ -177,9 +190,10 @@ func TestUpdate(t *testing.T) {
 					Address:   "test2",
 					Password:  "test2",
 					Type:      connect.TypeSSH,
-					CreatedAt: "test2",
-					UpdatedAt: "test2",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: "",
 					},
 				},

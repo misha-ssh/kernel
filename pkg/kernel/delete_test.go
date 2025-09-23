@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"testing"
+	"time"
 
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -29,14 +30,16 @@ func TestDelete(t *testing.T) {
 			name: "success - delete connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "deleted_alias",
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     "deleted_alias",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 				isCreate: true,
 			},
@@ -46,14 +49,16 @@ func TestDelete(t *testing.T) {
 			name: "fail - not found connection",
 			args: args{
 				connection: &connect.Connect{
-					Alias:      "notFoundAlias",
-					Login:      "test",
-					Address:    "test",
-					Password:   "test",
-					Type:       connect.TypeSSH,
-					CreatedAt:  "time",
-					UpdatedAt:  "time",
-					SshOptions: &connect.SshOptions{},
+					Alias:     "notFoundAlias",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port: 22,
+					},
 				},
 				isCreate: false,
 			},
@@ -68,9 +73,10 @@ func TestDelete(t *testing.T) {
 					Address:   "test",
 					Password:  "test",
 					Type:      connect.TypeSSH,
-					CreatedAt: "time",
-					UpdatedAt: "time",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: pathToPrivateKey,
 					},
 				},
@@ -87,9 +93,10 @@ func TestDelete(t *testing.T) {
 					Address:   "test",
 					Password:  "test",
 					Type:      connect.TypeSSH,
-					CreatedAt: "time",
-					UpdatedAt: "time",
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
+						Port:       22,
 						PrivateKey: "",
 					},
 				},
