@@ -5,6 +5,9 @@ labels: [ "bug", "triage" ]
 assignees: [ ]
 body:
   - type: markdown
+    attributes:
+      value: |
+        Example description
   - type: input
     id: pkg_version
     attributes:
