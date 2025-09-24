@@ -1,0 +1,20 @@
+name: Question
+description: Ask or suggest something.
+labels: ["question", "triage"]
+assignees: []
+body:
+  - type: markdown
+  - type: input
+    id: pkg_version
+    attributes:
+      label: Kernel package version
+      placeholder: "example: 1.0.0"
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      placeholder:
+    validations:
+      required: true
