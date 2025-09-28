@@ -7,4 +7,7 @@ exclude:
   paths:
     - ^examples
     - ^pkg/connect/ssh.go
+    - ^pkg/connect/sftp.go
     - ^pkg/kernel/connect.go
+    - ^pkg/kernel/download.go
+    - ^pkg/kernel/upload.go
