@@ -1,0 +1,42 @@
+name: Tests Integration
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    name: Test Integration on Ubuntu latest
+    runs-on: ubuntu-latest
+    container:
+      image: ubuntu:latest
+      options: --privileged
+      env:
+        DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: "go.mod"
+
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y gnome-keyring build-essential ca-certificates openssh-client
+          mkdir -p /github/home/.cache/
+          mkdir -p /github/home/.local/share/keyrings/
+          chmod 700 -R /github/home/.local/
+
+      - name: Get dependencies
+        run: |
+          go get -v -t -d ./...
+
+      - name: Tests integration
+        run: |
+          echo 'somecredstorepass' | gnome-keyring-daemon --unlock
+          make tests-integration
+
+        shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
