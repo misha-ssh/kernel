@@ -129,9 +129,6 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 	}
 
 	if c.IsRunning() {
-		cmdHost := exec.Command("ssh-keygen", "-R", host)
-		require.NoError(t, cmdHost.Run())
-
 		connection := &connect.Connect{
 			Alias:     "test",
 			Login:     "root",
