@@ -5,6 +5,7 @@
 [![Release](https://img.shields.io/github/release/misha-ssh/kernel?status.svg)](https://github.com/misha-ssh/kernel/releases)
 [![Action Lint](https://github.com/misha-ssh/kernel/actions/workflows/lint.yml/badge.svg)](https://github.com/misha-ssh/kernel)
 [![Action Tests](https://github.com/misha-ssh/kernel/actions/workflows/tests.yml/badge.svg)](https://github.com/misha-ssh/kernel)
+[![Action Tests Integration](https://github.com/misha-ssh/kernel/actions/workflows/tests-integration.yml/badge.svg)](https://github.com/misha-ssh/kernel)
 
 This package acts as the core for an ssh client written in go
 
@@ -17,6 +18,7 @@ Made using data from packages:
 ## 📝 Features
 
 - **Connection Management:** Commands for creating, connecting, deleting, and updating your connection
+- **Download & Upload files:** Commands for working with sftp file transfer
 - **Data encryption:** Your connection is securely encrypted
 - **Configurations:** Possibility of connection configuration
 - **The local environment** There is an environment for testing the connection
@@ -56,6 +58,62 @@ func main() {
 		panic(err)
 	}
 }
+```
+
+### 🔌 Download
+
+The command to connect to the remote server
+
+this command downloads the file from the server
+
+```go
+package main
+
+import (
+	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/pkg/kernel"
+)
+
+func main() {
+	connection := &connect.Connect{...}
+
+	remoteFile := "/remote.txt"
+	localFile := "~/local.txt"
+
+	err := kernel.Download(connection, remoteFile, localFile)
+	if err != nil {
+		panic(err)
+	}
+}
+
+```
+
+### 🔌 Upload
+
+The command to connect to the remote server
+
+this command is to upload a file to a remote server
+
+```go
+package main
+
+import (
+	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/pkg/kernel"
+)
+
+func main() {
+	connection := &connect.Connect{...}
+
+	remoteFile := "/upload.txt"
+	localFile := "/absolute/path/your_local_file.txt"
+
+	err := kernel.Upload(connection, localFile, remoteFile)
+	if err != nil {
+		panic(err)
+	}
+}
+
 ```
 
 ### ✍️ Create
