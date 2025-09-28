@@ -46,3 +46,10 @@ jobs:
           make test-coverage
 
         shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
+
+      - name: Tests integration
+        run: |
+          echo 'somecredstorepass' | gnome-keyring-daemon --unlock
+          make tests-integration
+
+        shell: dbus-run-session -- bash --noprofile --norc -eo pipefail {0}
