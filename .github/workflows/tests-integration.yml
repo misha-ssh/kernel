@@ -1,4 +1,4 @@
-name: Tests
+name: Tests Integration
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 
 jobs:
   tests:
-    name: Test on Ubuntu latest
+    name: Test Integration on Ubuntu latest
     runs-on: ubuntu-latest
     container:
       image: ubuntu:latest
