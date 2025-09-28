@@ -25,7 +25,7 @@ jobs:
       - name: Install Dependencies
         run: |
           apt-get update
-          apt-get install -y gnome-keyring build-essential ca-certificates
+          apt-get install -y gnome-keyring build-essential ca-certificates openssh-client
           mkdir -p /github/home/.cache/
           mkdir -p /github/home/.local/share/keyrings/
           chmod 700 -R /github/home/.local/
