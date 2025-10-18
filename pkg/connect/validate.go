@@ -17,7 +17,7 @@ var (
 func (c *Connect) Validate() error {
 	for _, err := range []error{
 		validateAlias(c.Alias),
-		validatePassword(c.Password),
+		validatePassword(c.Password, c.SshOptions.PrivateKey),
 		validateLogin(c.Login),
 		validateAddress(c.Address),
 		validateCreatedAt(c.CreatedAt),
@@ -79,7 +79,11 @@ func validateAddress(address string) error {
 	return nil
 }
 
-func validatePassword(password string) error {
+func validatePassword(password string, privateKey string) error {
+	if strings.TrimSpace(privateKey) != "" {
+		return nil
+	}
+
 	if strings.TrimSpace(password) == "" {
 		return errors.New("password cannot be empty")
 	}
