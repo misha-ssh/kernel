@@ -257,9 +257,10 @@ func TestValidateAddress(t *testing.T) {
 
 func TestValidatePassword(t *testing.T) {
 	tests := []struct {
-		name     string
-		password string
-		wantErr  bool
+		name       string
+		password   string
+		privateKey string
+		wantErr    bool
 	}{
 		{
 			name:     "success - valid password",
@@ -275,6 +276,18 @@ func TestValidatePassword(t *testing.T) {
 			name:     "success - special chars",
 			password: "p@ssw0rd!",
 			wantErr:  false,
+		},
+		{
+			name:       "success - skip validate pass",
+			password:   "",
+			privateKey: "path_to_pk_key",
+			wantErr:    false,
+		},
+		{
+			name:       "fail - none skip valida is empty key",
+			password:   " ",
+			privateKey: "",
+			wantErr:    true,
 		},
 		{
 			name:     "fail - empty password",
@@ -300,7 +313,7 @@ func TestValidatePassword(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validatePassword(tt.password); (err != nil) != tt.wantErr {
+			if err := validatePassword(tt.password, tt.privateKey); (err != nil) != tt.wantErr {
 				t.Errorf("validatePassword() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
