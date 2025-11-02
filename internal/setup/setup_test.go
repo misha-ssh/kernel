@@ -13,6 +13,7 @@ import (
 	"github.com/misha-ssh/kernel/internal/crypto"
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
+	"github.com/stretchr/testify/require"
 	"github.com/zalando/go-keyring"
 )
 
@@ -27,9 +28,7 @@ func TestInit(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Init() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			Init()
@@ -49,22 +48,17 @@ func TestInitCryptKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := initCryptKey(); (err != nil) != tt.wantErr {
-				t.Errorf("initCryptKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err := initCryptKey()
+			require.Equal(t, tt.wantErr, err != nil)
 
 			currentUser, err := user.Current()
-			if err != nil {
-				t.Errorf("initCryptKey() error = %v", err)
-			}
+			require.NoError(t, err)
 
 			username := currentUser.Username
 			service := envconst.NameServiceCryptKey
 			cryptKey, _ := keyring.Get(service, username)
 
-			if len(cryptKey) != crypto.SizeKey {
-				t.Errorf("initCryptKey() error = %v, CryptKey size is %v", err, crypto.SizeKey)
-			}
+			require.Equal(t, len(cryptKey), crypto.SizeKey)
 		})
 	}
 }
@@ -81,15 +75,10 @@ func TestInitFileConfig(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := initFileConfig(); (err != nil) != tt.wantErr {
-				t.Errorf("initFileConfig() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, initFileConfig() != nil)
 
 			direction := storage.GetAppDir()
-
-			if !storage.Exists(direction, envconst.FilenameConfig) {
-				t.Error("initFileConfig() dont create file")
-			}
+			require.True(t, storage.Exists(direction, envconst.FilenameConfig))
 		})
 	}
 }
@@ -106,15 +95,10 @@ func TestInitFileConnections(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := initFileConnections(); (err != nil) != tt.wantErr {
-				t.Errorf("initFileConnections() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, initFileConnections() != nil)
 
 			direction := storage.GetAppDir()
-
-			if !storage.Exists(direction, envconst.FilenameConnections) {
-				t.Error("initFileConnections() dont create file")
-			}
+			require.True(t, storage.Exists(direction, envconst.FilenameConnections))
 		})
 	}
 }
@@ -176,29 +160,17 @@ func TestInitLoggerFromConfig(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.args.loggerType != "" {
-				err := config.Set(envname.Logger, tt.args.loggerType)
-				if err != nil {
-					t.Errorf("initLoggerFromConfig() error = %v", err)
-				}
+				require.NoError(t, config.Set(envname.Logger, tt.args.loggerType))
 
-				// set default type logger before completed test
 				defer func() {
-					if err = config.Set(envname.Logger, envconst.TypeStorageLogger); err != nil {
-						t.Errorf("Set() error = %v", err)
-					}
+					require.NoError(t, config.Set(envname.Logger, envconst.TypeStorageLogger))
 				}()
 			}
 
-			if err := initLoggerFromConfig(); (err != nil) != tt.wantErr {
-				t.Errorf("initLoggerFromConfig() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, initLoggerFromConfig() != nil)
 
 			if !tt.wantErr {
-				loggerSetting := logger.Get()
-
-				if reflect.TypeOf(loggerSetting).String() != reflect.TypeOf(tt.args.wantSetLogger).String() {
-					t.Errorf("logger from configs: %v != %v", loggerSetting, tt.args.wantSetLogger)
-				}
+				require.Equal(t, reflect.TypeOf(logger.Get()), reflect.TypeOf(tt.args.wantSetLogger))
 			}
 		})
 	}
