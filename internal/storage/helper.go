@@ -27,14 +27,15 @@ func GetAppDir() string {
 	return filepath.Join(usr.HomeDir, hiddenDir)
 }
 
-// GetSshKeysFile get file with ssh keys
-func GetSshKeysFile() string {
+// GetUserPrivateKey get file with ssh keys
+// todo add more type key except rsa
+func GetUserPrivateKey() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {
 		panic(err)
 	}
 
-	return filepath.Join(homeDir, envconst.DirectionsSshKeys)
+	return filepath.Join(homeDir, envconst.DirectionsUserPrivateKey), nil
 }
 
 // GetPrivateKeysDir get dir where save private keys
