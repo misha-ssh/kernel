@@ -27,6 +27,16 @@ func GetAppDir() string {
 	return filepath.Join(usr.HomeDir, hiddenDir)
 }
 
+// GetSshKeysFile get file with ssh keys
+func GetSshKeysFile() string {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	return filepath.Join(homeDir, envconst.DirectionsSshKeys)
+}
+
 // GetPrivateKeysDir get dir where save private keys
 func GetPrivateKeysDir() string {
 	return filepath.Join(GetAppDir(), envconst.DirectionPrivateKeys)
