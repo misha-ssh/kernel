@@ -4,6 +4,8 @@ package config
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidateKey(t *testing.T) {
@@ -40,9 +42,7 @@ func TestValidateKey(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateKey(tt.key); (err != nil) != tt.wantErr {
-				t.Errorf("validateKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, validateKey(tt.key) != nil)
 		})
 	}
 }
@@ -66,9 +66,7 @@ func TestValidateOnEmptyString(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateOnEmptyString(tt.value); (err != nil) != tt.wantErr {
-				t.Errorf("validateOnEmptyString() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, validateOnEmptyString(tt.value) != nil)
 		})
 	}
 }
@@ -176,9 +174,7 @@ func TestValidateValue(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateValue(tt.args.value); (err != nil) != tt.wantErr {
-				t.Errorf("validateValue() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, validateValue(tt.args.value) != nil)
 		})
 	}
 }
