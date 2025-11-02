@@ -10,15 +10,13 @@ import (
 
 	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/misha-ssh/kernel/configs/envname"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetAppDir(t *testing.T) {
 	originalTesting := os.Getenv(envname.Testing)
 	defer func() {
-		err := os.Setenv(envname.Testing, originalTesting)
-		if err != nil {
-			t.Errorf("failed set env: %v", err)
-		}
+		require.NoError(t, os.Setenv(envname.Testing, originalTesting))
 	}()
 
 	tests := []struct {
@@ -30,9 +28,7 @@ func TestGetAppDir(t *testing.T) {
 			name: "success - get app dir",
 			want: func() string {
 				usr, err := user.Current()
-				if err != nil {
-					t.Errorf("failed get user: %v", err)
-				}
+				require.NoError(t, err)
 
 				return filepath.Join(usr.HomeDir, CharHidden+envconst.AppName)
 			},
@@ -49,20 +45,12 @@ func TestGetAppDir(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isSetTesting {
-				err := os.Setenv(envname.Testing, "true")
-				if err != nil {
-					t.Errorf("failed set env: %v", err)
-				}
+				require.NoError(t, os.Setenv(envname.Testing, "true"))
 			} else {
-				err := os.Setenv(envname.Testing, "false")
-				if err != nil {
-					t.Errorf("failed set env: %v", err)
-				}
+				require.NoError(t, os.Setenv(envname.Testing, "false"))
 			}
 
-			if got := GetAppDir(); got != tt.want() {
-				t.Errorf("GetAppDir() = %v, want %v", got, tt.want())
-			}
+			require.Equal(t, GetAppDir(), tt.want())
 		})
 	}
 }
@@ -103,12 +91,8 @@ func TestGetDirectionAndFilename(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotDir, gotFile := GetDirectionAndFilename(tt.fullPath)
-			if gotDir != tt.wantDir {
-				t.Errorf("GetDirectionAndFilename() dir = %v, want %v", gotDir, tt.wantDir)
-			}
-			if gotFile != tt.wantFile {
-				t.Errorf("GetDirectionAndFilename() file = %v, want %v", gotFile, tt.wantFile)
-			}
+			require.Equal(t, gotDir, tt.wantDir)
+			require.Equal(t, gotFile, tt.wantFile)
 		})
 	}
 }
@@ -148,9 +132,7 @@ func TestGetFullPath(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetFullPath(tt.direction, tt.filename); got != tt.want {
-				t.Errorf("GetFullPath() = %v, want %v", got, tt.want)
-			}
+			require.Equal(t, GetFullPath(tt.direction, tt.filename), tt.want)
 		})
 	}
 }
@@ -169,9 +151,7 @@ func TestGetPrivateKeysDir(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetPrivateKeysDir(); got != tt.want() {
-				t.Errorf("GetPrivateKeysDir() = %v, want %v", got, tt.want())
-			}
+			require.Equal(t, GetPrivateKeysDir(), tt.want())
 		})
 	}
 }

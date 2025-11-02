@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestCreate(t *testing.T) {
@@ -55,10 +57,7 @@ func TestCreate(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Create(tt.args.direction, tt.args.filename)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }
@@ -96,16 +95,11 @@ func TestDelete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateFile {
-				err := Create(tt.args.direction, tt.args.filename)
-				if err != nil {
-					t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
-				}
+				require.NoError(t, Create(tt.args.direction, tt.args.filename))
 			}
 
 			err := Delete(tt.args.direction, tt.args.filename)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }
@@ -163,16 +157,10 @@ func TestExists(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateFile {
-				err := Create(tt.args.direction, tt.args.filename)
-				if err != nil {
-					t.Errorf("Create() error = %v", err)
-				}
+				require.NoError(t, Create(tt.args.direction, tt.args.filename))
 			}
 
-			got := Exists(tt.args.direction, tt.args.filename)
-			if got != tt.want {
-				t.Errorf("got: %v != want: %v", got, tt.want)
-			}
+			require.Equal(t, Exists(tt.args.direction, tt.args.filename), tt.want)
 		})
 	}
 }
@@ -189,10 +177,7 @@ func TestGet(t *testing.T) {
 
 	for filename, data := range testFiles {
 		filePath := filepath.Join(tempDir, filename)
-		err := os.WriteFile(filePath, data, 0644)
-		if err != nil {
-			t.Fatalf("WriteFile() %s: error: %v", filename, err)
-		}
+		require.NoError(t, os.WriteFile(filePath, data, 0644))
 	}
 
 	tests := []struct {
@@ -242,14 +227,8 @@ func TestGet(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Get(tt.direction, tt.filename)
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if got != tt.want {
-				t.Errorf("got: %v != want: %v", got, tt.want)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
+			require.Equal(t, got, tt.want)
 		})
 	}
 }
@@ -310,18 +289,11 @@ func TestWrite(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Write(tt.args.direction, tt.args.filename, tt.args.data)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			got, err := Get(tt.args.direction, tt.args.filename)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Get() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if got != tt.want {
-				t.Errorf("got: %v != want: %v", got, tt.want)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
+			require.Equal(t, got, tt.want)
 		})
 	}
 }
@@ -357,25 +329,16 @@ func TestGetOpenFile(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			flags := os.O_WRONLY | os.O_APPEND | os.O_CREATE
 			got, err := GetOpenFile(tt.args.direction, tt.args.filename, flags)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetOpenFile() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			_, err = got.Write([]byte("test"))
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Write() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			err = got.Close()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Close() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			fileIsExists := Exists(tt.args.direction, tt.args.filename)
-
-			if !fileIsExists != tt.wantErr {
-				t.Errorf("file not exists")
-			}
+			require.Equal(t, fileIsExists, !tt.wantErr)
 		})
 	}
 }
