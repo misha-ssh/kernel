@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/misha-ssh/kernel/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConnectValidate(t *testing.T) {
@@ -63,8 +64,10 @@ func TestConnectValidate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := tt.connection.Validate(); (err != nil) != tt.wantErr {
-				t.Errorf("Validate() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, tt.connection.Validate())
+			} else {
+				require.NoError(t, tt.connection.Validate())
 			}
 		})
 	}
@@ -114,8 +117,10 @@ func TestValidateAlias(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateAlias(tt.alias); (err != nil) != tt.wantErr {
-				t.Errorf("validateAlias() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validateAlias(tt.alias))
+			} else {
+				require.NoError(t, validateAlias(tt.alias))
 			}
 		})
 	}
@@ -176,8 +181,10 @@ func TestValidateLogin(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateLogin(tt.login); (err != nil) != tt.wantErr {
-				t.Errorf("validateLogin() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validateLogin(tt.login))
+			} else {
+				require.NoError(t, validateLogin(tt.login))
 			}
 		})
 	}
@@ -248,8 +255,10 @@ func TestValidateAddress(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateAddress(tt.address); (err != nil) != tt.wantErr {
-				t.Errorf("validateAddress() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validateAddress(tt.address))
+			} else {
+				require.NoError(t, validateAddress(tt.address))
 			}
 		})
 	}
@@ -313,8 +322,10 @@ func TestValidatePassword(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validatePassword(tt.password, tt.privateKey); (err != nil) != tt.wantErr {
-				t.Errorf("validatePassword() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validatePassword(tt.password, tt.privateKey))
+			} else {
+				require.NoError(t, validatePassword(tt.password, tt.privateKey))
 			}
 		})
 	}
@@ -370,8 +381,10 @@ func TestValidateDate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateDate(tt.date); (err != nil) != tt.wantErr {
-				t.Errorf("validateDate() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validateDate(tt.date))
+			} else {
+				require.NoError(t, validateDate(tt.date))
 			}
 		})
 	}
@@ -399,8 +412,10 @@ func TestValidateCreatedAt(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateCreatedAt(tt.date); (err != nil) != tt.wantErr {
-				t.Errorf("validateCreatedAt() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validateCreatedAt(tt.date))
+			} else {
+				require.NoError(t, validateCreatedAt(tt.date))
 			}
 		})
 	}
@@ -428,8 +443,10 @@ func TestValidateUpdatedAt(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validateUpdatedAt(tt.date); (err != nil) != tt.wantErr {
-				t.Errorf("validateUpdatedAt() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validateUpdatedAt(tt.date))
+			} else {
+				require.NoError(t, validateUpdatedAt(tt.date))
 			}
 		})
 	}
@@ -475,8 +492,10 @@ func TestValidatePort(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := validatePort(tt.port); (err != nil) != tt.wantErr {
-				t.Errorf("validatePort() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, validatePort(tt.port))
+			} else {
+				require.NoError(t, validatePort(tt.port))
 			}
 		})
 	}
