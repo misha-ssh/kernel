@@ -155,3 +155,19 @@ func TestGetPrivateKeysDir(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSshKeysFile(t *testing.T) {
+	tests := []struct {
+		name string
+		want string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetSshKeysFile(); got != tt.want {
+				t.Errorf("GetSshKeysFile() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
