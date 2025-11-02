@@ -28,7 +28,7 @@ func GetAppDir() string {
 }
 
 // GetUserPrivateKey get file with ssh keys
-// todo add more type key except rsa
+// todo add more type key except rsa and get success exist files
 func GetUserPrivateKey() (string, error) {
 	homeDir, err := os.UserHomeDir()
 	if err != nil {

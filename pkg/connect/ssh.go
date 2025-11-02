@@ -134,6 +134,7 @@ func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
 
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	if len(connection.SshOptions.PrivateKey) == 0 && len(connection.Password) == 0 {
+		//todo add logic more retry from type user private key
 		userPrivateKey, err := storage.GetUserPrivateKey()
 		if err != nil {
 			return nil, err
