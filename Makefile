@@ -3,7 +3,6 @@
 # address - localhost
 # password - password
 # port - 22
-# test
 up-ssh:
 	docker build -f ./build/ssh/default/Dockerfile -t ssh-host .
 	docker run -d --name ssh-default -p 22:22 ssh-host
@@ -32,7 +31,7 @@ down-ssh-port:
 # login - root
 # address - localhost
 # private key - ./dockerkey
-# port - 2222
+# port - 22
 up-ssh-key:
 	ssh-keygen -b 4096 -t rsa -f dockerkey
 	ssh-keygen -R localhost
