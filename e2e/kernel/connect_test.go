@@ -32,24 +32,17 @@ func TestIntegrationDefaultConnect(t *testing.T) {
 		ContainerRequest: req,
 		Started:          true,
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	defer func() {
-		if err := c.Terminate(ctx); err != nil {
-			t.Logf("failed to terminate container: %s", err)
-		}
+		require.NoError(t, c.Terminate(ctx))
 	}()
 
 	host, err := c.Host(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	port, err := c.MappedPort(ctx, "22/tcp")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if c.IsRunning() {
 		connection := &connect.Connect{
@@ -68,21 +61,16 @@ func TestIntegrationDefaultConnect(t *testing.T) {
 
 		sshConnector := &connect.Ssh{}
 		session, err := sshConnector.Session(connection)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, err)
 
 		defer func(session *ssh.Session) {
 			err := session.Close()
 			if err != nil {
-				t.Fatal(err)
+				require.NoError(t, err)
 			}
 		}(session)
 
-		err = session.Shell()
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, session.Shell())
 	}
 }
 
@@ -109,24 +97,17 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 		ContainerRequest: req,
 		Started:          true,
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	defer func() {
-		if err := c.Terminate(ctx); err != nil {
-			t.Logf("failed to terminate container: %s", err)
-		}
+		require.NoError(t, c.Terminate(ctx))
 	}()
 
 	host, err := c.Host(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	port, err := c.MappedPort(ctx, "22/tcp")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if c.IsRunning() {
 		connection := &connect.Connect{

@@ -33,24 +33,17 @@ func TestIntegrationDownloadFile(t *testing.T) {
 		ContainerRequest: req,
 		Started:          true,
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	defer func() {
-		if err := c.Terminate(ctx); err != nil {
-			t.Logf("failed to terminate container: %s", err)
-		}
+		require.NoError(t, c.Terminate(ctx))
 	}()
 
 	host, err := c.Host(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	port, err := c.MappedPort(ctx, "22/tcp")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if c.IsRunning() {
 		connection := &connect.Connect{

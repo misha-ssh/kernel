@@ -33,24 +33,17 @@ func TestIntegrationUploadFile(t *testing.T) {
 		ContainerRequest: req,
 		Started:          true,
 	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+
 	defer func() {
-		if err := c.Terminate(ctx); err != nil {
-			t.Logf("failed to terminate container: %s", err)
-		}
+		require.NoError(t, c.Terminate(ctx))
 	}()
 
 	host, err := c.Host(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	port, err := c.MappedPort(ctx, "22/tcp")
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	if c.IsRunning() {
 		connection := &connect.Connect{
@@ -72,13 +65,11 @@ func TestIntegrationUploadFile(t *testing.T) {
 
 		remoteFile := "/upload"
 
-		err = kernel.Upload(connection, localFile, remoteFile)
-		require.NoError(t, err)
+		require.NoError(t, kernel.Upload(connection, localFile, remoteFile))
 
 		downloadedFile := filepath.Join(t.TempDir(), "test.txt")
 
-		err = kernel.Download(connection, remoteFile, downloadedFile)
-		require.NoError(t, err)
+		require.NoError(t, kernel.Download(connection, remoteFile, downloadedFile))
 
 		want, err := storage.Get(storage.GetDirectionAndFilename(localFile))
 		require.NoError(t, err)
