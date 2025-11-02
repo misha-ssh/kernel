@@ -5,6 +5,8 @@ package logger
 import (
 	"math/rand"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestCombinedLogger_Debug(t *testing.T) {
@@ -59,9 +61,7 @@ func TestCombinedLogger_Debug(t *testing.T) {
 			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Debug() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			cl.Debug(tt.args.value)
@@ -121,9 +121,7 @@ func TestCombinedLogger_Error(t *testing.T) {
 			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Error() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			cl.Error(tt.args.value)
@@ -183,9 +181,7 @@ func TestCombinedLogger_Info(t *testing.T) {
 			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Info() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			cl.Info(tt.args.value)
@@ -245,9 +241,7 @@ func TestCombinedLogger_Warn(t *testing.T) {
 			cl := NewCombinedLogger(tt.fields.loggers...)
 
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Warn() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			cl.Warn(tt.args.value)

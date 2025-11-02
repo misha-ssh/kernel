@@ -5,6 +5,8 @@ package logger
 import (
 	"math/rand"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestStorageLogger_Error(t *testing.T) {
@@ -28,9 +30,7 @@ func TestStorageLogger_Error(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Error() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			storageLogger.Error(tt.value)
@@ -59,9 +59,7 @@ func TestStorageLogger_Warn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Warn() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			storageLogger.Warn(tt.value)
@@ -90,9 +88,7 @@ func TestStorageLogger_Info(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Info() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			storageLogger.Info(tt.value)
@@ -121,9 +117,7 @@ func TestStorageLogger_Debug(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Debug() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			storageLogger.Debug(tt.value)
@@ -163,10 +157,7 @@ func TestStorageLogger_log(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := storageLogger.log(tt.value, tt.status)
-			if err != nil {
-				t.Errorf("log() error = %v", err)
-			}
+			require.NoError(t, storageLogger.log(tt.value, tt.status))
 		})
 	}
 }

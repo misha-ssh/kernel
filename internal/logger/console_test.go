@@ -5,6 +5,8 @@ package logger
 import (
 	"math/rand"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func TestConsoleLogger_Error(t *testing.T) {
@@ -28,9 +30,7 @@ func TestConsoleLogger_Error(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Error() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			consoleLogger.Error(tt.value)
@@ -59,9 +59,7 @@ func TestConsoleLogger_Warn(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Warn() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			consoleLogger.Warn(tt.value)
@@ -90,9 +88,7 @@ func TestConsoleLogger_Info(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Info() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			consoleLogger.Info(tt.value)
@@ -121,9 +117,7 @@ func TestConsoleLogger_Debug(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			defer func() {
-				if r := recover(); r != nil {
-					t.Error("Debug() is panicked")
-				}
+				require.Nil(t, recover())
 			}()
 
 			consoleLogger.Debug(tt.value)
@@ -163,10 +157,7 @@ func TestConsoleLogger_log(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := consoleLogger.log(tt.value, tt.status)
-			if err != nil {
-				t.Errorf("log error: %v", err)
-			}
+			require.NoError(t, consoleLogger.log(tt.value, tt.status))
 		})
 	}
 }
