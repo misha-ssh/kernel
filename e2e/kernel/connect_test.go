@@ -135,3 +135,6 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 		require.NoError(t, session.Shell())
 	}
 }
+
+// todo add e2e test
+func TestIntegrationOnlyUsernameAndLoginConnect(t *testing.T) {}
