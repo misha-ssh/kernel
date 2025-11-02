@@ -3,27 +3,23 @@
 package store
 
 import (
-	"reflect"
 	"testing"
 
 	"github.com/misha-ssh/kernel/internal/setup"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidatePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	type args struct {
 		privateKey string
@@ -52,13 +48,10 @@ func TestValidatePrivateKey(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			direction, filename := storage.GetDirectionAndFilename(tt.args.privateKey)
 			privateKey, err := storage.Get(direction, filename)
-			if err != nil {
-				t.Errorf("Get() error = %v", err)
-			}
+			require.NoError(t, err)
 
-			if err := validatePrivateKey(privateKey); (err != nil) != tt.wantErr {
-				t.Errorf("validatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err = validatePrivateKey(privateKey)
+			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }
@@ -67,14 +60,10 @@ func TestDeletePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	type args struct {
 		connection *connect.Connect
@@ -136,19 +125,14 @@ func TestDeletePrivateKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pathSavedPrivateKey, err := SavePrivateKey(tt.args.connection)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SavePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			tt.args.connection.SshOptions.PrivateKey = pathSavedPrivateKey
 
-			if err := DeletePrivateKey(tt.args.connection); (err != nil) != tt.wantErr {
-				t.Errorf("DeletePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err = DeletePrivateKey(tt.args.connection)
+			require.Equal(t, tt.wantErr, err != nil)
 
-			if storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias) {
-				t.Errorf("key exists after delete")
-			}
+			require.False(t, storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias))
 		})
 	}
 }
@@ -157,14 +141,10 @@ func TestSavePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	type args struct {
 		connection *connect.Connect
@@ -238,13 +218,11 @@ func TestSavePrivateKey(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			savedPathPrivateKey, err := SavePrivateKey(tt.args.connection)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("SavePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			_, err := SavePrivateKey(tt.args.connection)
+			require.Equal(t, tt.wantErr, err != nil)
 
-			if !tt.wantErr && !storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias) {
-				t.Errorf("dont save file: %v", savedPathPrivateKey)
+			if !tt.wantErr {
+				require.True(t, storage.Exists(storage.GetPrivateKeysDir(), tt.args.connection.Alias))
 			}
 		})
 	}
@@ -254,19 +232,13 @@ func TestUpdatePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pathToExtraPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	type args struct {
 		connection *connect.Connect
@@ -386,31 +358,22 @@ func TestUpdatePrivateKey(t *testing.T) {
 			pathOldPrivateKey := tt.args.connection.SshOptions.PrivateKey
 
 			pathCreatedKey, err := UpdatePrivateKey(tt.args.connection)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("UpdatePrivateKey() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
-			if (pathCreatedKey != tt.want()) != tt.wantErr {
-				t.Errorf("UpdatePrivateKey() got = %v, want %v", pathCreatedKey, tt.want())
+			if !tt.wantErr {
+				require.Equal(t, pathCreatedKey, tt.want())
 			}
 
 			if len(pathOldPrivateKey) != 0 && len(pathCreatedKey) != 0 {
 				directionOldKey, filenameOldKey := storage.GetDirectionAndFilename(pathOldPrivateKey)
 				dataOldKey, err := storage.Get(directionOldKey, filenameOldKey)
-				if err != nil {
-					t.Error("old key Get() error = ", err)
-				}
+				require.NoError(t, err)
 
 				directionCreatedKey, filenameCreatedKey := storage.GetDirectionAndFilename(pathCreatedKey)
 				dataCreatedKey, err := storage.Get(directionCreatedKey, filenameCreatedKey)
-				if err != nil {
-					t.Error("old key Get() error = ", err)
-				}
+				require.NoError(t, err)
 
-				if !reflect.DeepEqual(dataOldKey, dataCreatedKey) {
-					t.Errorf("data old key: %v != data created key: %v", pathOldPrivateKey, dataCreatedKey)
-				}
+				require.Equal(t, dataOldKey, dataCreatedKey)
 			}
 
 		})

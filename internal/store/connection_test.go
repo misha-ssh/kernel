@@ -8,6 +8,7 @@ import (
 
 	"github.com/misha-ssh/kernel/internal/setup"
 	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/stretchr/testify/require"
 )
 
 func TestGetConnections(t *testing.T) {
@@ -28,13 +29,8 @@ func TestGetConnections(t *testing.T) {
 			setup.Init()
 
 			got, err := GetConnections()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetConnections() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if reflect.TypeOf(got) != reflect.TypeOf(tt.want) {
-				t.Errorf("GetConnections() got: %v != want: %v", got, tt.want)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
+			require.Equal(t, reflect.TypeOf(got), reflect.TypeOf(tt.want))
 		})
 	}
 }
@@ -60,9 +56,8 @@ func TestSetConnections(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			setup.Init()
 
-			if err := SetConnections(tt.args.connections); (err != nil) != tt.wantErr {
-				t.Errorf("SetConnections() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			err := SetConnections(tt.args.connections)
+			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
 }
