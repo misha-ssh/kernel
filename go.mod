@@ -3,7 +3,7 @@ module github.com/misha-ssh/kernel
 go 1.24.2
 
 require (
-	github.com/pkg/sftp v1.13.9
+	github.com/pkg/sftp v1.13.10
 	github.com/stretchr/testify v1.11.1
 	github.com/testcontainers/testcontainers-go v0.39.0
 	github.com/zalando/go-keyring v0.2.6
