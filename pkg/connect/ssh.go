@@ -133,6 +133,23 @@ func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
 }
 
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
+	if len(connection.SshOptions.PrivateKey) == 0 && len(connection.Password) == 0 {
+		direction, filename := storage.GetDirectionAndFilename(storage.GetSshKeysFile())
+		dataSshKeys, err := storage.Get(direction, filename)
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, err
+		}
+
+		key, err := ssh.ParsePrivateKey([]byte(dataSshKeys))
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, err
+		}
+
+		return []ssh.AuthMethod{ssh.PublicKeys(key)}, nil
+	}
+
 	if len(connection.SshOptions.PrivateKey) == 0 {
 		return []ssh.AuthMethod{
 			ssh.Password(connection.Password),
