@@ -9,6 +9,7 @@ import (
 
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestList(t *testing.T) {
@@ -81,20 +82,17 @@ func TestList(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateConnection {
 				for _, connection := range tt.want.Connects {
-					if err := Create(&connection); (err != nil) != tt.wantErr {
-						t.Errorf("Create() error = %v, wantErr %v", err, tt.wantErr)
+					if tt.wantErr {
+						require.Error(t, Create(&connection))
+					} else {
+						require.NoError(t, Create(&connection))
 					}
 				}
 			}
 
 			got, err := List()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("List() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if reflect.TypeOf(got).String() != reflect.TypeOf(tt.want).String() {
-				t.Errorf("List() got = %v, want %v", got, tt.want)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
+			require.Equal(t, reflect.TypeOf(got), reflect.TypeOf(tt.want))
 		})
 	}
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/misha-ssh/kernel/internal/storage"
+	"github.com/stretchr/testify/require"
 )
 
 func TestStorage_Set(t *testing.T) {
@@ -106,24 +107,16 @@ func TestStorage_Set(t *testing.T) {
 	direction := storage.GetAppDir()
 
 	if !storage.Exists(direction, filename) {
-		err := storage.Create(direction, filename)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, storage.Create(direction, filename))
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := Set(tt.key, tt.value)
+			require.Equal(t, tt.wantErr, err != nil)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Set() error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			got := Get(tt.key)
-
-			if (got != tt.value) != tt.wantErr {
-				t.Errorf("got: %v != want: %v", got, tt.wantErr)
+			if !tt.wantErr {
+				require.Equal(t, Get(tt.key), tt.value)
 			}
 		})
 	}
@@ -178,25 +171,16 @@ func TestStorage_Get(t *testing.T) {
 	direction := storage.GetAppDir()
 
 	if !storage.Exists(direction, filename) {
-		err := storage.Create(direction, filename)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, storage.Create(direction, filename))
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isSetValue {
-				err := Set(tt.key, tt.want)
-				if err != nil {
-					t.Errorf("Set() error = %v", err)
-				}
+				require.NoError(t, Set(tt.key, tt.want))
 			}
 
-			got := Get(tt.key)
-			if got != tt.want {
-				t.Errorf("got: %v != want: %v", got, tt.want)
-			}
+			require.Equal(t, Get(tt.key), tt.want)
 		})
 	}
 }
@@ -238,25 +222,16 @@ func TestStorage_Exists(t *testing.T) {
 	direction := storage.GetAppDir()
 
 	if !storage.Exists(direction, filename) {
-		err := storage.Create(direction, filename)
-		if err != nil {
-			t.Fatal(err)
-		}
+		require.NoError(t, storage.Create(direction, filename))
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.isCreateKey {
-				err := Set(tt.key, "test")
-				if err != nil {
-					t.Errorf("Set() error = %v", err)
-				}
+				require.NoError(t, Set(tt.key, "test"))
 			}
 
-			got := Exists(tt.key)
-			if got != tt.want {
-				t.Errorf("got: %v != want: %v", got, tt.want)
-			}
+			require.Equal(t, Exists(tt.key), tt.want)
 		})
 	}
 }

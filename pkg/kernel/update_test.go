@@ -9,20 +9,17 @@ import (
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestUpdate(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	createdConnection := &connect.Connect{
 		Alias:     testutil.RandomString(),
@@ -231,21 +228,17 @@ func TestUpdate(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err = Update(tt.args.connection, tt.args.oldAlias); (err != nil) != tt.wantErr {
-				t.Errorf("Update() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			if tt.wantErr {
+				require.Error(t, Update(tt.args.connection, tt.args.oldAlias))
+			} else {
+				require.NoError(t, Update(tt.args.connection, tt.args.oldAlias))
 
-			direction, filename := storage.GetDirectionAndFilename(tt.args.connection.SshOptions.PrivateKey)
+				direction, filename := storage.GetDirectionAndFilename(tt.args.connection.SshOptions.PrivateKey)
 
-			if !tt.wantErr {
 				if len(tt.args.connection.SshOptions.PrivateKey) != 0 {
-					if !storage.Exists(direction, filename) {
-						t.Error("private key dont exists")
-					}
+					require.True(t, storage.Exists(direction, filename))
 				} else {
-					if storage.Exists(direction, filename) {
-						t.Error("private key exist but should be removed")
-					}
+					require.False(t, storage.Exists(direction, filename))
 				}
 			}
 		})

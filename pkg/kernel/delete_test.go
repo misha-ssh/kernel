@@ -9,15 +9,14 @@ import (
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDelete(t *testing.T) {
 	tempDir := t.TempDir()
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 
 	type args struct {
 		connection *connect.Connect
@@ -111,20 +110,18 @@ func TestDelete(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.args.isCreate {
-				if err = Create(tt.args.connection); err != nil {
-					t.Errorf("Create connection error = %v", err)
-				}
+				require.NoError(t, Create(tt.args.connection))
 			}
 
-			if err := Delete(tt.args.connection); (err != nil) != tt.wantErr {
-				t.Errorf("Delete() error = %v, wantErr %v", err, tt.wantErr)
+			if tt.wantErr {
+				require.Error(t, Delete(tt.args.connection))
+			} else {
+				require.NoError(t, Delete(tt.args.connection))
 			}
 
 			if len(tt.args.connection.SshOptions.PrivateKey) != 0 {
 				direction, filename := storage.GetDirectionAndFilename(tt.args.connection.SshOptions.PrivateKey)
-				if storage.Exists(direction, filename) {
-					t.Errorf("failed to check connection %v", err)
-				}
+				require.False(t, storage.Exists(direction, filename))
 			}
 		})
 	}

@@ -2,7 +2,11 @@
 
 package crypto
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/require"
+)
 
 func TestDecrypt(t *testing.T) {
 	type args struct {
@@ -63,23 +67,17 @@ func TestDecrypt(t *testing.T) {
 
 			if tt.generateKey {
 				tt.args.key, err = GenerateKey()
-				if err != nil {
-					t.Errorf("GenerateKey() error = %v", err)
-				}
+				require.NoError(t, err)
 			}
 
 			cryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Encrypt() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			got, err := Decrypt(cryptText, tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Decrypt() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
-			if (got != tt.want) != tt.wantErr {
-				t.Errorf("got: %v != want %v", got, tt.want)
+			if !tt.wantErr {
+				require.Equal(t, got, tt.want)
 			}
 		})
 	}
@@ -144,23 +142,17 @@ func TestEncrypt(t *testing.T) {
 
 			if tt.generateKey {
 				tt.args.key, err = GenerateKey()
-				if err != nil {
-					t.Errorf("GenerateKey() error = %v", err)
-				}
+				require.NoError(t, err)
 			}
 
 			encryptText, err := Encrypt(tt.args.plaintext, tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Encrypt() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
 			got, err := Decrypt(encryptText, tt.args.key)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Decrypt() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
 
-			if (got != tt.want) != tt.wantErr {
-				t.Errorf("got: %v != want %v", got, tt.want)
+			if !tt.wantErr {
+				require.Equal(t, got, tt.want)
 			}
 		})
 	}
@@ -179,14 +171,8 @@ func TestGenerateKey(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			key, err := GenerateKey()
-
-			if len(key) < SizeKey {
-				t.Errorf("key is invalid error = %v, wantErr %v", err, tt.wantErr)
-			}
-
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GenerateKey() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			require.Equal(t, tt.wantErr, err != nil)
+			require.True(t, len(key) == SizeKey)
 		})
 	}
 }
