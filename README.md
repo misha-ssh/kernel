@@ -242,7 +242,6 @@ Description of fields:
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -262,8 +261,6 @@ func main() {
 			PrivateKey: "/path/to/private/key",
 		},
 	}
-
-	fmt.Println(connection)
 }
 ```
 
@@ -311,7 +308,7 @@ Server accesses:
 * ``login`` - root
 * ``address`` - localhost
 * ``private key`` - ./dockerkey
-* ``port`` - 2222
+* ``port`` - 22
 
 3) connecting via a non-standard port
 
@@ -378,6 +375,12 @@ Run test coverage:
 
 ```bash
 make test-coverage
+```
+
+Run test e2e:
+
+```bash
+make tests-integration
 ```
 
 ## 🤝 Feedback
