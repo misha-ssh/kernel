@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"net"
 	"os"
-	"strings"
-	"syscall"
 
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
@@ -134,8 +132,6 @@ func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
 	return client, nil
 }
 
-// todo shorten the code - moved to in new method
-// todo fix auth private key from conn with passphare
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	var authMethod []ssh.AuthMethod
 
@@ -144,27 +140,9 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	}
 
 	if len(connection.SshOptions.PrivateKey) > 0 {
-		direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
-		data, err := storage.Get(direction, filename)
+		key, err := parsePrivateKey(connection.SshOptions.PrivateKey)
 		if err != nil {
-			logger.Error(err.Error())
 			return nil, err
-		}
-
-		dataSshKey := []byte(data)
-
-		key, err := ssh.ParsePrivateKey(dataSshKey)
-		if err != nil {
-			if !strings.Contains(err.Error(), "passphrase") {
-				logger.Error(err.Error())
-				return nil, err
-			}
-
-			key, err = parsePassphraseKey(filename, dataSshKey)
-			if err != nil {
-				logger.Error(err.Error())
-				return nil, err
-			}
 		}
 
 		authMethod = append(authMethod, ssh.PublicKeys(key))
@@ -180,26 +158,10 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 		var successKeys []ssh.Signer
 
 		for _, privateKey := range userPrivateKeys {
-			direction, filename := storage.GetDirectionAndFilename(privateKey)
-			data, err := storage.Get(direction, filename)
+			key, err := parsePrivateKey(privateKey)
 			if err != nil {
 				logger.Error(err.Error())
 				continue
-			}
-
-			dataSshKey := []byte(data)
-
-			key, err := ssh.ParsePrivateKey(dataSshKey)
-			if err != nil {
-				if !strings.Contains(err.Error(), "passphrase") {
-					continue
-				}
-
-				key, err = parsePassphraseKey(filename, dataSshKey)
-				if err != nil {
-					logger.Error(err.Error())
-					continue
-				}
 			}
 
 			successKeys = append(successKeys, key)
@@ -213,19 +175,6 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	}
 
 	return authMethod, nil
-}
-
-func parsePassphraseKey(keyName string, dataKey []byte) (ssh.Signer, error) {
-	fmt.Printf("Enter passphrase for %v (ctrl+m for skip): ", keyName)
-
-	passphrase, err := term.ReadPassword(syscall.Stdin)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("\n")
-
-	return ssh.ParsePrivateKeyWithPassphrase(dataKey, passphrase)
 }
 
 func getClientConfig(connection *Connect) (*ssh.ClientConfig, error) {
