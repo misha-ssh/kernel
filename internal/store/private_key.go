@@ -26,11 +26,8 @@ func validatePrivateKey(privateKey string) error {
 		return ErrNotValidPrivateKey
 	}
 
-	if _, err := ssh.ParseRawPrivateKey([]byte(privateKey)); err != nil {
-		return err
-	}
-
-	return nil
+	_, err := ssh.ParseRawPrivateKey([]byte(privateKey))
+	return err
 }
 
 // SavePrivateKey create private key for connection in spec dir
