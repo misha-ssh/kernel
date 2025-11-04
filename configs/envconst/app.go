@@ -5,5 +5,5 @@ const (
 	Theme   = "default"
 
 	DirectionPrivateKeys     = "private_keys"
-	DirectionsUserPrivateKey = ".ssh/id_rsa"
+	DirectionsUserPrivateKey = ".ssh"
 )
