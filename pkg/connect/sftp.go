@@ -2,12 +2,16 @@ package connect
 
 import "github.com/pkg/sftp"
 
-type Sftp struct{}
+type Sftp struct {
+	Connection *Connect
+}
 
-func NewSftp(connection *Connect, opts ...sftp.ClientOption) (*sftp.Client, error) {
-	ssh := Ssh{}
+func (s Sftp) Client(opts ...sftp.ClientOption) (*sftp.Client, error) {
+	ssh := Ssh{
+		Connection: s.Connection,
+	}
 
-	client, err := ssh.Client(connection)
+	client, err := ssh.Client()
 	if err != nil {
 		return nil, err
 	}
