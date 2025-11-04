@@ -87,6 +87,7 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 	return nil
 }
 
+// Client create ssh client from config and Auth
 func (s *Ssh) Client() (*ssh.Client, error) {
 	sshAuth, err := s.Auth()
 	if err != nil {
@@ -108,6 +109,7 @@ func (s *Ssh) Client() (*ssh.Client, error) {
 	return ssh.Dial("tcp", hostWithPort, config)
 }
 
+// Auth automate defines method auth from Connect
 func (s *Ssh) Auth() ([]ssh.AuthMethod, error) {
 	var authMethod []ssh.AuthMethod
 
