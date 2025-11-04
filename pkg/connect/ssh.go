@@ -134,42 +134,21 @@ func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
 	return client, nil
 }
 
+// todo shorten the code - moved to in new method
+// todo fix auth private key from conn with passphare
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
+	var authMethod []ssh.AuthMethod
+
 	if len(connection.Password) > 0 {
-		return []ssh.AuthMethod{ssh.Password(connection.Password)}, nil
+		authMethod = append(authMethod, ssh.Password(connection.Password))
 	}
 
 	if len(connection.SshOptions.PrivateKey) > 0 {
 		direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
-		dataPrivateKey, err := storage.Get(direction, filename)
-		if err != nil {
-			logger.Error(err.Error())
-			return nil, err
-		}
-		//todo add logic for key with passphrase
-		key, err := ssh.ParsePrivateKey([]byte(dataPrivateKey))
-		if err != nil {
-			logger.Error(err.Error())
-			return nil, err
-		}
-
-		return []ssh.AuthMethod{ssh.PublicKeys(key)}, nil
-	}
-
-	userPrivateKeys, err := storage.GetUserPrivateKey()
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	var successKeys []ssh.Signer
-
-	for _, privateKey := range userPrivateKeys {
-		direction, filename := storage.GetDirectionAndFilename(privateKey)
 		data, err := storage.Get(direction, filename)
 		if err != nil {
 			logger.Error(err.Error())
-			continue
+			return nil, err
 		}
 
 		dataSshKey := []byte(data)
@@ -177,24 +156,63 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 		key, err := ssh.ParsePrivateKey(dataSshKey)
 		if err != nil {
 			if !strings.Contains(err.Error(), "passphrase") {
-				continue
+				logger.Error(err.Error())
+				return nil, err
 			}
 
 			key, err = parsePassphraseKey(filename, dataSshKey)
 			if err != nil {
 				logger.Error(err.Error())
-				continue
+				return nil, err
 			}
 		}
 
-		successKeys = append(successKeys, key)
+		authMethod = append(authMethod, ssh.PublicKeys(key))
 	}
 
-	if len(successKeys) == 0 {
-		return nil, fmt.Errorf("no authentication methods available")
+	if len(connection.Password) == 0 && len(connection.SshOptions.PrivateKey) == 0 {
+		userPrivateKeys, err := storage.GetUserPrivateKey()
+		if err != nil {
+			logger.Error(err.Error())
+			return nil, err
+		}
+
+		var successKeys []ssh.Signer
+
+		for _, privateKey := range userPrivateKeys {
+			direction, filename := storage.GetDirectionAndFilename(privateKey)
+			data, err := storage.Get(direction, filename)
+			if err != nil {
+				logger.Error(err.Error())
+				continue
+			}
+
+			dataSshKey := []byte(data)
+
+			key, err := ssh.ParsePrivateKey(dataSshKey)
+			if err != nil {
+				if !strings.Contains(err.Error(), "passphrase") {
+					continue
+				}
+
+				key, err = parsePassphraseKey(filename, dataSshKey)
+				if err != nil {
+					logger.Error(err.Error())
+					continue
+				}
+			}
+
+			successKeys = append(successKeys, key)
+		}
+
+		if len(successKeys) == 0 {
+			return nil, fmt.Errorf("no authentication methods available")
+		}
+
+		authMethod = append(authMethod, ssh.PublicKeys(successKeys...))
 	}
 
-	return []ssh.AuthMethod{ssh.PublicKeys(successKeys...)}, nil
+	return authMethod, nil
 }
 
 func parsePassphraseKey(keyName string, dataKey []byte) (ssh.Signer, error) {
