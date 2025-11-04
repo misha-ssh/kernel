@@ -14,13 +14,11 @@ import (
 func Upload(connection *connect.Connect, uploadLocalFile string, uploadRemoteFile string) error {
 	setup.Init()
 
-	localPath, localFilename := storage.GetDirectionAndFilename(uploadLocalFile)
-	localFile, err := storage.GetOpenFile(localPath, localFilename, os.O_RDWR)
-	if err != nil {
-		return err
+	sp := connect.Sftp{
+		Connection: connection,
 	}
 
-	client, err := connect.NewSftp(connection)
+	client, err := sp.Client()
 	if err != nil {
 		return err
 	}
@@ -41,6 +39,12 @@ func Upload(connection *connect.Connect, uploadLocalFile string, uploadRemoteFil
 			logger.Error(err.Error())
 		}
 	}(remoteFile)
+
+	localPath, localFilename := storage.GetDirectionAndFilename(uploadLocalFile)
+	localFile, err := storage.GetOpenFile(localPath, localFilename, os.O_RDWR)
+	if err != nil {
+		return err
+	}
 
 	_, err = io.Copy(remoteFile, localFile)
 	return err
