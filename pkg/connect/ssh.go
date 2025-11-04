@@ -11,40 +11,16 @@ import (
 	"golang.org/x/term"
 )
 
-const (
-	TypeConnect = "tcp"
-
-	Timeout = 0
-
-	EnableMod = 1
-	ICRNLMod  = 1
-	INLCRMod  = 1
-	ISIGMod   = 1
-
-	ISPEED = 115200
-	OSPEED = 115200
-
-	TypeTerm       = "xterm-256color"
-	HeightTerminal = 80
-	WidthTerminal  = 40
-)
-
 type Ssh struct{}
 
-// Session establishes a new SSH session with the remote server.
-// It handles the complete connection lifecycle including:
-// - Authentication (password or private key)
-// - Client creation
-// - Terminal setup
-// - Error handling and resource cleanup
-// Returns an active SSH session or error if any step fails.
+// Session establishes a new SSH session with the remote server
 func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
 	client, err := s.Client(connection)
 	if err != nil {
 		return nil, err
 	}
 
-	session, err := getSession(client)
+	session, err := client.NewSession()
 	if err != nil {
 		if errClient := client.Close(); errClient != nil {
 			logger.Error(errClient.Error())
@@ -73,9 +49,7 @@ func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
 	return session, nil
 }
 
-// Connect starts an interactive shell session using the established SSH connection.
-// It manages the session lifecycle including proper cleanup on exit.
-// Returns error if shell startup or session wait fails.
+// Connect starts an interactive shell session using the established SSH connection
 func (s *Ssh) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {
@@ -112,7 +86,7 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 }
 
 func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
-	sshAuth, err := auth(connection)
+	sshAuth, err := s.Auth(connection)
 	if err != nil {
 		return nil, err
 	}
@@ -129,10 +103,10 @@ func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
 		fmt.Sprint(connection.SshOptions.Port),
 	)
 
-	return ssh.Dial(TypeConnect, hostWithPort, config)
+	return ssh.Dial("tcp", hostWithPort, config)
 }
 
-func auth(connection *Connect) ([]ssh.AuthMethod, error) {
+func (s *Ssh) Auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	var authMethod []ssh.AuthMethod
 
 	if len(connection.Password) > 0 {
@@ -175,43 +149,4 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	}
 
 	return authMethod, nil
-}
-
-func createTerminalSession(session *ssh.Session) error {
-	fd := int(os.Stdin.Fd())
-	width, height, err := term.GetSize(fd)
-	if err != nil {
-		width = WidthTerminal
-		height = HeightTerminal
-	}
-
-	modes := ssh.TerminalModes{
-		ssh.ECHO:          EnableMod,
-		ssh.ICRNL:         ICRNLMod,
-		ssh.INLCR:         INLCRMod,
-		ssh.ISIG:          ISIGMod,
-		ssh.TTY_OP_ISPEED: ISPEED,
-		ssh.TTY_OP_OSPEED: OSPEED,
-	}
-
-	if err = session.RequestPty(TypeTerm, height, width, modes); err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	session.Stdin = os.Stdin
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
-
-	return nil
-}
-
-func getSession(client *ssh.Client) (*ssh.Session, error) {
-	session, err := client.NewSession()
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return session, nil
 }
