@@ -7,7 +7,7 @@ func main() {
 	connection := &connect.Connect{
 		Alias:     "test",
 		Login:     "root",
-		Password:  "password",
+		Password:  "",
 		Address:   "localhost",
 		Type:      connect.TypeSSH,
 		CreatedAt: "",
