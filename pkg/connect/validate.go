@@ -84,6 +84,10 @@ func validatePassword(password string, privateKey string) error {
 		return nil
 	}
 
+	if strings.TrimSpace(password) != password {
+		return errors.New("password contains spaces")
+	}
+
 	if len(password) < 4 {
 		return errors.New("password too short (min 4 characters)")
 	}
