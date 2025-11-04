@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strings"
+	"syscall"
 
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
@@ -164,16 +166,25 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 
 	for _, privateKey := range userPrivateKeys {
 		direction, filename := storage.GetDirectionAndFilename(privateKey)
-		dataSshKey, err := storage.Get(direction, filename)
+		data, err := storage.Get(direction, filename)
 		if err != nil {
 			logger.Error(err.Error())
 			continue
 		}
-		//todo add logic for key with passphrase
-		key, err := ssh.ParsePrivateKey([]byte(dataSshKey))
+
+		dataSshKey := []byte(data)
+
+		key, err := ssh.ParsePrivateKey(dataSshKey)
 		if err != nil {
-			logger.Error(err.Error())
-			continue
+			if !strings.Contains(err.Error(), "passphrase") {
+				continue
+			}
+
+			key, err = parsePassphraseKey(filename, dataSshKey)
+			if err != nil {
+				logger.Error(err.Error())
+				continue
+			}
 		}
 
 		successKeys = append(successKeys, key)
@@ -184,6 +195,19 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	}
 
 	return []ssh.AuthMethod{ssh.PublicKeys(successKeys...)}, nil
+}
+
+func parsePassphraseKey(keyName string, dataKey []byte) (ssh.Signer, error) {
+	fmt.Printf("Enter passphrase for %v (ctrl+m for skip): ", keyName)
+
+	passphrase, err := term.ReadPassword(syscall.Stdin)
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Printf("\n")
+
+	return ssh.ParsePrivateKeyWithPassphrase(dataKey, passphrase)
 }
 
 func getClientConfig(connection *Connect) (*ssh.ClientConfig, error) {
