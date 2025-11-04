@@ -144,7 +144,7 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 			logger.Error(err.Error())
 			return nil, err
 		}
-
+		//todo add logic for key with passphrase
 		key, err := ssh.ParsePrivateKey([]byte(dataPrivateKey))
 		if err != nil {
 			logger.Error(err.Error())
@@ -169,7 +169,7 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 			logger.Error(err.Error())
 			continue
 		}
-
+		//todo add logic for key with passphrase
 		key, err := ssh.ParsePrivateKey([]byte(dataSshKey))
 		if err != nil {
 			logger.Error(err.Error())
