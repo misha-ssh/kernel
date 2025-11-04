@@ -60,6 +60,6 @@ test-coverage:
 	&& go-test-coverage --config=./.coverage.yml
 
 # use tests-integration for check integration tests cases
-# You need an installed docker to work
+# you need an installed docker to work
 tests-integration:
 	GO_TESTING=true go test -tags=integration ./...
