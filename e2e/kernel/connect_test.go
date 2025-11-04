@@ -137,4 +137,10 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 }
 
 // todo add e2e test
+func TestIntegrationPrivateKeyConnectWithPassphare(t *testing.T) {}
+
+// todo add e2e test
 func TestIntegrationOnlyUsernameAndLoginConnect(t *testing.T) {}
+
+// todo add e2e test
+func TestIntegrationOnlyUsernameAndLoginConnectWithPassphare(t *testing.T) {}
