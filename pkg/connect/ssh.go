@@ -112,10 +112,16 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 }
 
 func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
-	config, err := getClientConfig(connection)
+	sshAuth, err := auth(connection)
 	if err != nil {
-		logger.Error(err.Error())
 		return nil, err
+	}
+
+	config := &ssh.ClientConfig{
+		Timeout:         Timeout,
+		User:            connection.Login,
+		Auth:            sshAuth,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	hostWithPort := net.JoinHostPort(
@@ -123,13 +129,7 @@ func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
 		fmt.Sprint(connection.SshOptions.Port),
 	)
 
-	client, err := getClient(hostWithPort, config)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return client, nil
+	return ssh.Dial(TypeConnect, hostWithPort, config)
 }
 
 func auth(connection *Connect) ([]ssh.AuthMethod, error) {
@@ -177,22 +177,6 @@ func auth(connection *Connect) ([]ssh.AuthMethod, error) {
 	return authMethod, nil
 }
 
-func getClientConfig(connection *Connect) (*ssh.ClientConfig, error) {
-	callback := ssh.InsecureIgnoreHostKey()
-	sshAuth, err := auth(connection)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return &ssh.ClientConfig{
-		Timeout:         Timeout,
-		User:            connection.Login,
-		Auth:            sshAuth,
-		HostKeyCallback: callback,
-	}, nil
-}
-
 func createTerminalSession(session *ssh.Session) error {
 	fd := int(os.Stdin.Fd())
 	width, height, err := term.GetSize(fd)
@@ -220,16 +204,6 @@ func createTerminalSession(session *ssh.Session) error {
 	session.Stderr = os.Stderr
 
 	return nil
-}
-
-func getClient(hostWithPort string, config *ssh.ClientConfig) (*ssh.Client, error) {
-	client, err := ssh.Dial(TypeConnect, hostWithPort, config)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return client, nil
 }
 
 func getSession(client *ssh.Client) (*ssh.Session, error) {
