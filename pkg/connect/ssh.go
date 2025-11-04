@@ -11,11 +11,13 @@ import (
 	"golang.org/x/term"
 )
 
-type Ssh struct{}
+type Ssh struct {
+	Connection *Connect
+}
 
 // Session establishes a new SSH session with the remote server
-func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
-	client, err := s.Client(connection)
+func (s *Ssh) Session() (*ssh.Session, error) {
+	client, err := s.Client()
 	if err != nil {
 		return nil, err
 	}
@@ -85,36 +87,36 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 	return nil
 }
 
-func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
-	sshAuth, err := s.Auth(connection)
+func (s *Ssh) Client() (*ssh.Client, error) {
+	sshAuth, err := s.Auth()
 	if err != nil {
 		return nil, err
 	}
 
 	config := &ssh.ClientConfig{
 		Timeout:         Timeout,
-		User:            connection.Login,
+		User:            s.Connection.Login,
 		Auth:            sshAuth,
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	hostWithPort := net.JoinHostPort(
-		connection.Address,
-		fmt.Sprint(connection.SshOptions.Port),
+		s.Connection.Address,
+		fmt.Sprint(s.Connection.SshOptions.Port),
 	)
 
 	return ssh.Dial("tcp", hostWithPort, config)
 }
 
-func (s *Ssh) Auth(connection *Connect) ([]ssh.AuthMethod, error) {
+func (s *Ssh) Auth() ([]ssh.AuthMethod, error) {
 	var authMethod []ssh.AuthMethod
 
-	if len(connection.Password) > 0 {
-		authMethod = append(authMethod, ssh.Password(connection.Password))
+	if len(s.Connection.Password) > 0 {
+		authMethod = append(authMethod, ssh.Password(s.Connection.Password))
 	}
 
-	if len(connection.SshOptions.PrivateKey) > 0 {
-		key, err := parsePrivateKey(connection.SshOptions.PrivateKey)
+	if len(s.Connection.SshOptions.PrivateKey) > 0 {
+		key, err := parsePrivateKey(s.Connection.SshOptions.PrivateKey)
 		if err != nil {
 			return nil, err
 		}
@@ -122,7 +124,7 @@ func (s *Ssh) Auth(connection *Connect) ([]ssh.AuthMethod, error) {
 		authMethod = append(authMethod, ssh.PublicKeys(key))
 	}
 
-	if len(connection.Password) == 0 && len(connection.SshOptions.PrivateKey) == 0 {
+	if len(s.Connection.Password) == 0 && len(s.Connection.SshOptions.PrivateKey) == 0 {
 		userPrivateKeys, err := storage.GetUserPrivateKey()
 		if err != nil {
 			logger.Error(err.Error())
