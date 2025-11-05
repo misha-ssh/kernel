@@ -59,8 +59,11 @@ func TestIntegrationDefaultConnect(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{}
-		session, err := sshConnector.Session(connection)
+		sshConnector := &connect.Ssh{
+			Connection: connection,
+		}
+
+		session, err := sshConnector.Session()
 		require.NoError(t, err)
 
 		defer func(session *ssh.Session) {
@@ -124,8 +127,10 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{}
-		session, err := sshConnector.Session(connection)
+		sshConnector := &connect.Ssh{
+			Connection: connection,
+		}
+		session, err := sshConnector.Session()
 		require.NoError(t, err)
 
 		defer func(session *ssh.Session) {
@@ -138,9 +143,3 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 
 // todo add e2e test
 func TestIntegrationPrivateKeyConnectWithPassphare(t *testing.T) {}
-
-// todo add e2e test
-func TestIntegrationOnlyUsernameAndLoginConnect(t *testing.T) {}
-
-// todo add e2e test
-func TestIntegrationOnlyUsernameAndLoginConnectWithPassphare(t *testing.T) {}
