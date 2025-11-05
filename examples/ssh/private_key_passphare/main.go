@@ -2,6 +2,9 @@ package main
 
 import "github.com/misha-ssh/kernel/pkg/connect"
 
+//todo add make command for passphare
+//todo update this example
+
 // main for success connect start make command: up-ssh
 // generate key ssh-keygen -b 4096 -t rsa
 // ssh-copy-id root@localhost
