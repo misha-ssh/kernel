@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/misha-ssh/kernel/internal/logger"
-	"github.com/misha-ssh/kernel/internal/storage"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
@@ -118,38 +117,15 @@ func (s *Ssh) Auth() ([]ssh.AuthMethod, error) {
 	}
 
 	if len(s.Connection.SshOptions.PrivateKey) > 0 {
-		key, err := parsePrivateKey(s.Connection.SshOptions.PrivateKey)
+		key, err := parsePrivateKey(
+			s.Connection.SshOptions.PrivateKey,
+			s.Connection.SshOptions.Passphrase,
+		)
 		if err != nil {
 			return nil, err
 		}
 
 		authMethod = append(authMethod, ssh.PublicKeys(key))
-	}
-
-	if len(s.Connection.Password) == 0 && len(s.Connection.SshOptions.PrivateKey) == 0 {
-		userPrivateKeys, err := storage.GetUserPrivateKey()
-		if err != nil {
-			logger.Error(err.Error())
-			return nil, err
-		}
-
-		var successKeys []ssh.Signer
-
-		for _, privateKey := range userPrivateKeys {
-			key, err := parsePrivateKey(privateKey)
-			if err != nil {
-				logger.Error(err.Error())
-				continue
-			}
-
-			successKeys = append(successKeys, key)
-		}
-
-		if len(successKeys) == 0 {
-			return nil, fmt.Errorf("no authentication methods available")
-		}
-
-		authMethod = append(authMethod, ssh.PublicKeys(successKeys...))
 	}
 
 	return authMethod, nil
