@@ -1,30 +1,14 @@
 package connect
 
 import (
-	"fmt"
 	"strings"
-	"syscall"
 
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"golang.org/x/crypto/ssh"
-	"golang.org/x/term"
 )
 
-func parsePrivateKeyWithPass(keyName string, dataKey []byte) (ssh.Signer, error) {
-	fmt.Printf("Enter passphrase for %v (ctrl+m for skip): ", keyName)
-
-	passphrase, err := term.ReadPassword(syscall.Stdin)
-	if err != nil {
-		return nil, err
-	}
-
-	fmt.Printf("\n")
-
-	return ssh.ParsePrivateKeyWithPassphrase(dataKey, passphrase)
-}
-
-func parsePrivateKey(keyName string) (ssh.Signer, error) {
+func parsePrivateKey(keyName string, passphrase string) (ssh.Signer, error) {
 	direction, filename := storage.GetDirectionAndFilename(keyName)
 	data, err := storage.Get(direction, filename)
 	if err != nil {
@@ -41,7 +25,7 @@ func parsePrivateKey(keyName string) (ssh.Signer, error) {
 			return nil, err
 		}
 
-		key, err = parsePrivateKeyWithPass(filename, dataSshKey)
+		key, err = ssh.ParsePrivateKeyWithPassphrase(dataSshKey, []byte(passphrase))
 		if err != nil {
 			logger.Error(err.Error())
 			return nil, err
