@@ -7,7 +7,7 @@ type Sftp struct {
 }
 
 func (s Sftp) Client(opts ...sftp.ClientOption) (*sftp.Client, error) {
-	ssh := Ssh{
+	ssh := &Ssh{
 		Connection: s.Connection,
 	}
 
