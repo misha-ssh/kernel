@@ -105,6 +105,27 @@ func TestDelete(t *testing.T) {
 			},
 			wantErr: false,
 		},
+		{
+			name: "success - delete connection with private key and key pass",
+			args: args{
+				connection: &connect.Connect{
+					Alias:     "deleted_alias",
+					Login:     "test",
+					Address:   "test",
+					Password:  "test",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port:       22,
+						PrivateKey: pathToPrivateKey,
+						Passphrase: "password",
+					},
+				},
+				isCreate: true,
+			},
+			wantErr: false,
+		},
 	}
 
 	for _, tt := range tests {

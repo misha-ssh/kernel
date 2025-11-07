@@ -6,45 +6,22 @@ import (
 	"os"
 
 	"github.com/misha-ssh/kernel/internal/logger"
-	"github.com/misha-ssh/kernel/internal/storage"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/term"
 )
 
-const (
-	TypeConnect = "tcp"
+type Ssh struct {
+	Connection *Connect
+}
 
-	Timeout = 0
-
-	EnableMod = 1
-	ICRNLMod  = 1
-	INLCRMod  = 1
-	ISIGMod   = 1
-
-	ISPEED = 115200
-	OSPEED = 115200
-
-	TypeTerm       = "xterm-256color"
-	HeightTerminal = 80
-	WidthTerminal  = 40
-)
-
-type Ssh struct{}
-
-// Session establishes a new SSH session with the remote server.
-// It handles the complete connection lifecycle including:
-// - Authentication (password or private key)
-// - Client creation
-// - Terminal setup
-// - Error handling and resource cleanup
-// Returns an active SSH session or error if any step fails.
-func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
-	client, err := s.Client(connection)
+// Session establishes a new SSH session with the remote server
+func (s *Ssh) Session() (*ssh.Session, error) {
+	client, err := s.Client()
 	if err != nil {
 		return nil, err
 	}
 
-	session, err := getSession(client)
+	session, err := client.NewSession()
 	if err != nil {
 		if errClient := client.Close(); errClient != nil {
 			logger.Error(errClient.Error())
@@ -73,9 +50,7 @@ func (s *Ssh) Session(connection *Connect) (*ssh.Session, error) {
 	return session, nil
 }
 
-// Connect starts an interactive shell session using the established SSH connection.
-// It manages the session lifecycle including proper cleanup on exit.
-// Returns error if shell startup or session wait fails.
+// Connect starts an interactive shell session using the established SSH connection
 func (s *Ssh) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {
@@ -111,113 +86,47 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 	return nil
 }
 
-func (s *Ssh) Client(connection *Connect) (*ssh.Client, error) {
-	config, err := getClientConfig(connection)
+// Client create ssh client from config and Auth
+func (s *Ssh) Client() (*ssh.Client, error) {
+	sshAuth, err := s.Auth()
 	if err != nil {
-		logger.Error(err.Error())
 		return nil, err
+	}
+
+	config := &ssh.ClientConfig{
+		Timeout:         Timeout,
+		User:            s.Connection.Login,
+		Auth:            sshAuth,
+		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
 	hostWithPort := net.JoinHostPort(
-		connection.Address,
-		fmt.Sprint(connection.SshOptions.Port),
+		s.Connection.Address,
+		fmt.Sprint(s.Connection.SshOptions.Port),
 	)
 
-	client, err := getClient(hostWithPort, config)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return client, nil
+	return ssh.Dial("tcp", hostWithPort, config)
 }
 
-func auth(connection *Connect) ([]ssh.AuthMethod, error) {
-	if len(connection.SshOptions.PrivateKey) == 0 {
-		return []ssh.AuthMethod{
-			ssh.Password(connection.Password),
-		}, nil
+// Auth automate defines method auth from Connect
+func (s *Ssh) Auth() ([]ssh.AuthMethod, error) {
+	var authMethod []ssh.AuthMethod
+
+	if len(s.Connection.Password) > 0 {
+		authMethod = append(authMethod, ssh.Password(s.Connection.Password))
 	}
 
-	direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
-	dataPrivateKey, err := storage.Get(direction, filename)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
+	if len(s.Connection.SshOptions.PrivateKey) > 0 {
+		key, err := parsePrivateKey(
+			s.Connection.SshOptions.PrivateKey,
+			s.Connection.SshOptions.Passphrase,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		authMethod = append(authMethod, ssh.PublicKeys(key))
 	}
 
-	key, err := ssh.ParsePrivateKey([]byte(dataPrivateKey))
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return []ssh.AuthMethod{
-		ssh.PublicKeys(key),
-	}, nil
-}
-
-func getClientConfig(connection *Connect) (*ssh.ClientConfig, error) {
-	callback := ssh.InsecureIgnoreHostKey()
-	sshAuth, err := auth(connection)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return &ssh.ClientConfig{
-		Timeout:         Timeout,
-		User:            connection.Login,
-		Auth:            sshAuth,
-		HostKeyCallback: callback,
-	}, nil
-}
-
-func createTerminalSession(session *ssh.Session) error {
-	fd := int(os.Stdin.Fd())
-	width, height, err := term.GetSize(fd)
-	if err != nil {
-		width = WidthTerminal
-		height = HeightTerminal
-	}
-
-	modes := ssh.TerminalModes{
-		ssh.ECHO:          EnableMod,
-		ssh.ICRNL:         ICRNLMod,
-		ssh.INLCR:         INLCRMod,
-		ssh.ISIG:          ISIGMod,
-		ssh.TTY_OP_ISPEED: ISPEED,
-		ssh.TTY_OP_OSPEED: OSPEED,
-	}
-
-	if err = session.RequestPty(TypeTerm, height, width, modes); err != nil {
-		logger.Error(err.Error())
-		return err
-	}
-
-	session.Stdin = os.Stdin
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
-
-	return nil
-}
-
-func getClient(hostWithPort string, config *ssh.ClientConfig) (*ssh.Client, error) {
-	client, err := ssh.Dial(TypeConnect, hostWithPort, config)
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return client, nil
-}
-
-func getSession(client *ssh.Client) (*ssh.Session, error) {
-	session, err := client.NewSession()
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, err
-	}
-
-	return session, nil
+	return authMethod, nil
 }

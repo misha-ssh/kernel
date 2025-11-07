@@ -8,6 +8,9 @@ exclude:
     - ^examples
     - ^pkg/connect/ssh.go
     - ^pkg/connect/sftp.go
+    - ^pkg/connect/connect.go
+    - ^pkg/connect/private_key.go
+    - ^pkg/connect/terminal.go
     - ^pkg/kernel/connect.go
     - ^pkg/kernel/download.go
     - ^pkg/kernel/upload.go

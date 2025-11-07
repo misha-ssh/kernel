@@ -59,8 +59,11 @@ func TestIntegrationDefaultConnect(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{}
-		session, err := sshConnector.Session(connection)
+		sshConnector := &connect.Ssh{
+			Connection: connection,
+		}
+
+		session, err := sshConnector.Session()
 		require.NoError(t, err)
 
 		defer func(session *ssh.Session) {
@@ -124,8 +127,76 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{}
-		session, err := sshConnector.Session(connection)
+		sshConnector := &connect.Ssh{
+			Connection: connection,
+		}
+		session, err := sshConnector.Session()
+		require.NoError(t, err)
+
+		defer func(session *ssh.Session) {
+			require.NoError(t, session.Close())
+		}(session)
+
+		require.NoError(t, session.Shell())
+	}
+}
+
+func TestIntegrationPrivateKeyConnectWithPassphrase(t *testing.T) {
+	sshKeysName := "../../build/ssh/key-pass/dockerkeyWithPass"
+	passphrase := "password"
+
+	if !storage.Exists(storage.GetDirectionAndFilename(sshKeysName)) {
+		cmdKey := exec.Command("ssh-keygen", "-b", "4096", "-t", "rsa", "-f", sshKeysName, "-N", passphrase)
+		require.NoError(t, cmdKey.Run())
+	}
+
+	ctx := context.Background()
+
+	req := testcontainers.ContainerRequest{
+		FromDockerfile: testcontainers.FromDockerfile{
+			Context:    "../../build/ssh/key-pass",
+			Dockerfile: "Dockerfile",
+		},
+		ExposedPorts: []string{"22/tcp"},
+		WaitingFor:   wait.ForListeningPort("22/tcp").WithStartupTimeout(30 * time.Second),
+	}
+
+	c, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          true,
+	})
+	require.NoError(t, err)
+
+	defer func() {
+		require.NoError(t, c.Terminate(ctx))
+	}()
+
+	host, err := c.Host(ctx)
+	require.NoError(t, err)
+
+	port, err := c.MappedPort(ctx, "22/tcp")
+	require.NoError(t, err)
+
+	if c.IsRunning() {
+		connection := &connect.Connect{
+			Alias:     "test",
+			Login:     "root",
+			Password:  "password",
+			Address:   host,
+			Type:      connect.TypeSSH,
+			CreatedAt: "",
+			UpdatedAt: "",
+			SshOptions: &connect.SshOptions{
+				Port:       port.Int(),
+				PrivateKey: sshKeysName,
+				Passphrase: passphrase,
+			},
+		}
+
+		sshConnector := &connect.Ssh{
+			Connection: connection,
+		}
+		session, err := sshConnector.Session()
 		require.NoError(t, err)
 
 		defer func(session *ssh.Session) {

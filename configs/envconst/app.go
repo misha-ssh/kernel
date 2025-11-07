@@ -4,5 +4,6 @@ const (
 	AppName = "misha"
 	Theme   = "default"
 
-	DirectionPrivateKeys = "private_keys"
+	DirectionPrivateKeys     = "private_keys"
+	DirectionsUserPrivateKey = ".ssh"
 )

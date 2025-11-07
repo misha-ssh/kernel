@@ -14,18 +14,11 @@ import (
 func Download(connection *connect.Connect, downloadRemoteFile string, downloadLocalFile string) error {
 	setup.Init()
 
-	localPath, localFilename := storage.GetDirectionAndFilename(downloadLocalFile)
-	err := storage.Create(localPath, localFilename)
-	if err != nil {
-		return err
+	sp := connect.Sftp{
+		Connection: connection,
 	}
 
-	localFile, err := storage.GetOpenFile(localPath, localFilename, os.O_RDWR)
-	if err != nil {
-		return err
-	}
-
-	client, err := connect.NewSftp(connection)
+	client, err := sp.Client()
 	if err != nil {
 		return err
 	}
@@ -46,6 +39,17 @@ func Download(connection *connect.Connect, downloadRemoteFile string, downloadLo
 			logger.Error(err.Error())
 		}
 	}(remoteFile)
+
+	localPath, localFilename := storage.GetDirectionAndFilename(downloadLocalFile)
+	err = storage.Create(localPath, localFilename)
+	if err != nil {
+		return err
+	}
+
+	localFile, err := storage.GetOpenFile(localPath, localFilename, os.O_RDWR)
+	if err != nil {
+		return err
+	}
 
 	if _, err = io.Copy(localFile, remoteFile); err != nil {
 		return err

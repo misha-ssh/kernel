@@ -14,7 +14,7 @@ var defaultLogger Logger
 
 func Get() Logger {
 	if defaultLogger == nil {
-		defaultLogger = NewConsoleLogger()
+		defaultLogger = NewStorageLogger()
 	}
 
 	return defaultLogger

@@ -22,3 +22,6 @@ vendor/
 
 dockerkey
 dockerkey.pub
+
+dockerkeyWithPass
+dockerkeyWithPass.pub

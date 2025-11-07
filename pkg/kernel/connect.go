@@ -20,8 +20,11 @@ func Connect(connection *connect.Connect) error {
 
 	switch connection.Type {
 	case connect.TypeSSH:
-		ssh := &connect.Ssh{}
-		session, err := ssh.Session(connection)
+		ssh := &connect.Ssh{
+			Connection: connection,
+		}
+
+		session, err := ssh.Session()
 		if err != nil {
 			logger.Error(ErrSshSession)
 			return ErrSshSession

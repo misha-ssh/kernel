@@ -33,4 +33,7 @@ type SshOptions struct {
 
 	// PrivateKey contains the PEM-encoded private key for authentication
 	PrivateKey string `json:"private_key"`
+
+	// Passphrase pass for private key
+	Passphrase string `json:"passphrase"`
 }
