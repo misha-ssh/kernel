@@ -2,12 +2,7 @@ package main
 
 import "github.com/misha-ssh/kernel/pkg/connect"
 
-//todo add make command for passphare
-//todo update this example
-
-// main for success connect start make command: up-ssh
-// generate key ssh-keygen -b 4096 -t rsa
-// ssh-copy-id root@localhost
+// main for success connect start make command: up-ssh-key-pass
 func main() {
 	ssh := &connect.Ssh{
 		Connection: &connect.Connect{
@@ -19,7 +14,9 @@ func main() {
 			CreatedAt: "",
 			UpdatedAt: "",
 			SshOptions: &connect.SshOptions{
-				Port: 22,
+				Port:       22,
+				PrivateKey: "./dockerkeyWithPass",
+				Passphrase: "password",
 			},
 		},
 	}
