@@ -137,6 +137,26 @@ func TestCreate(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name: "success - save private key with pass",
+			args: args{
+				connect: &connect.Connect{
+					Alias:     testutil.RandomString(),
+					Login:     "test",
+					Address:   "test",
+					Password:  "",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port:       22,
+						PrivateKey: pathToPrivateKey,
+						Passphrase: "password",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
 			name: "fail - dont valid private key",
 			args: args{
 				connect: &connect.Connect{
