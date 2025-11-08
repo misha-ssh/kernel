@@ -14,8 +14,12 @@ import (
 
 func TestCreate(t *testing.T) {
 	tempDir := t.TempDir()
+	passphrase := "password"
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	require.NoError(t, err)
+
+	pathToPrivateKeyWithPass, err := testutil.CreatePrivateKeyWithPass(tempDir, passphrase)
 	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
@@ -149,12 +153,32 @@ func TestCreate(t *testing.T) {
 					UpdatedAt: time.Now().Format(time.RFC3339),
 					SshOptions: &connect.SshOptions{
 						Port:       22,
-						PrivateKey: pathToPrivateKey,
-						Passphrase: "password",
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: passphrase,
 					},
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "fail - invalid passphrase",
+			args: args{
+				connect: &connect.Connect{
+					Alias:     testutil.RandomString(),
+					Login:     "test",
+					Address:   "test",
+					Password:  "",
+					Type:      connect.TypeSSH,
+					CreatedAt: time.Now().Format(time.RFC3339),
+					UpdatedAt: time.Now().Format(time.RFC3339),
+					SshOptions: &connect.SshOptions{
+						Port:       22,
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: "invalid passphrase",
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "fail - dont valid private key",

@@ -74,13 +74,13 @@ lint:
 # use tests for check tests cases
 .PHONY: tests
 tests:
-	GO_TESTING=true go test -tags=unit -v ./...
+	GO_TESTING=true go test -tags=unit ./... -count=1
 
 # use test-coverage for verify coverage
 .PHONY: test-coverage
 test-coverage:
 	go install github.com/vladopajic/go-test-coverage/v2@latest
-	GO_TESTING=true go test -tags=unit ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./...
+	GO_TESTING=true go test -tags=unit ./... -coverprofile=./cover.out -covermode=atomic -coverpkg=./... -count=1
 	${GOBIN}/go-test-coverage --config=./.coverage.yml
 
 # use tests-integration for check integration tests cases
