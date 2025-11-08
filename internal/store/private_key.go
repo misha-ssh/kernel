@@ -4,6 +4,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"reflect"
+	"strings"
 
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
@@ -20,13 +21,22 @@ var (
 	ErrGetDataPrivateKey     = errors.New("private key get data error")
 )
 
-func validatePrivateKey(privateKey string) error {
+func validatePrivateKey(privateKey string, passphrase string) error {
 	block, _ := pem.Decode([]byte(privateKey))
 	if block == nil {
 		return ErrNotValidPrivateKey
 	}
 
 	_, err := ssh.ParseRawPrivateKey([]byte(privateKey))
+	if err != nil {
+		if !strings.Contains(err.Error(), "passphrase") {
+			logger.Error(err.Error())
+			return err
+		}
+
+		_, err = ssh.ParsePrivateKeyWithPassphrase([]byte(privateKey), []byte(passphrase))
+	}
+
 	return err
 }
 
@@ -39,10 +49,10 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 		return "", ErrGetDataPrivateKey
 	}
 
-	err = validatePrivateKey(dataPrivateKey)
+	err = validatePrivateKey(dataPrivateKey, connection.SshOptions.Passphrase)
 	if err != nil {
 		logger.Error(ErrNotValidPrivateKey.Error())
-		return "", ErrNotValidPrivateKey
+		return "", err
 	}
 
 	filenamePrivateKey := connection.Alias
@@ -95,6 +105,12 @@ func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 	if err != nil {
 		logger.Error(ErrGetDataPrivateKey.Error())
 		return "", ErrGetDataPrivateKey
+	}
+
+	err = validatePrivateKey(dataPrivateKey, connection.SshOptions.Passphrase)
+	if err != nil {
+		logger.Error(err.Error())
+		return "", err
 	}
 
 	if !reflect.DeepEqual(existDataPrivateKey, dataPrivateKey) {
