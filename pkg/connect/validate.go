@@ -37,7 +37,7 @@ func validateAlias(alias string) error {
 	}
 
 	if !aliasPattern.MatchString(alias) {
-		return errors.New("special characters are not allowed")
+		return errors.New("alias special characters are not allowed")
 	}
 
 	return nil
@@ -109,7 +109,7 @@ func validateUpdatedAt(date string) error {
 
 func validateDate(date string) error {
 	if strings.TrimSpace(date) == "" {
-		return errors.New("cannot be empty")
+		return errors.New("date cannot be empty")
 	}
 
 	parsedTime, err := time.Parse(time.RFC3339, date)
@@ -118,7 +118,7 @@ func validateDate(date string) error {
 	}
 
 	if parsedTime.After(time.Now()) {
-		return errors.New("cannot be in the future")
+		return errors.New("date cannot be in the future")
 	}
 
 	return nil
