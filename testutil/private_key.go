@@ -23,6 +23,7 @@ func GeneratePrivateKey(pass string) ([]byte, error) {
 	}
 
 	if pass != "" {
+		//nolint:all
 		privateBlock, err = x509.EncryptPEMBlock(rand.Reader, privateBlock.Type, privateBlock.Bytes, []byte(pass), x509.PEMCipherAES256)
 		if err != nil {
 			return nil, err
