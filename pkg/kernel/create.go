@@ -43,7 +43,7 @@ func Create(connection *connect.Connect) error {
 		connection.SshOptions.PrivateKey, err = store.SavePrivateKey(connection)
 		if err != nil {
 			logger.Error(ErrSavePrivateKeyAtCreate.Error())
-			return ErrSavePrivateKeyAtCreate
+			return err
 		}
 	}
 
