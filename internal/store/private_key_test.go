@@ -12,10 +12,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestValidatePrivateKey(t *testing.T) {
+func TestStore_ValidatePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
+	passphrase := "passphrase"
+
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	require.NoError(t, err)
+
+	pathToPrivateKeyWithPass, err := testutil.CreatePrivateKeyWithPass(tempDir, passphrase)
 	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
@@ -23,6 +28,7 @@ func TestValidatePrivateKey(t *testing.T) {
 
 	type args struct {
 		privateKey string
+		passphrase string
 	}
 	tests := []struct {
 		name    string
@@ -30,16 +36,34 @@ func TestValidatePrivateKey(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "successful validate data private key",
+			name: "success - validate data private key",
 			args: args{
 				privateKey: pathToPrivateKey,
+				passphrase: "",
 			},
 			wantErr: false,
 		},
 		{
-			name: "invalid data private key",
+			name: "success - validate data private key with passphrase",
+			args: args{
+				privateKey: pathToPrivateKeyWithPass,
+				passphrase: passphrase,
+			},
+			wantErr: false,
+		},
+		{
+			name: "fail - invalid data private key",
 			args: args{
 				privateKey: pathToInvalidKey,
+				passphrase: "",
+			},
+			wantErr: true,
+		},
+		{
+			name: "fail - invalid passphrase data",
+			args: args{
+				privateKey: pathToPrivateKeyWithPass,
+				passphrase: "invalid passphrase",
 			},
 			wantErr: true,
 		},
@@ -50,7 +74,7 @@ func TestValidatePrivateKey(t *testing.T) {
 			privateKey, err := storage.Get(direction, filename)
 			require.NoError(t, err)
 
-			err = validatePrivateKey(privateKey)
+			err = validatePrivateKey(privateKey, tt.args.passphrase)
 			require.Equal(t, tt.wantErr, err != nil)
 		})
 	}
@@ -59,7 +83,12 @@ func TestValidatePrivateKey(t *testing.T) {
 func TestDeletePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
+	passphrase := "passphrase"
+
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	require.NoError(t, err)
+
+	pathToPrivateKeyWithPass, err := testutil.CreatePrivateKeyWithPass(tempDir, passphrase)
 	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
@@ -80,6 +109,19 @@ func TestDeletePrivateKey(t *testing.T) {
 					Alias: "test_alias",
 					SshOptions: &connect.SshOptions{
 						PrivateKey: pathToPrivateKey,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "success - delete with key and passphrase",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test_alias",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: passphrase,
 					},
 				},
 			},
@@ -140,7 +182,12 @@ func TestDeletePrivateKey(t *testing.T) {
 func TestSavePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
 
+	passphrase := "passphrase"
+
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
+	require.NoError(t, err)
+
+	pathToPrivateKeyWithPass, err := testutil.CreatePrivateKeyWithPass(tempDir, passphrase)
 	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
@@ -165,6 +212,32 @@ func TestSavePrivateKey(t *testing.T) {
 				},
 			},
 			wantErr: false,
+		},
+		{
+			name: "success - save private key with passphrase",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test_alias",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: passphrase,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "fail - invalid passphrase",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test_alias",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: "invalid passphrase",
+					},
+				},
+			},
+			wantErr: true,
 		},
 		{
 			name: "fail - nonexistent private key",
@@ -230,6 +303,7 @@ func TestSavePrivateKey(t *testing.T) {
 
 func TestUpdatePrivateKey(t *testing.T) {
 	tempDir := t.TempDir()
+	passphrase := "passphrase"
 
 	pathToPrivateKey, err := testutil.CreatePrivateKey(tempDir)
 	require.NoError(t, err)
@@ -238,6 +312,9 @@ func TestUpdatePrivateKey(t *testing.T) {
 	require.NoError(t, err)
 
 	pathToInvalidKey, err := testutil.CreateInvalidPrivateKey(tempDir)
+	require.NoError(t, err)
+
+	pathToPrivateKeyWithPass, err := testutil.CreatePrivateKeyWithPass(tempDir, passphrase)
 	require.NoError(t, err)
 
 	type args struct {
@@ -266,6 +343,44 @@ func TestUpdatePrivateKey(t *testing.T) {
 				)
 			},
 			wantErr: false,
+		},
+		{
+			name: "success - save private key with passphrase",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: passphrase,
+					},
+				},
+			},
+			want: func() string {
+				return storage.GetFullPath(
+					storage.GetPrivateKeysDir(),
+					"test",
+				)
+			},
+			wantErr: false,
+		},
+		{
+			name: "fail - invalid passphrase",
+			args: args{
+				connection: &connect.Connect{
+					Alias: "test",
+					SshOptions: &connect.SshOptions{
+						PrivateKey: pathToPrivateKeyWithPass,
+						Passphrase: "invalid passphrase",
+					},
+				},
+			},
+			want: func() string {
+				return storage.GetFullPath(
+					storage.GetPrivateKeysDir(),
+					"test",
+				)
+			},
+			wantErr: true,
 		},
 		{
 			name: "fail update - dont save invalid key",
