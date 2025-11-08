@@ -10,33 +10,54 @@ import (
 )
 
 // GeneratePrivateKey generate private key for ssh connect
-func GeneratePrivateKey() ([]byte, error) {
+func GeneratePrivateKey(pass string) ([]byte, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, err
 	}
 
-	privateDER := x509.MarshalPKCS1PrivateKey(privateKey)
-
-	privateBlock := pem.Block{
+	privateBlock := &pem.Block{
 		Type:    "RSA PRIVATE KEY",
 		Headers: nil,
-		Bytes:   privateDER,
+		Bytes:   x509.MarshalPKCS1PrivateKey(privateKey),
 	}
 
-	privatePEM := pem.EncodeToMemory(&privateBlock)
+	if pass != "" {
+		privateBlock, err = x509.EncryptPEMBlock(rand.Reader, privateBlock.Type, privateBlock.Bytes, []byte(pass), x509.PEMCipherAES256)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	privatePEM := pem.EncodeToMemory(privateBlock)
 
 	return privatePEM, nil
 }
 
 // CreatePrivateKey generate and save private key in file
 func CreatePrivateKey(direction string) (string, error) {
-	privatePEM, err := GeneratePrivateKey()
+	privatePEM, err := GeneratePrivateKey("")
 	if err != nil {
 		return "", err
 	}
 
 	file := filepath.Join(direction, "key")
+	err = os.WriteFile(file, privatePEM, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return file, nil
+}
+
+// CreatePrivateKeyWithPass generate and save private key with pass in file
+func CreatePrivateKeyWithPass(direction string, pass string) (string, error) {
+	privatePEM, err := GeneratePrivateKey(pass)
+	if err != nil {
+		return "", err
+	}
+
+	file := filepath.Join(direction, "key-pass")
 	err = os.WriteFile(file, privatePEM, os.ModePerm)
 	if err != nil {
 		return "", err
