@@ -6,6 +6,7 @@
 [![Action Lint](https://github.com/misha-ssh/kernel/actions/workflows/lint.yml/badge.svg)](https://github.com/misha-ssh/kernel)
 [![Action Tests](https://github.com/misha-ssh/kernel/actions/workflows/tests.yml/badge.svg)](https://github.com/misha-ssh/kernel)
 [![Action Tests Integration](https://github.com/misha-ssh/kernel/actions/workflows/tests-integration.yml/badge.svg)](https://github.com/misha-ssh/kernel)
+[![Wakatime](https://wakatime.com/badge/user/018b9f7a-8548-4f9d-9ebe-df3058a5bab7/project/ab5d101e-09f3-43ae-98a5-ca3f08a4c0fe.svg)](https://wakatime.com/badge/user/018b9f7a-8548-4f9d-9ebe-df3058a5bab7/project/ab5d101e-09f3-43ae-98a5-ca3f08a4c0fe)
 
 This package acts as the core for an ssh client written in go
 
