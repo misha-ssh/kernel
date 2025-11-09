@@ -1,6 +1,10 @@
 package main
 
-import "github.com/misha-ssh/kernel/pkg/connect"
+import (
+	"time"
+
+	"github.com/misha-ssh/kernel/pkg/connect"
+)
 
 // main for success connect start make command: up-ssh-key-pass
 func main() {
@@ -11,8 +15,8 @@ func main() {
 			Password:  "",
 			Address:   "localhost",
 			Type:      connect.TypeSSH,
-			CreatedAt: "",
-			UpdatedAt: "",
+			CreatedAt: time.Now().Format(time.RFC3339),
+			UpdatedAt: time.Now().Format(time.RFC3339),
 			SshOptions: &connect.SshOptions{
 				Port:       22,
 				PrivateKey: "./dockerkeyWithPass",
