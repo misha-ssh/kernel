@@ -28,7 +28,7 @@ func Create(connection *connect.Connect) error {
 
 	connections, err := store.GetConnections()
 	if err != nil {
-		logger.Error(ErrGetConnectionAtCreate.Error())
+		logger.Error(err.Error())
 		return ErrGetConnectionAtCreate
 	}
 
@@ -42,7 +42,7 @@ func Create(connection *connect.Connect) error {
 	if len(connection.SshOptions.PrivateKey) != 0 {
 		connection.SshOptions.PrivateKey, err = store.SavePrivateKey(connection)
 		if err != nil {
-			logger.Error(ErrSavePrivateKeyAtCreate.Error())
+			logger.Error(err.Error())
 			return err
 		}
 	}
@@ -54,12 +54,12 @@ func Create(connection *connect.Connect) error {
 		if len(connection.SshOptions.PrivateKey) != 0 {
 			errDeleteKey := store.DeletePrivateKey(connection)
 			if errDeleteKey != nil {
-				logger.Error(ErrDeletePrivateKeyAtCreate.Error())
+				logger.Error(errDeleteKey.Error())
 				return ErrDeletePrivateKeyAtCreate
 			}
 		}
 
-		logger.Error(ErrSetConnectionAtCreate.Error())
+		logger.Error(err.Error())
 		return ErrSetConnectionAtCreate
 	}
 

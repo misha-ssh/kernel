@@ -27,7 +27,7 @@ func Update(connection *connect.Connect, oldAlias string) error {
 
 	connections, err := store.GetConnections()
 	if err != nil {
-		logger.Error(ErrGetConnectionAtUpdate.Error())
+		logger.Error(err.Error())
 		return ErrGetConnectionAtUpdate
 	}
 
@@ -35,7 +35,7 @@ func Update(connection *connect.Connect, oldAlias string) error {
 		if savedConnection.Alias == oldAlias {
 			connection.SshOptions.PrivateKey, err = store.UpdatePrivateKey(connection)
 			if err != nil {
-				logger.Error(ErrSavePrivateKeyAtUpdate.Error())
+				logger.Error(err.Error())
 				return ErrSavePrivateKeyAtUpdate
 			}
 
@@ -43,7 +43,7 @@ func Update(connection *connect.Connect, oldAlias string) error {
 
 			err = store.SetConnections(connections)
 			if err != nil {
-				logger.Error(ErrSetConnectionAtUpdate.Error())
+				logger.Error(err.Error())
 				return ErrSetConnectionAtUpdate
 			}
 

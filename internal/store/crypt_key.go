@@ -23,7 +23,7 @@ func GetCryptKey() (string, error) {
 
 	cryptKey, err := keyring.Get(envconst.NameServiceCryptKey, username)
 	if err != nil {
-		logger.Error(ErrGetCryptKey.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 

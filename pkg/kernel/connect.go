@@ -26,13 +26,13 @@ func Connect(connection *connect.Connect) error {
 
 		session, err := ssh.Session()
 		if err != nil {
-			logger.Error(ErrSshSession)
+			logger.Error(err.Error())
 			return ErrSshSession
 		}
 
 		err = ssh.Connect(session)
 		if err != nil {
-			logger.Error(ErrSshConnect)
+			logger.Error(err.Error())
 			return ErrSshConnect
 		}
 	default:
