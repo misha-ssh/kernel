@@ -17,7 +17,7 @@ func List() (*connect.Connections, error) {
 
 	connections, err := store.GetConnections()
 	if err != nil {
-		logger.Error(ErrGetConnectionAtList.Error())
+		logger.Error(err.Error())
 		return nil, ErrGetConnectionAtList
 	}
 

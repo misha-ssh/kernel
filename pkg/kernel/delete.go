@@ -21,7 +21,7 @@ func Delete(connection *connect.Connect) error {
 
 	connections, err := store.GetConnections()
 	if err != nil {
-		logger.Error(ErrGetConnectionAtDelete.Error())
+		logger.Error(err.Error())
 		return ErrGetConnectionAtDelete
 	}
 
@@ -31,7 +31,7 @@ func Delete(connection *connect.Connect) error {
 
 			err = store.SetConnections(connections)
 			if err != nil {
-				logger.Error(ErrSetConnectionAtDelete.Error())
+				logger.Error(err.Error())
 				return ErrSetConnectionAtDelete
 			}
 

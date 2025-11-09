@@ -36,19 +36,19 @@ func GetConnections() (*connect.Connections, error) {
 
 	encryptedConnections, err := storage.Get(DirectionApp, FileConnections)
 	if err != nil {
-		logger.Error(ErrGetConnection.Error())
+		logger.Error(err.Error())
 		return nil, ErrGetConnection
 	}
 
 	decryptedConnections, err := crypto.Decrypt(encryptedConnections, cryptKey)
 	if err != nil {
-		logger.Error(ErrDecryptData.Error())
+		logger.Error(err.Error())
 		return nil, ErrDecryptData
 	}
 
 	err = json.Unmarshal([]byte(decryptedConnections), &connections)
 	if err != nil {
-		logger.Error(ErrUnmarshalJson.Error())
+		logger.Error(err.Error())
 		return nil, ErrUnmarshalJson
 	}
 
@@ -65,19 +65,19 @@ func SetConnections(connections *connect.Connections) error {
 
 	jsonConnections, err := json.Marshal(connections)
 	if err != nil {
-		logger.Error(ErrMarshalJson.Error())
+		logger.Error(err.Error())
 		return ErrMarshalJson
 	}
 
 	updatedEncryptedConnections, err := crypto.Encrypt(string(jsonConnections), cryptKey)
 	if err != nil {
-		logger.Error(ErrEncryptData.Error())
+		logger.Error(err.Error())
 		return ErrEncryptData
 	}
 
 	err = storage.Write(DirectionApp, FileConnections, updatedEncryptedConnections)
 	if err != nil {
-		logger.Error(ErrWriteJson.Error())
+		logger.Error(err.Error())
 		return ErrWriteJson
 	}
 

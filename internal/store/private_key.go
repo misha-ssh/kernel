@@ -45,13 +45,13 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 	direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
 	dataPrivateKey, err := storage.Get(direction, filename)
 	if err != nil {
-		logger.Error(ErrGetDataPrivateKey.Error())
+		logger.Error(err.Error())
 		return "", ErrGetDataPrivateKey
 	}
 
 	err = validatePrivateKey(dataPrivateKey, connection.SshOptions.Passphrase)
 	if err != nil {
-		logger.Error(ErrNotValidPrivateKey.Error())
+		logger.Error(err.Error())
 		return "", err
 	}
 
@@ -59,13 +59,13 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 
 	err = storage.Create(DirectionKeys, filenamePrivateKey)
 	if err != nil {
-		logger.Error(ErrCreateFilePrivateKey.Error())
+		logger.Error(err.Error())
 		return "", ErrCreateFilePrivateKey
 	}
 
 	err = storage.Write(DirectionKeys, filenamePrivateKey, dataPrivateKey)
 	if err != nil {
-		logger.Error(ErrWriteToFilePrivateKey.Error())
+		logger.Error(err.Error())
 		return "", ErrWriteToFilePrivateKey
 	}
 
@@ -96,14 +96,14 @@ func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 
 	existDataPrivateKey, err := storage.Get(DirectionKeys, existFilenamePrivateKey)
 	if err != nil {
-		logger.Error(ErrGetDataPrivateKey.Error())
+		logger.Error(err.Error())
 		return "", ErrGetDataPrivateKey
 	}
 
 	direction, filename := storage.GetDirectionAndFilename(connection.SshOptions.PrivateKey)
 	dataPrivateKey, err := storage.Get(direction, filename)
 	if err != nil {
-		logger.Error(ErrGetDataPrivateKey.Error())
+		logger.Error(err.Error())
 		return "", ErrGetDataPrivateKey
 	}
 

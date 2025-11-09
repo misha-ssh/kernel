@@ -64,7 +64,7 @@ func Set(key, value string) error {
 		err = openConfigFile.Close()
 	}(openConfigFile)
 	if err != nil {
-		logger.Error(ErrGetOpenFile.Error())
+		logger.Error(err.Error())
 		return ErrGetOpenFile
 	}
 
@@ -72,7 +72,7 @@ func Set(key, value string) error {
 
 	_, err = openConfigFile.WriteString(param)
 	if err != nil {
-		logger.Error(ErrWriteDataToOpenFile.Error())
+		logger.Error(err.Error())
 		return ErrWriteDataToOpenFile
 	}
 
@@ -86,7 +86,7 @@ func Set(key, value string) error {
 func Get(key string) string {
 	err := validateKey(key)
 	if err != nil {
-		logger.Error(ErrGetOpenFile.Error())
+		logger.Error(err.Error())
 		return EmptyValue
 	}
 
@@ -105,7 +105,7 @@ func Get(key string) string {
 		data := strings.Split(sc.Text(), Separator)
 
 		if len(data) != 2 {
-			logger.Error(ErrGetKeyValueData.Error())
+			logger.Error(err.Error())
 			return EmptyValue
 		}
 
@@ -151,7 +151,7 @@ func rewrite(key, value string) error {
 		err = openConfigFile.Close()
 	}(openConfigFile)
 	if err != nil {
-		logger.Error(ErrGetOpenFile.Error())
+		logger.Error(err.Error())
 		return ErrGetOpenFile
 	}
 
@@ -163,7 +163,7 @@ func rewrite(key, value string) error {
 		data := strings.Split(line, Separator)
 
 		if len(data) != 2 {
-			logger.Error(ErrGetKeyValueData.Error())
+			logger.Error(err.Error())
 			return ErrGetKeyValueData
 		}
 
