@@ -238,6 +238,7 @@ Description of fields:
 * ``SshOptions`` - this is a structure with additional fields for creating software - ``connect.TypeSSH``
 * ``Port`` - the port is filled in manually
 * ``PrivateKey`` - the path along with the name of the private key
+* ``Passphrase`` - the pass for private key
 
 ```go
 package main
@@ -255,11 +256,12 @@ func main() {
 		Password:  "password",
 		Address:   "localhost",
 		Type:      connect.TypeSSH,
-		CreatedAt: time.Now().Format("2006.01.02 15:04:05"),
-		UpdatedAt: time.Now().Format("2006.01.02 15:04:05"),
+		CreatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339),
 		SshOptions: &connect.SshOptions{
 			Port:       22,
 			PrivateKey: "/path/to/private/key",
+			Passphrase: "",
 		},
 	}
 }
@@ -331,6 +333,28 @@ Server accesses:
 * ``address`` - localhost
 * ``password`` - password
 * ``port`` - 2222
+
+4) connect with a private key with passphrase
+
+to run, write the command:
+
+```bash
+make up-ssh-key-pass
+```
+
+to install and remove the server:
+
+```bash
+make down-ssh-key-pass
+```
+
+Server accesses:
+
+* ``login`` - root
+* ``address`` - localhost
+* ``private key`` - ./dockerkeyWithPass
+* ``port`` - 22
+* ``passphrase`` - password
 
 ### 🔖 Description variable
 

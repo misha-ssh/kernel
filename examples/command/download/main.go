@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+
 	"github.com/misha-ssh/kernel/pkg/connect"
 	"github.com/misha-ssh/kernel/pkg/kernel"
 )
@@ -14,11 +16,12 @@ func main() {
 		Password:  "password",
 		Address:   "localhost",
 		Type:      connect.TypeSSH,
-		CreatedAt: "",
-		UpdatedAt: "",
+		CreatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339),
 		SshOptions: &connect.SshOptions{
 			Port:       22,
 			PrivateKey: "",
+			Passphrase: "",
 		},
 	}
 
