@@ -63,6 +63,8 @@ func getFromConfigSSH() (string, error) {
 func GetConnections() (*connect.Connections, error) {
 	var connections connect.Connections
 
+	//todo add fast read ~goroutine
+
 	cls, err := getFromLocalStorage()
 	if err != nil {
 		logger.Error(err.Error())
