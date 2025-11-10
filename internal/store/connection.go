@@ -12,9 +12,11 @@ import (
 )
 
 const FileConnections = envconst.FilenameConnections
+const FileConfigSSH = envconst.FilenameConfigSSH
 
 var (
 	DirectionApp = storage.GetAppDir()
+	DirectionSSH = storage.GetDirSSH()
 
 	ErrEncryptData   = errors.New("err encrypt data")
 	ErrMarshalJson   = errors.New("failed to marshal json")
@@ -46,9 +48,15 @@ func getFromLocalStorage() (string, error) {
 	return decryptedConnections, nil
 }
 
-// todo add logic
-func getFromSSHConfig() (string, error) {
-	return "", nil
+// todo add logic get connection from ssh config
+func getFromConfigSSH() (string, error) {
+	sshConfig, err := storage.Get(DirectionSSH, FileConfigSSH)
+	if err != nil {
+		logger.Error(err.Error())
+		return "", err
+	}
+
+	return sshConfig, nil
 }
 
 // GetConnections get connection from file
