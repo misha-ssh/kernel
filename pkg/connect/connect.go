@@ -1,9 +1,15 @@
 package connect
 
 type ConnectionType string
+type FromType string
 
-// TypeSSH type for ssh connection
-const TypeSSH ConnectionType = "ssh"
+const (
+	// TypeSSH type for ssh connection
+	TypeSSH ConnectionType = "ssh"
+
+	FromLocal     FromType = "local"
+	FromSSHConfig FromType = "ssh-config"
+)
 
 type Connections struct {
 	Connects []Connect `json:"connects"`
@@ -18,6 +24,9 @@ type Connect struct {
 	Password  string `json:"password"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
+
+	//todo it is saved when updating and creating
+	From FromType `json:"from"`
 
 	// Type specifies the connection protocol (e.g., "ssh")
 	Type ConnectionType `json:"type"`

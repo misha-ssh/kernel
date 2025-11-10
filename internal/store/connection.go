@@ -24,29 +24,44 @@ var (
 	ErrDecryptData   = errors.New("failed to decrypt data")
 )
 
-// GetConnections get connection from file
-func GetConnections() (*connect.Connections, error) {
-	var connections connect.Connections
-
+func getFromLocalStorage() (string, error) {
 	cryptKey, err := GetCryptKey()
 	if err != nil {
 		logger.Error(err.Error())
-		return nil, err
+		return "", err
 	}
 
 	encryptedConnections, err := storage.Get(DirectionApp, FileConnections)
 	if err != nil {
 		logger.Error(err.Error())
-		return nil, ErrGetConnection
+		return "", ErrGetConnection
 	}
 
 	decryptedConnections, err := crypto.Decrypt(encryptedConnections, cryptKey)
 	if err != nil {
 		logger.Error(err.Error())
-		return nil, ErrDecryptData
+		return "", ErrDecryptData
 	}
 
-	err = json.Unmarshal([]byte(decryptedConnections), &connections)
+	return decryptedConnections, nil
+}
+
+// todo add logic
+func getFromSSHConfig() (string, error) {
+	return "", nil
+}
+
+// GetConnections get connection from file
+func GetConnections() (*connect.Connections, error) {
+	var connections connect.Connections
+
+	cls, err := getFromLocalStorage()
+	if err != nil {
+		logger.Error(err.Error())
+		return nil, ErrGetConnection
+	}
+
+	err = json.Unmarshal([]byte(cls), &connections)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, ErrUnmarshalJson
