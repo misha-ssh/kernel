@@ -8,7 +8,7 @@ const (
 	TypeSSH ConnectionType = "ssh"
 
 	FromLocal     FromType = "local"
-	FromSSHConfig FromType = "ssh-config"
+	FromConfigSSH FromType = "config-ssh"
 )
 
 type Connections struct {
