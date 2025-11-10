@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
-	"reflect"
 	"testing"
 
 	"github.com/misha-ssh/kernel/configs/envconst"
@@ -153,28 +152,6 @@ func TestGetPrivateKeysDir(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			require.Equal(t, GetPrivateKeysDir(), tt.want())
-		})
-	}
-}
-
-func TestGetUserPrivateKey(t *testing.T) {
-	tests := []struct {
-		name    string
-		want    []string
-		wantErr bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetUserPrivateKey()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetUserPrivateKey() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetUserPrivateKey() got = %v, want %v", got, tt.want)
-			}
 		})
 	}
 }
