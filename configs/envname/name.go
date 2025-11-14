@@ -4,4 +4,5 @@ const (
 	Theme   = "THEME"
 	Logger  = "LOGGER"
 	Testing = "GO_TESTING"
+	Storage = "STORAGE"
 )
