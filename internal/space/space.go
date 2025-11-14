@@ -9,7 +9,7 @@ import (
 )
 
 type Space struct {
-	Storage *storage.Storage
+	Storage storage.Storage
 }
 
 func New() *Space {
