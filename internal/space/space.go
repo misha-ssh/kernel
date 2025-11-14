@@ -1,6 +1,7 @@
 package space
 
 import (
+	"fmt"
 	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/misha-ssh/kernel/configs/envname"
 	"github.com/misha-ssh/kernel/internal/config"
@@ -18,6 +19,8 @@ func New() *Space {
 	switch config.Get(envname.Storage) {
 	case envconst.TypeLocalStorage:
 		space.Storage = storage.NewLocal()
+	default:
+		panic(fmt.Sprintf("%s: unknown variable type", envname.Storage))
 	}
 
 	return space
