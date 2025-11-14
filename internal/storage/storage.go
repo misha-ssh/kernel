@@ -1,93 +1,62 @@
 package storage
 
 import (
-	"errors"
+	"github.com/misha-ssh/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/configs/envname"
 	"os"
+	"os/user"
 	"path/filepath"
-	"strings"
 )
 
-var ErrEmptyDirectory = errors.New("empty directory")
-var ErrDeleteDirectory = errors.New("get dir, delete only file")
-
-// Create creates a new file at the specified path, including parent directories if needed.
-// Returns error if file creation fails.
-func Create(path string, filename string) error {
-	if strings.TrimSpace(path) == "" {
-		return ErrEmptyDirectory
-	}
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = os.Mkdir(path, os.ModePerm)
-		if err != nil {
-			return err
-		}
-	}
-
-	if strings.TrimSpace(filename) != "" {
-		return Write(path, filename, "")
-	}
-
-	return nil
+type Storage interface {
+	Create(path string, filename string) error
+	Delete(path string, filename string) error
+	Exists(path string, filename string) bool
+	Get(path string, filename string) (string, error)
+	Write(path string, filename string, data string) error
+	GetOpenFile(path string, filename string, flags int) (*os.File, error)
 }
 
-// Delete removes the specified file. Returns error if deletion fails.
-func Delete(path string, filename string) error {
-	file := filepath.Join(path, filename)
-	info, err := os.Stat(file)
+const CharHidden = "."
+
+// GetAppDir get dir application
+func GetAppDir() string {
+	usr, err := user.Current()
 	if err != nil {
-		return err
+		panic(err)
 	}
 
-	if info.IsDir() {
-		return ErrDeleteDirectory
+	hiddenDir := CharHidden + envconst.AppName
+
+	if os.Getenv(envname.Testing) == envconst.IsTesting {
+		return filepath.Join(os.TempDir(), hiddenDir)
 	}
 
-	return os.Remove(filepath.Join(path, filename))
+	return filepath.Join(usr.HomeDir, hiddenDir)
 }
 
-// Exists checks if a file exists at the given path and is not a directory.
-// Returns boolean indicating existence.
-func Exists(path string, filename string) bool {
-	info, err := os.Stat(filepath.Join(path, filename))
-	if errors.Is(err, os.ErrNotExist) {
-		return false
-	}
-
-	return !info.IsDir()
-}
-
-// Get reads and returns the contents of a file as a string.
-// Returns error if file cannot be read.
-func Get(path string, filename string) (string, error) {
-	data, err := os.ReadFile(filepath.Join(path, filename))
+// GetDirSSH get dir ssh
+func GetDirSSH() string {
+	homeDir, err := os.UserHomeDir()
 	if err != nil {
-		return "", err
+		panic(err)
 	}
 
-	return string(data), nil
+	return filepath.Join(homeDir, envconst.DirectionsUserPrivateKey)
 }
 
-// Write saves data to a file, overwriting existing content.
-// Creates file if it doesn't exist. Returns error on failure.
-func Write(path string, filename string, data string) error {
-	err := os.WriteFile(filepath.Join(path, filename), []byte(data), os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	return nil
+// GetPrivateKeysDir get dir where save private keys
+func GetPrivateKeysDir() string {
+	return filepath.Join(GetAppDir(), envconst.DirectionPrivateKeys)
 }
 
-// GetOpenFile opens a file with specified flags (os.O_RDWR, etc.) and returns the file handle.
-// Returns error if file cannot be opened.
-func GetOpenFile(path string, filename string, flags int) (*os.File, error) {
-	file := filepath.Join(path, filename)
+// GetDirectionAndFilename get dir and filename from full path
+func GetDirectionAndFilename(fullPath string) (string, string) {
+	return filepath.Dir(fullPath),
+		filepath.Base(fullPath)
+}
 
-	openFile, err := os.OpenFile(file, flags, os.ModePerm)
-	if err != nil {
-		return nil, err
-	}
-
-	return openFile, nil
+// GetFullPath get full path from dir and filename
+func GetFullPath(direction string, filename string) string {
+	return filepath.Join(direction, filename)
 }
