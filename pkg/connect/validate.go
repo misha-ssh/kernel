@@ -1,7 +1,10 @@
 package connect
 
 import (
+	"encoding/pem"
 	"errors"
+	"github.com/misha-ssh/kernel/internal/logger"
+	"golang.org/x/crypto/ssh"
 	"net"
 	"regexp"
 	"strings"
@@ -17,6 +20,7 @@ var (
 func (c *Connect) Validate() error {
 	for _, err := range []error{
 		validateAlias(c.Alias),
+		validatePrivateKey(c.SshOptions.PrivateKey, c.SshOptions.Passphrase, c.Password),
 		validatePassword(c.Password, c.SshOptions.PrivateKey),
 		validateLogin(c.Login),
 		validateAddress(c.Address),
@@ -97,6 +101,29 @@ func validatePassword(password string, privateKey string) error {
 	}
 
 	return nil
+}
+
+func validatePrivateKey(privateKey string, passphrase string, password string) error {
+	if strings.TrimSpace(password) != "" {
+		return nil
+	}
+
+	block, _ := pem.Decode([]byte(privateKey))
+	if block == nil {
+		return errors.New("private key is not valid")
+	}
+
+	_, err := ssh.ParseRawPrivateKey([]byte(privateKey))
+	if err != nil {
+		if !strings.Contains(err.Error(), "passphrase") {
+			logger.Error(err.Error())
+			return err
+		}
+
+		_, err = ssh.ParsePrivateKeyWithPassphrase([]byte(privateKey), []byte(passphrase))
+	}
+
+	return err
 }
 
 func validateCreatedAt(date string) error {
