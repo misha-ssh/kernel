@@ -94,6 +94,7 @@ func initFileConfig() error {
 	defaultValues := map[string]string{
 		envname.Theme:  envconst.Theme,
 		envname.Logger: envconst.TypeStorageLogger,
+		envname.Space:  envconst.TypeLocalSpace,
 	}
 
 	for key, value := range defaultValues {
