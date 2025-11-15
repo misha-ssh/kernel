@@ -19,14 +19,14 @@ var (
 
 func (c *Connect) Validate() error {
 	for _, err := range []error{
-		validateAlias(c.Alias),
-		validatePrivateKey(c.SshOptions.PrivateKey, c.SshOptions.Passphrase, c.Password),
-		validatePassword(c.Password, c.SshOptions.PrivateKey),
-		validateLogin(c.Login),
-		validateAddress(c.Address),
-		validateCreatedAt(c.CreatedAt),
-		validateUpdatedAt(c.UpdatedAt),
-		validatePort(c.SshOptions.Port),
+		c.validateAlias(),
+		c.validatePrivateKey(),
+		c.validatePassword(),
+		c.validateLogin(),
+		c.validateAddress(),
+		c.validateCreatedAt(),
+		c.validateUpdatedAt(),
+		c.validatePort(),
 	} {
 		if err != nil {
 			return err
@@ -35,103 +35,103 @@ func (c *Connect) Validate() error {
 	return nil
 }
 
-func validateAlias(alias string) error {
-	if strings.TrimSpace(alias) == "" {
+func (c *Connect) validateAlias() error {
+	if strings.TrimSpace(c.Alias) == "" {
 		return errors.New("alias is empty")
 	}
 
-	if !aliasPattern.MatchString(alias) {
+	if !aliasPattern.MatchString(c.Alias) {
 		return errors.New("alias special characters are not allowed")
 	}
 
 	return nil
 }
 
-func validateLogin(login string) error {
-	if strings.TrimSpace(login) == "" {
+func (c *Connect) validateLogin() error {
+	if strings.TrimSpace(c.Login) == "" {
 		return errors.New("login cannot be empty")
 	}
 
-	if len(login) > 50 {
+	if len(c.Login) > 50 {
 		return errors.New("login too long (max 50 characters)")
 	}
 
-	if !loginPattern.MatchString(login) {
+	if !loginPattern.MatchString(c.Login) {
 		return errors.New("login contains invalid characters")
 	}
 
 	return nil
 }
 
-func validateAddress(address string) error {
-	if strings.TrimSpace(address) == "" {
+func (c *Connect) validateAddress() error {
+	if strings.TrimSpace(c.Address) == "" {
 		return errors.New("address cannot be empty")
 	}
 
-	if ip := net.ParseIP(address); ip != nil {
+	if ip := net.ParseIP(c.Address); ip != nil {
 		return nil
 	}
 
-	if !addressPattern.MatchString(address) {
+	if !addressPattern.MatchString(c.Address) {
 		return errors.New("invalid address format")
 	}
 
-	if len(address) > 253 {
+	if len(c.Address) > 253 {
 		return errors.New("address too long")
 	}
 
 	return nil
 }
 
-func validatePassword(password string, privateKey string) error {
-	if strings.TrimSpace(privateKey) != "" {
+func (c *Connect) validatePassword() error {
+	if strings.TrimSpace(c.PrivateKey) != "" {
 		return nil
 	}
 
-	if strings.TrimSpace(password) == "" {
+	if strings.TrimSpace(c.Password) == "" {
 		return errors.New("password cannot be empty")
 	}
 
-	if len(password) < 4 {
+	if len(c.Password) < 4 {
 		return errors.New("password too short (min 4 characters)")
 	}
 
-	if len(password) > 100 {
+	if len(c.Password) > 100 {
 		return errors.New("password too long (max 100 characters)")
 	}
 
 	return nil
 }
 
-func validatePrivateKey(privateKey string, passphrase string, password string) error {
-	if strings.TrimSpace(password) != "" {
+func (c *Connect) validatePrivateKey() error {
+	if strings.TrimSpace(c.Password) != "" {
 		return nil
 	}
 
-	block, _ := pem.Decode([]byte(privateKey))
+	block, _ := pem.Decode([]byte(c.PrivateKey))
 	if block == nil {
 		return errors.New("private key is not valid")
 	}
 
-	_, err := ssh.ParseRawPrivateKey([]byte(privateKey))
+	_, err := ssh.ParseRawPrivateKey([]byte(c.PrivateKey))
 	if err != nil {
 		if !strings.Contains(err.Error(), "passphrase") {
 			logger.Error(err.Error())
 			return err
 		}
 
-		_, err = ssh.ParsePrivateKeyWithPassphrase([]byte(privateKey), []byte(passphrase))
+		_, err = ssh.ParsePrivateKeyWithPassphrase([]byte(c.PrivateKey), []byte(c.Passphrase))
 	}
 
 	return err
 }
 
-func validateCreatedAt(date string) error {
-	return validateDate(date)
+func (c *Connect) validateCreatedAt() error {
+	return validateDate(c.CreatedAt)
 }
 
-func validateUpdatedAt(date string) error {
-	return validateDate(date)
+func (c *Connect) validateUpdatedAt() error {
+	return validateDate(c.UpdatedAt)
 }
 
 func validateDate(date string) error {
@@ -151,8 +151,8 @@ func validateDate(date string) error {
 	return nil
 }
 
-func validatePort(port int) error {
-	if port < 1 || port > 65535 {
+func (c *Connect) validatePort() error {
+	if c.Port < 1 || c.Port > 65535 {
 		return errors.New("port must be between 1 and 65535")
 	}
 
