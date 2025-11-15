@@ -9,12 +9,12 @@ import (
 )
 
 type Storage interface {
-	Create(path string, filename string) error
-	Delete(path string, filename string) error
-	Exists(path string, filename string) bool
-	Get(path string, filename string) (string, error)
-	Write(path string, filename string, data string) error
-	GetOpenFile(path string, filename string, flags int) (*os.File, error)
+	Create(filename string) error
+	Delete(filename string) error
+	Exists(filename string) bool
+	Get(filename string) (string, error)
+	Write(filename string, data string) error
+	GetOpenFile(filename string, flags int) (*os.File, error)
 }
 
 const CharHidden = "."
