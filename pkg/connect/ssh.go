@@ -10,6 +10,7 @@ import (
 	"golang.org/x/term"
 )
 
+// Ssh todo rename struct to SSH and put in ssh pkg
 type Ssh struct {
 	Connection *Connect
 }
