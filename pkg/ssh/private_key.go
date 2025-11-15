@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-// todo put file in ssh pkg before ssh struct
 func parsePrivateKey(keyName string, passphrase string) (ssh.Signer, error) {
 	direction, filename := storage.GetDirectionAndFilename(keyName)
 	data, err := storage.Get(direction, filename)

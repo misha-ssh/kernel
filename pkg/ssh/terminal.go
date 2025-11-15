@@ -8,7 +8,6 @@ import (
 	"golang.org/x/term"
 )
 
-// todo put file ssh pkg
 const (
 	Timeout = 0
 

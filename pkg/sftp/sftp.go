@@ -6,7 +6,6 @@ import (
 	"github.com/pkg/sftp"
 )
 
-// Sftp todo put in sftp pkg
 type Sftp struct {
 	Connection *connect.Connect
 }
