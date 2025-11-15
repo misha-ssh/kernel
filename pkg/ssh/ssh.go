@@ -11,12 +11,18 @@ import (
 	"golang.org/x/term"
 )
 
-type Ssh struct {
+type SSH struct {
 	Connection *connect.Connect
 }
 
+func NewSSH(connection *connect.Connect) *SSH {
+	return &SSH{
+		Connection: connection,
+	}
+}
+
 // Session establishes a new SSH session with the remote server
-func (s *Ssh) Session() (*ssh.Session, error) {
+func (s *SSH) Session() (*ssh.Session, error) {
 	client, err := s.Client()
 	if err != nil {
 		return nil, err
@@ -52,7 +58,7 @@ func (s *Ssh) Session() (*ssh.Session, error) {
 }
 
 // Connect starts an interactive shell session using the established SSH connection
-func (s *Ssh) Connect(session *ssh.Session) error {
+func (s *SSH) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {
 			logger.Error(err.Error())
@@ -88,7 +94,7 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 }
 
 // Client create ssh client from config and Auth
-func (s *Ssh) Client() (*ssh.Client, error) {
+func (s *SSH) Client() (*ssh.Client, error) {
 	sshAuth, err := s.Auth()
 	if err != nil {
 		return nil, err
@@ -110,7 +116,7 @@ func (s *Ssh) Client() (*ssh.Client, error) {
 }
 
 // Auth automate defines method auth from Connect
-func (s *Ssh) Auth() ([]ssh.AuthMethod, error) {
+func (s *SSH) Auth() ([]ssh.AuthMethod, error) {
 	var authMethod []ssh.AuthMethod
 
 	if len(s.Connection.Password) > 0 {
