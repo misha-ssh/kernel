@@ -12,11 +12,9 @@ import (
 )
 
 const FileConnections = envconst.FilenameConnections
-const FileConfigSSH = envconst.FilenameConfigSSH
 
 var (
 	DirectionApp = storage.GetAppDir()
-	DirectionSSH = storage.GetDirSSH()
 
 	ErrEncryptData   = errors.New("err encrypt data")
 	ErrMarshalJson   = errors.New("failed to marshal json")
@@ -26,52 +24,29 @@ var (
 	ErrDecryptData   = errors.New("failed to decrypt data")
 )
 
-func getFromLocalStorage() (string, error) {
+// GetConnections get connection from file
+func GetConnections() (*connect.Connections, error) {
+	var connections connect.Connections
+
 	cryptKey, err := GetCryptKey()
 	if err != nil {
 		logger.Error(err.Error())
-		return "", err
+		return nil, err
 	}
 
 	encryptedConnections, err := storage.Get(DirectionApp, FileConnections)
 	if err != nil {
 		logger.Error(err.Error())
-		return "", ErrGetConnection
+		return nil, ErrGetConnection
 	}
 
 	decryptedConnections, err := crypto.Decrypt(encryptedConnections, cryptKey)
 	if err != nil {
 		logger.Error(err.Error())
-		return "", ErrDecryptData
+		return nil, ErrDecryptData
 	}
 
-	return decryptedConnections, nil
-}
-
-// todo add logic get connection from ssh config
-func getFromConfigSSH() (string, error) {
-	sshConfig, err := storage.Get(DirectionSSH, FileConfigSSH)
-	if err != nil {
-		logger.Error(err.Error())
-		return "", err
-	}
-
-	return sshConfig, nil
-}
-
-// GetConnections get connection from file
-func GetConnections() (*connect.Connections, error) {
-	var connections connect.Connections
-
-	//todo add fast read ~goroutine
-
-	cls, err := getFromLocalStorage()
-	if err != nil {
-		logger.Error(err.Error())
-		return nil, ErrGetConnection
-	}
-
-	err = json.Unmarshal([]byte(cls), &connections)
+	err = json.Unmarshal([]byte(decryptedConnections), &connections)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, ErrUnmarshalJson
