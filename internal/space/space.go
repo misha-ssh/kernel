@@ -1,26 +1,29 @@
 package space
 
 import (
-	"fmt"
 	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/misha-ssh/kernel/configs/envname"
 	"github.com/misha-ssh/kernel/internal/config"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/pkg/ssh"
 )
 
 type Space struct {
-	Storage storage.Storage
+	Storage   storage.Storage
+	SSHConfig *ssh.Config
 }
 
 func New() *Space {
-	space := &Space{}
+	space := new(Space)
 
-	switch config.Get(envname.Storage) {
-	case envconst.TypeLocalStorage:
+	switch config.Get(envname.Space) {
+	case envconst.TypeLocalSpace:
 		space.Storage = storage.NewLocal()
+	case envconst.TypeSSHConfig:
+		space.SSHConfig = ssh.NewConfig()
 	default:
-		panic(fmt.Sprintf("%s: unknown variable type", envname.Storage))
+		panic(envname.Space + ": unknown variable type or undefined")
 	}
 
 	return space
