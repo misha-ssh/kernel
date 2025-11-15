@@ -1,7 +1,8 @@
-package connect
+package ssh
 
 import (
 	"fmt"
+	"github.com/misha-ssh/kernel/pkg/connect"
 	"net"
 	"os"
 
@@ -12,7 +13,7 @@ import (
 
 // Ssh todo rename struct to SSH and put in ssh pkg
 type Ssh struct {
-	Connection *Connect
+	Connection *connect.Connect
 }
 
 // Session establishes a new SSH session with the remote server

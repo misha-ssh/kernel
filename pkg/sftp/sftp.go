@@ -1,14 +1,18 @@
-package connect
+package sftp
 
-import "github.com/pkg/sftp"
+import (
+	"github.com/misha-ssh/kernel/pkg/connect"
+	ssh2 "github.com/misha-ssh/kernel/pkg/ssh"
+	"github.com/pkg/sftp"
+)
 
 // Sftp todo put in sftp pkg
 type Sftp struct {
-	Connection *Connect
+	Connection *connect.Connect
 }
 
 func (s Sftp) Client(opts ...sftp.ClientOption) (*sftp.Client, error) {
-	ssh := &Ssh{
+	ssh := &ssh2.Ssh{
 		Connection: s.Connection,
 	}
 
