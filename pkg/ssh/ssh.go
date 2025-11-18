@@ -109,7 +109,7 @@ func (s *SSH) Client() (*ssh.Client, error) {
 
 	hostWithPort := net.JoinHostPort(
 		s.Connection.Address,
-		fmt.Sprint(s.Connection.SshOptions.Port),
+		fmt.Sprint(s.Connection.Port),
 	)
 
 	return ssh.Dial("tcp", hostWithPort, config)
@@ -123,11 +123,8 @@ func (s *SSH) Auth() ([]ssh.AuthMethod, error) {
 		authMethod = append(authMethod, ssh.Password(s.Connection.Password))
 	}
 
-	if len(s.Connection.SshOptions.PrivateKey) > 0 {
-		key, err := parsePrivateKey(
-			s.Connection.SshOptions.PrivateKey,
-			s.Connection.SshOptions.Passphrase,
-		)
+	if len(s.Connection.PrivateKey) > 0 {
+		key, err := s.parsePrivateKey()
 		if err != nil {
 			return nil, err
 		}
