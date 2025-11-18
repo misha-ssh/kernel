@@ -24,7 +24,10 @@ func TestConfig_GetConnections(t *testing.T) {
 			config := NewConfig()
 
 			got, err := config.GetConnections()
-			assert.Equal(t, tt.wantErr, err != nil)
+			if !tt.wantErr {
+				assert.NoError(t, err)
+			}
+
 			assert.Equal(t, tt.want, got)
 		})
 	}
