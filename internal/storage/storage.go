@@ -17,6 +17,20 @@ type Storage interface {
 	GetOpenFile(filename string, flags int) (*os.File, error)
 }
 
+var defaultStorage Storage
+
+func Get() Storage {
+	if defaultStorage == nil {
+		defaultStorage = NewLocal()
+	}
+
+	return defaultStorage
+}
+
+func Set(storage Storage) {
+	defaultStorage = storage
+}
+
 const CharHidden = "."
 
 // GetAppDir get dir application
