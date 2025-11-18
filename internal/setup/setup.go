@@ -3,6 +3,8 @@ package setup
 import (
 	"encoding/json"
 	"errors"
+	"github.com/misha-ssh/kernel/internal/space"
+	"github.com/misha-ssh/kernel/pkg/ssh"
 	"os/user"
 
 	"github.com/misha-ssh/kernel/configs/envconst"
@@ -17,7 +19,9 @@ import (
 
 var (
 	ErrCreateFileConnection = errors.New("err create file connection")
-	ErrSetLoggerFromConfig  = errors.New("err set logger from configs")
+	ErrSetLoggerFromConfig  = errors.New("err set logger from config")
+	ErrSetStorageFromConfig = errors.New("err set storage from config")
+	ErrSetSpaceFromConfig   = errors.New("err set space from config")
 	ErrSetDefaultValue      = errors.New("err set default value")
 	ErrMarshalJson          = errors.New("failed to marshal json")
 	ErrWriteJson            = errors.New("failed to write json")
@@ -92,9 +96,10 @@ func initFileConfig() error {
 	}
 
 	defaultValues := map[string]string{
-		envname.Theme:  envconst.Theme,
-		envname.Logger: envconst.TypeStorageLogger,
-		envname.Space:  envconst.TypeLocalSpace,
+		envname.Theme:   envconst.Theme,
+		envname.Logger:  envconst.TypeStorageLogger,
+		envname.Space:   envconst.TypeStorageSpace,
+		envname.Storage: envconst.TypeLocalStorage,
 	}
 
 	for key, value := range defaultValues {
@@ -164,6 +169,42 @@ func initLoggerFromConfig() error {
 	return nil
 }
 
+func initStorageFromConfig() error {
+	storageType := config.Get(envname.Storage)
+
+	switch storageType {
+	case envconst.TypeLocalStorage:
+		storage.Set(storage.NewLocal())
+	default:
+		return ErrSetStorageFromConfig
+	}
+
+	return nil
+}
+
+func initSpaceFromConfig() error {
+	storageType := config.Get(envname.Space)
+
+	switch storageType {
+	case envconst.TypeStorageSpace:
+		space.Set(
+			&space.Storage{
+				Storage: storage.Get(),
+			},
+		)
+	case envconst.TypeConfigSpace:
+		space.Set(
+			&space.SSHConfig{
+				Config: ssh.NewConfig(),
+			},
+		)
+	default:
+		return ErrSetSpaceFromConfig
+	}
+
+	return nil
+}
+
 // Init performs complete application initialization:
 // 1. Config file setup
 // 2. Logger configuration
@@ -184,6 +225,16 @@ func Init() {
 	}
 
 	err = initCryptKey()
+	if err != nil {
+		panic(err)
+	}
+
+	err = initStorageFromConfig()
+	if err != nil {
+		panic(err)
+	}
+
+	err = initSpaceFromConfig()
 	if err != nil {
 		panic(err)
 	}
