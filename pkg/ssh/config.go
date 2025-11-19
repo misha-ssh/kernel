@@ -39,6 +39,7 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 			continue
 		}
 
+		//todo it is necessary to make a strict comparison to distinguish between Host and Hostname
 		if strings.Contains(line, "Host") {
 			value := strings.Split(line, " ")
 
