@@ -1,4 +1,4 @@
-package connect
+package ssh
 
 import (
 	"strings"
@@ -8,9 +8,10 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
-func parsePrivateKey(keyName string, passphrase string) (ssh.Signer, error) {
-	direction, filename := storage.GetDirectionAndFilename(keyName)
-	data, err := storage.Get(direction, filename)
+func (s *SSH) parsePrivateKey() (ssh.Signer, error) {
+	currentStorage := storage.Get()
+
+	data, err := currentStorage.Get(s.Connection.PrivateKey)
 	if err != nil {
 		logger.Error(err.Error())
 		return nil, err
@@ -25,7 +26,7 @@ func parsePrivateKey(keyName string, passphrase string) (ssh.Signer, error) {
 			return nil, err
 		}
 
-		key, err = ssh.ParsePrivateKeyWithPassphrase(dataSshKey, []byte(passphrase))
+		key, err = ssh.ParsePrivateKeyWithPassphrase(dataSshKey, []byte(s.Connection.Passphrase))
 		if err != nil {
 			logger.Error(err.Error())
 			return nil, err

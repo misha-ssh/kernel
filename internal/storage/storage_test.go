@@ -3,342 +3,155 @@
 package storage
 
 import (
-	"bytes"
+	"github.com/misha-ssh/kernel/configs/envconst"
+	"github.com/misha-ssh/kernel/configs/envname"
 	"os"
+	"os/user"
 	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreate(t *testing.T) {
-	type args struct {
-		direction string
-		filename  string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "success - create file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "test.txt",
-			},
-			wantErr: false,
-		},
-		{
-			name: "success - create dir",
-			args: args{
-				direction: t.TempDir() + "/new_dir",
-				filename:  "",
-			},
-			wantErr: false,
-		},
-		{
-			name: "fail - empty dir",
-			args: args{
-				direction: "",
-				filename:  "new.txt",
-			},
-			wantErr: true,
-		},
-		{
-			name: "fail - empty dir and filename",
-			args: args{
-				direction: "",
-				filename:  "",
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := Create(tt.args.direction, tt.args.filename)
-			require.Equal(t, tt.wantErr, err != nil)
-		})
-	}
-}
+func TestGetAppDir(t *testing.T) {
+	originalTesting := os.Getenv(envname.Testing)
+	defer func() {
+		require.NoError(t, os.Setenv(envname.Testing, originalTesting))
+	}()
 
-func TestDelete(t *testing.T) {
-	type args struct {
-		direction string
-		filename  string
-	}
 	tests := []struct {
 		name         string
-		args         args
-		isCreateFile bool
-		wantErr      bool
+		want         func() string
+		isSetTesting bool
 	}{
 		{
-			name: "success - delete file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "test.txt",
+			name: "success - get app dir",
+			want: func() string {
+				usr, err := user.Current()
+				require.NoError(t, err)
+
+				return filepath.Join(usr.HomeDir, CharHidden+envconst.AppName)
 			},
-			isCreateFile: true,
-			wantErr:      false,
+			isSetTesting: false,
 		},
 		{
-			name: "fail - delete non exists file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "nonexistent.txt",
+			name: "success - get test app dir",
+			want: func() string {
+				return filepath.Join(os.TempDir(), CharHidden+envconst.AppName)
 			},
-			isCreateFile: false,
-			wantErr:      true,
+			isSetTesting: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isCreateFile {
-				require.NoError(t, Create(tt.args.direction, tt.args.filename))
+			if tt.isSetTesting {
+				require.NoError(t, os.Setenv(envname.Testing, "true"))
+			} else {
+				require.NoError(t, os.Setenv(envname.Testing, "false"))
 			}
 
-			err := Delete(tt.args.direction, tt.args.filename)
-			require.Equal(t, tt.wantErr, err != nil)
+			require.Equal(t, GetAppDir(), tt.want())
 		})
 	}
 }
 
-func TestExists(t *testing.T) {
-	tempDir := t.TempDir()
-
-	type args struct {
-		direction string
-		filename  string
-	}
+func TestGetDirectionAndFilename(t *testing.T) {
 	tests := []struct {
-		name         string
-		args         args
-		isCreateFile bool
-		want         bool
+		name     string
+		fullPath string
+		wantDir  string
+		wantFile string
 	}{
 		{
-			name: "success - is exists",
-			args: args{
-				direction: tempDir,
-				filename:  "test.txt",
-			},
-			isCreateFile: true,
-			want:         true,
+			name:     "simple path",
+			fullPath: "/home/user/file.txt",
+			wantDir:  "/home/user",
+			wantFile: "file.txt",
 		},
 		{
-			name: "fail - is not exists",
-			args: args{
-				direction: tempDir,
-				filename:  "nonexistent.txt",
-			},
-			isCreateFile: false,
-			want:         false,
+			name:     "nested path",
+			fullPath: "/home/user/documents/file.txt",
+			wantDir:  "/home/user/documents",
+			wantFile: "file.txt",
 		},
 		{
-			name: "fail - is not exists empty file",
-			args: args{
-				direction: tempDir,
-				filename:  "",
-			},
-			isCreateFile: false,
-			want:         false,
+			name:     "current dir file",
+			fullPath: "file.txt",
+			wantDir:  ".",
+			wantFile: "file.txt",
 		},
 		{
-			name: "fail - is not exists empty dir",
-			args: args{
-				direction: "",
-				filename:  "text.txt",
-			},
-			isCreateFile: false,
-			want:         false,
+			name:     "empty path",
+			fullPath: "",
+			wantDir:  ".",
+			wantFile: ".",
 		},
 	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.isCreateFile {
-				require.NoError(t, Create(tt.args.direction, tt.args.filename))
-			}
-
-			require.Equal(t, Exists(tt.args.direction, tt.args.filename), tt.want)
+			gotDir, gotFile := GetDirectionAndFilename(tt.fullPath)
+			require.Equal(t, gotDir, tt.wantDir)
+			require.Equal(t, gotFile, tt.wantFile)
 		})
 	}
 }
 
-func TestGet(t *testing.T) {
-	tempDir := t.TempDir()
-
-	testFiles := map[string][]byte{
-		"test.txt":         []byte("test data"),
-		"empty.txt":        []byte(""),
-		"large.txt":        make([]byte, 1024*1024),
-		"large-repeat.txt": bytes.Repeat([]byte("x"), 1024*1024),
-	}
-
-	for filename, data := range testFiles {
-		filePath := filepath.Join(tempDir, filename)
-		require.NoError(t, os.WriteFile(filePath, data, 0644))
-	}
-
+func TestGetFullPath(t *testing.T) {
 	tests := []struct {
 		name      string
 		direction string
 		filename  string
 		want      string
-		wantErr   bool
 	}{
 		{
-			name:      "success - read test file",
-			direction: tempDir,
-			filename:  "test.txt",
-			want:      string(testFiles["test.txt"]),
-			wantErr:   false,
+			name:      "simple join",
+			direction: "/home/user",
+			filename:  "file.txt",
+			want:      "/home/user/file.txt",
 		},
 		{
-			name:      "success - read empty file",
-			direction: tempDir,
-			filename:  "empty.txt",
-			want:      string(testFiles["empty.txt"]),
-			wantErr:   false,
+			name:      "empty dir",
+			direction: "",
+			filename:  "file.txt",
+			want:      "file.txt",
 		},
 		{
-			name:      "success - read large file",
-			direction: tempDir,
-			filename:  "large.txt",
-			want:      string(testFiles["large.txt"]),
-			wantErr:   false,
+			name:      "empty filename",
+			direction: "/home/user",
+			filename:  "",
+			want:      "/home/user",
 		},
 		{
-			name:      "success - read large file",
-			direction: tempDir,
-			filename:  "large-repeat.txt",
-			want:      string(testFiles["large-repeat.txt"]),
-			wantErr:   false,
-		},
-		{
-			name:      "fail - non-existent file",
-			direction: tempDir,
-			filename:  "nonexistent.txt",
+			name:      "both empty",
+			direction: "",
+			filename:  "",
 			want:      "",
-			wantErr:   true,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Get(tt.direction, tt.filename)
-			require.Equal(t, tt.wantErr, err != nil)
-			require.Equal(t, got, tt.want)
+			require.Equal(t, GetFullPath(tt.direction, tt.filename), tt.want)
 		})
 	}
 }
 
-func TestWrite(t *testing.T) {
-	type args struct {
-		direction string
-		filename  string
-		data      string
-	}
+func TestGetPrivateKeysDir(t *testing.T) {
 	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-		want    string
+		name string
+		want func() string
 	}{
 		{
-			name: "write to new file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "test.txt",
-				data:      "Hello, World!",
+			name: "success - get private keys dir",
+			want: func() string {
+				return filepath.Join(GetAppDir(), envconst.DirectionPrivateKeys)
 			},
-			wantErr: false,
-			want:    "Hello, World!",
-		},
-		{
-			name: "write to existing file (overwrite)",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "test.txt",
-				data:      "New content",
-			},
-			wantErr: false,
-			want:    "New content",
-		},
-		{
-			name: "write empty data to new file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "empty.txt",
-				data:      "",
-			},
-			wantErr: false,
-			want:    "",
-		},
-		{
-			name: "write to invalid filename",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "",
-				data:      "Invalid",
-			},
-			wantErr: true,
-			want:    "",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := Write(tt.args.direction, tt.args.filename, tt.args.data)
-			require.Equal(t, tt.wantErr, err != nil)
-
-			got, err := Get(tt.args.direction, tt.args.filename)
-			require.Equal(t, tt.wantErr, err != nil)
-			require.Equal(t, got, tt.want)
-		})
-	}
-}
-
-func TestGetOpenFile(t *testing.T) {
-	type args struct {
-		direction string
-		filename  string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "write to new file",
-			args: args{
-				direction: t.TempDir(),
-				filename:  "test.txt",
-			},
-			wantErr: false,
-		},
-		{
-			name: "error on invalid directory",
-			args: args{
-				direction: "invalidDir" + t.TempDir(),
-				filename:  "test.txt",
-			},
-			wantErr: true,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			flags := os.O_WRONLY | os.O_APPEND | os.O_CREATE
-			got, err := GetOpenFile(tt.args.direction, tt.args.filename, flags)
-			require.Equal(t, tt.wantErr, err != nil)
-
-			_, err = got.Write([]byte("test"))
-			require.Equal(t, tt.wantErr, err != nil)
-
-			err = got.Close()
-			require.Equal(t, tt.wantErr, err != nil)
-
-			fileIsExists := Exists(tt.args.direction, tt.args.filename)
-			require.Equal(t, fileIsExists, !tt.wantErr)
+			require.Equal(t, GetPrivateKeysDir(), tt.want())
 		})
 	}
 }
