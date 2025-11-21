@@ -75,14 +75,6 @@ func parsePrivateKey(connection *connect.Connect, values []string) error {
 	return nil
 }
 
-func addConnection(connection *connect.Connect, connections *connect.Connections) {
-	if !reflect.DeepEqual(connection, new(connect.Connect)) {
-		connections.Connects = append(connections.Connects, *connection)
-	}
-
-	connection = new(connect.Connect)
-}
-
 func parseConnection(s *bufio.Scanner) (*connect.Connections, error) {
 	connections := new(connect.Connections)
 	connection := new(connect.Connect)
@@ -96,7 +88,12 @@ func parseConnection(s *bufio.Scanner) (*connect.Connections, error) {
 		}
 
 		if line == "" {
-			addConnection(connection, connections)
+			if !reflect.DeepEqual(connection, new(connect.Connect)) {
+				connections.Connects = append(connections.Connects, *connection)
+			}
+
+			connection = new(connect.Connect)
+
 			continue
 		}
 
