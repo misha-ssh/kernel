@@ -10,7 +10,7 @@ import (
 	"github.com/misha-ssh/kernel/pkg/connect"
 )
 
-func parseHost(connection *connect.Connect, values []string) error {
+func parseAlias(connection *connect.Connect, values []string) error {
 	if strings.ToLower(values[0]) != "host" {
 		return nil
 	}
@@ -19,6 +19,8 @@ func parseHost(connection *connect.Connect, values []string) error {
 		return fmt.Errorf("empty host")
 	}
 
+	//todo add logic for pase host with * and ! for set data
+	//todo this is operation used in last order
 	if strings.Contains(values[1], "*") || strings.Contains(values[1], "!") {
 		return nil
 	}
@@ -100,7 +102,7 @@ func parseConnection(s *bufio.Scanner) (*connect.Connections, error) {
 		aliasValues := strings.Split(line, " ")
 
 		for _, err := range []error{
-			parseHost(connection, aliasValues),
+			parseAlias(connection, aliasValues),
 			parsePort(connection, aliasValues),
 			parseLogin(connection, aliasValues),
 			parsePrivateKey(connection, aliasValues),
