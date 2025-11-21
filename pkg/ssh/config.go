@@ -55,7 +55,9 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 			connection = new(connect.Connect)
 		}
 
-		if value[0] == "Host" {
+		aliasColumn := strings.ToLower(value[0])
+
+		if aliasColumn == "host" {
 			if len(value) < 1 {
 				continue
 			}
@@ -67,15 +69,15 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 			connection.Alias = value[1]
 		}
 
-		if value[0] == "HostName" {
+		if aliasColumn == "hostname" {
 			connection.Address = value[1]
 		}
 
-		if value[0] == "User" {
+		if aliasColumn == "user" {
 			connection.Login = value[1]
 		}
 
-		if value[0] == "Port" {
+		if aliasColumn == "port" {
 			port, err := strconv.Atoi(value[1])
 			if err != nil {
 				return nil, err
@@ -83,7 +85,7 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 			connection.Port = port
 		}
 
-		if value[0] == "IdentityFile" {
+		if aliasColumn == "identityfile" {
 			connection.PrivateKey = value[1]
 		}
 	}
