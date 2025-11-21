@@ -2,15 +2,10 @@ package ssh
 
 import (
 	"bufio"
-	"fmt"
-	"os"
-	"reflect"
-	"strconv"
-	"strings"
-
 	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
+	"os"
 )
 
 type Config struct {
@@ -26,75 +21,12 @@ func NewConfig() *Config {
 }
 
 func (c *Config) GetConnections() (*connect.Connections, error) {
-	var connections connect.Connections
-
 	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_RDWR)
 	if err != nil {
 		return nil, err
 	}
 
-	s := bufio.NewScanner(file)
-
-	connection := new(connect.Connect)
-
-	for s.Scan() {
-		line := strings.TrimSpace(s.Text())
-		fmt.Println(line)
-
-		if strings.HasPrefix(line, "#") {
-			continue
-		}
-
-		value := strings.Split(line, " ")
-
-		if line == "" {
-			if !reflect.DeepEqual(connection, &connect.Connect{}) {
-				connections.Connects = append(connections.Connects, *connection)
-			}
-
-			connection = new(connect.Connect)
-		}
-
-		aliasColumn := strings.ToLower(value[0])
-
-		if aliasColumn == "host" {
-			if len(value) < 1 {
-				continue
-			}
-
-			if strings.Contains(value[1], "*") || strings.Contains(value[1], "!") {
-				continue
-			}
-
-			connection.Alias = value[1]
-		}
-
-		if aliasColumn == "hostname" {
-			connection.Address = value[1]
-		}
-
-		if aliasColumn == "user" {
-			connection.Login = value[1]
-		}
-
-		if aliasColumn == "port" {
-			port, err := strconv.Atoi(value[1])
-			if err != nil {
-				return nil, err
-			}
-			connection.Port = port
-		}
-
-		if aliasColumn == "identityfile" {
-			connection.PrivateKey = value[1]
-		}
-	}
-
-	fmt.Println(connections)
-
-	if err = s.Err(); err != nil {
-		return nil, err
-	}
+	_, _ = parseConnection(bufio.NewScanner(file))
 
 	return nil, nil
 }

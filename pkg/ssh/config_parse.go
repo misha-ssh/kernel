@@ -3,12 +3,11 @@ package ssh
 import (
 	"bufio"
 	"fmt"
-	"github.com/misha-ssh/kernel/configs/envconst"
-	"github.com/misha-ssh/kernel/pkg/connect"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/misha-ssh/kernel/pkg/connect"
 )
 
 func parseHost(connection *connect.Connect, values []string) error {
@@ -77,23 +76,15 @@ func parsePrivateKey(connection *connect.Connect, values []string) error {
 }
 
 func addConnection(connection *connect.Connect, connections *connect.Connections) {
-	if !reflect.DeepEqual(connection, &connect.Connect{}) {
+	if !reflect.DeepEqual(connection, new(connect.Connect)) {
 		connections.Connects = append(connections.Connects, *connection)
 	}
 
 	connection = new(connect.Connect)
 }
 
-func (c *Config) parse() (*connect.Connections, error) {
-	var connections connect.Connections
-
-	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_RDWR)
-	if err != nil {
-		return nil, err
-	}
-
-	s := bufio.NewScanner(file)
-
+func parseConnection(s *bufio.Scanner) (*connect.Connections, error) {
+	connections := new(connect.Connections)
 	connection := new(connect.Connect)
 
 	for s.Scan() {
@@ -105,13 +96,13 @@ func (c *Config) parse() (*connect.Connections, error) {
 		}
 
 		if line == "" {
-			addConnection(connection, &connections)
+			addConnection(connection, connections)
 			continue
 		}
 
 		aliasValues := strings.Split(line, " ")
 
-		for _, err = range []error{
+		for _, err := range []error{
 			parseHost(connection, aliasValues),
 			parsePort(connection, aliasValues),
 			parseLogin(connection, aliasValues),
@@ -125,9 +116,9 @@ func (c *Config) parse() (*connect.Connections, error) {
 
 	fmt.Println(connections)
 
-	if err = s.Err(); err != nil {
+	if err := s.Err(); err != nil {
 		return nil, err
 	}
 
-	return nil, nil
+	return connections, nil
 }
