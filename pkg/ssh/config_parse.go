@@ -9,11 +9,6 @@ import (
 	"github.com/misha-ssh/kernel/pkg/connect"
 )
 
-type ConfigParser struct {
-	connections *connect.Connections
-	current     *connect.Connect
-}
-
 func parseAlias(connection *connect.Connect, values []string) error {
 	if strings.ToLower(values[0]) != "host" {
 		return nil
@@ -23,7 +18,7 @@ func parseAlias(connection *connect.Connect, values []string) error {
 		return fmt.Errorf("empty host")
 	}
 
-	//todo add logic for pase host with * and ! for set data
+	//todo add logic for parse host with * and ! for set data
 	//todo this is operation used in last order
 	if strings.Contains(values[1], "*") || strings.Contains(values[1], "!") {
 		return nil
@@ -85,7 +80,7 @@ func isEmptyLine(line string) bool {
 	return strings.TrimSpace(line) == ""
 }
 
-func (p *ConfigParser) parseLine(line string) error {
+func parseLine(connection *connect.Connect, line string) error {
 	values := strings.Fields(line)
 	if len(values) == 0 {
 		return nil
@@ -99,7 +94,7 @@ func (p *ConfigParser) parseLine(line string) error {
 	}
 
 	for _, parser := range parsers {
-		if err := parser(p.current, values); err != nil {
+		if err := parser(connection, values); err != nil {
 			return err
 		}
 	}
@@ -107,30 +102,28 @@ func (p *ConfigParser) parseLine(line string) error {
 	return nil
 }
 
-func (p *ConfigParser) saveCurrentConnection() {
-	if p.current != nil && !p.isConnectionEmpty() {
-		if p.current.Port == 0 {
-			p.current.Port = 22
+func saveCurrentConnection(connection *connect.Connect, connections *connect.Connections) {
+	if connection != nil && !isConnectionEmpty(connection) {
+		if connection.Port == 0 {
+			connection.Port = 22
 		}
 
-		p.connections.Connects = append(p.connections.Connects, *p.current)
+		connections.Connects = append(connections.Connects, *connection)
 	}
 
-	p.current = &connect.Connect{}
+	*connection = connect.Connect{}
 }
 
-func (p *ConfigParser) isConnectionEmpty() bool {
-	return p.current.Alias == "" &&
-		p.current.Port == 0 &&
-		p.current.Login == "" &&
-		p.current.PrivateKey == ""
+func isConnectionEmpty(connection *connect.Connect) bool {
+	return connection.Alias == "" &&
+		connection.Port == 0 &&
+		connection.Login == "" &&
+		connection.PrivateKey == ""
 }
 
 func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
-	parser := &ConfigParser{
-		connections: &connect.Connections{},
-		current:     &connect.Connect{},
-	}
+	connections := new(connect.Connections)
+	current := new(connect.Connect)
 
 	for s.Scan() {
 		line := strings.TrimSpace(s.Text())
@@ -140,20 +133,20 @@ func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
 		case isComment(line):
 			continue
 		case isEmptyLine(line):
-			parser.saveCurrentConnection()
+			saveCurrentConnection(current, connections)
 		default:
-			if err := parser.parseLine(line); err != nil {
+			if err := parseLine(current, line); err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	parser.saveCurrentConnection()
+	saveCurrentConnection(current, connections)
 
 	if err := s.Err(); err != nil {
 		return nil, err
 	}
 
-	fmt.Println(parser.connections)
-	return parser.connections, nil
+	fmt.Println(connections)
+	return connections, nil
 }
