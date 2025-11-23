@@ -77,7 +77,7 @@ func parsePrivateKey(connection *connect.Connect, values []string) error {
 	return nil
 }
 
-func parseConnection(s *bufio.Scanner) (*connect.Connections, error) {
+func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
 	connections := new(connect.Connections)
 	connection := new(connect.Connect)
 
