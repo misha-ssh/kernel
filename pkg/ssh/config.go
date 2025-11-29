@@ -26,9 +26,7 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 		return nil, err
 	}
 
-	_, _ = parseConnections(bufio.NewScanner(file))
-
-	return nil, nil
+	return parseConnections(bufio.NewScanner(file))
 }
 
 func (c *Config) SaveConnection(connection *connect.Connect) error {
