@@ -85,6 +85,6 @@ test-coverage:
 
 # use tests-integration for check integration tests cases
 # you need an installed docker to work
-.PHONY: tests-integration
-tests-integration:
+.PHONY: test-e2e
+test-e2e:
 	GO_TESTING=true go test -tags=integration ./...

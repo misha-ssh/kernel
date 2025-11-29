@@ -405,7 +405,7 @@ make test-coverage
 Run test e2e:
 
 ```bash
-make tests-integration
+make test-e2e
 ```
 
 ## 🤝 Feedback
