@@ -3,6 +3,8 @@ package ssh
 import (
 	"bufio"
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -18,13 +20,24 @@ func parseAlias(connection *connect.Connect, values []string) error {
 		return fmt.Errorf("empty host")
 	}
 
-	//todo add logic for parse host with * and ! for set data
-	//todo this is operation used in last order
 	if strings.Contains(values[1], "*") || strings.Contains(values[1], "!") {
 		return nil
 	}
 
 	connection.Alias = values[1]
+	return nil
+}
+
+func parseAddress(connection *connect.Connect, values []string) error {
+	if strings.ToLower(values[0]) != "hostname" {
+		return nil
+	}
+
+	if len(values) < 2 {
+		return fmt.Errorf("empty hostname")
+	}
+
+	connection.Address = values[1]
 	return nil
 }
 
@@ -68,16 +81,27 @@ func parsePrivateKey(connection *connect.Connect, values []string) error {
 		return fmt.Errorf("empty private key")
 	}
 
-	connection.PrivateKey = values[1]
+	pathKey := values[1]
+
+	if strings.HasPrefix(pathKey, "~/") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+
+		pathKey = filepath.Join(home, pathKey[2:])
+	}
+
+	connection.PrivateKey = pathKey
 	return nil
 }
 
 func isComment(line string) bool {
-	return strings.HasPrefix(strings.TrimSpace(line), "#")
+	return strings.HasPrefix(line, "#")
 }
 
 func isEmptyLine(line string) bool {
-	return strings.TrimSpace(line) == ""
+	return line == ""
 }
 
 func parseLine(connection *connect.Connect, line string) error {
@@ -88,8 +112,9 @@ func parseLine(connection *connect.Connect, line string) error {
 
 	parsers := []func(*connect.Connect, []string) error{
 		parseAlias,
-		parsePort,
+		parseAddress,
 		parseLogin,
+		parsePort,
 		parsePrivateKey,
 	}
 
@@ -108,7 +133,9 @@ func saveCurrentConnection(connection *connect.Connect, connections *connect.Con
 			connection.Port = 22
 		}
 
-		connections.Connects = append(connections.Connects, *connection)
+		if err := connection.Validate(); err == nil {
+			connections.Connects = append(connections.Connects, *connection)
+		}
 	}
 
 	*connection = connect.Connect{}
@@ -118,6 +145,7 @@ func isConnectionEmpty(connection *connect.Connect) bool {
 	return connection.Alias == "" &&
 		connection.Port == 0 &&
 		connection.Login == "" &&
+		connection.Address == "" &&
 		connection.PrivateKey == ""
 }
 
