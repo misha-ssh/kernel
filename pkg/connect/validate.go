@@ -3,9 +3,9 @@ package connect
 import (
 	"encoding/pem"
 	"errors"
-	"github.com/misha-ssh/kernel/internal/logger"
 	"golang.org/x/crypto/ssh"
 	"net"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -108,19 +108,23 @@ func (c *Connect) validatePrivateKey() error {
 		return nil
 	}
 
-	block, _ := pem.Decode([]byte(c.PrivateKey))
+	data, err := os.ReadFile(c.PrivateKey)
+	if err != nil {
+		return errors.New("note found private key")
+	}
+
+	block, _ := pem.Decode(data)
 	if block == nil {
 		return errors.New("private key is not valid")
 	}
 
-	_, err := ssh.ParseRawPrivateKey([]byte(c.PrivateKey))
+	_, err = ssh.ParseRawPrivateKey(data)
 	if err != nil {
 		if !strings.Contains(err.Error(), "passphrase") {
-			logger.Error(err.Error())
 			return err
 		}
 
-		_, err = ssh.ParsePrivateKeyWithPassphrase([]byte(c.PrivateKey), []byte(c.Passphrase))
+		_, err = ssh.ParsePrivateKeyWithPassphrase(data, []byte(c.Passphrase))
 	}
 
 	return err
@@ -136,7 +140,7 @@ func (c *Connect) validateUpdatedAt() error {
 
 func validateDate(date string) error {
 	if strings.TrimSpace(date) == "" {
-		return errors.New("date cannot be empty")
+		return nil
 	}
 
 	parsedTime, err := time.Parse(time.RFC3339, date)
