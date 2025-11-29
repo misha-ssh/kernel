@@ -9,8 +9,8 @@ import (
 	"path/filepath"
 )
 
-// GeneratePrivateKey generate private key for ssh connect
-func GeneratePrivateKey(pass string) ([]byte, error) {
+// generatePrivateKey generate private key for ssh connect
+func generatePrivateKey(pass string) ([]byte, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
 	if err != nil {
 		return nil, err
@@ -37,7 +37,7 @@ func GeneratePrivateKey(pass string) ([]byte, error) {
 
 // CreatePrivateKey generate and save private key in file
 func CreatePrivateKey(direction string) (string, error) {
-	privatePEM, err := GeneratePrivateKey("")
+	privatePEM, err := generatePrivateKey("")
 	if err != nil {
 		return "", err
 	}
@@ -53,7 +53,7 @@ func CreatePrivateKey(direction string) (string, error) {
 
 // CreatePrivateKeyWithPass generate and save private key with pass in file
 func CreatePrivateKeyWithPass(direction string, pass string) (string, error) {
-	privatePEM, err := GeneratePrivateKey(pass)
+	privatePEM, err := generatePrivateKey(pass)
 	if err != nil {
 		return "", err
 	}
