@@ -1,13 +1,9 @@
 package ssh
 
 import (
-	"bufio"
-	"fmt"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/testutil"
 	"github.com/stretchr/testify/require"
-	"os"
-	"path/filepath"
 	"testing"
 
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -148,14 +144,6 @@ func TestConfig_SaveConnection(t *testing.T) {
 				require.Error(t, err)
 			} else {
 				require.NoError(t, err)
-			}
-
-			// todo delete before finished method
-			file, err := os.OpenFile(filepath.Join(tmpDir, "config"), os.O_RDONLY, 0)
-			s := bufio.NewScanner(file)
-
-			for s.Scan() {
-				fmt.Println(s.Text())
 			}
 		})
 	}
