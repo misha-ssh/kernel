@@ -211,6 +211,29 @@ func addConnection(connection *connect.Connect, file *os.File) error {
 		return err
 	}
 
+	s := bufio.NewScanner(file)
+
+	for s.Scan() {
+		line := strings.TrimSpace(s.Text())
+
+		switch {
+		case isComment(line):
+			continue
+		case isEmptyLine(line):
+			continue
+		default:
+			values := strings.Fields(line)
+
+			if len(values) < 2 {
+				continue
+			}
+
+			if strings.ToLower(values[0]) == "host" && values[1] == connection.Alias {
+				return fmt.Errorf("alias already in use")
+			}
+		}
+	}
+
 	_, err := file.WriteString(prepareConnection(connection))
 	return err
 }
