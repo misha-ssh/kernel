@@ -32,13 +32,29 @@ func TestConfig_GetConnections(t *testing.T) {
 			filename: "testdata/config",
 			wantErr:  false,
 		},
+		{
+			name: "success - get empty connections",
+			want: &connect.Connections{
+				Connects: nil,
+			},
+			filename: "testdata/empty_config",
+			wantErr:  false,
+		},
+		{
+			name:     "err - note exists config",
+			want:     nil,
+			filename: "",
+			wantErr:  true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			tmpDir := t.TempDir()
 
-			err := testutil.CreateSSHConfig(tmpDir, tt.filename)
-			require.NoError(t, err)
+			if tt.filename != "" {
+				err := testutil.CreateSSHConfig(tmpDir, tt.filename)
+				require.NoError(t, err)
+			}
 
 			config := &Config{
 				LocalStorage: &storage.Local{
