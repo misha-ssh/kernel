@@ -1,8 +1,14 @@
-Host targaryen
-    HostName 192.168.1.10
-    User daenerys
-    Port 7654
-    IdentityFile ~/.ssh/id_ed25519
+Host test
+    HostName localhost
+    User user
+    Port 3333
+    IdentityFile testdata/private_key
+
+Host test2
+    HostName localhost
+    User user2
+    Port 3333
+    IdentityFile testdata/invalid_private_key
 
 Host tyrell
     HostName 192.168.10.20
