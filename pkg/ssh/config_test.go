@@ -17,8 +17,18 @@ func TestConfig_GetConnections(t *testing.T) {
 		wantErr  bool
 	}{
 		{
-			name:     "success - get connections",
-			want:     &connect.Connections{},
+			name: "success - get connections",
+			want: &connect.Connections{
+				Connects: []connect.Connect{
+					{
+						Alias:      "test",
+						Address:    "localhost",
+						Login:      "user",
+						Port:       3333,
+						PrivateKey: "testdata/private_key",
+					},
+				},
+			},
 			filename: "testdata/config",
 			wantErr:  false,
 		},
@@ -28,9 +38,6 @@ func TestConfig_GetConnections(t *testing.T) {
 			tmpDir := t.TempDir()
 
 			err := testutil.CreateSSHConfig(tmpDir, tt.filename)
-			require.NoError(t, err)
-
-			_, err = testutil.CreatePrivateKey(tmpDir)
 			require.NoError(t, err)
 
 			config := &Config{
