@@ -9,6 +9,8 @@ import (
 	"path/filepath"
 )
 
+// todo delete method and usage file from testdata with pk
+
 // generatePrivateKey generate private key for ssh connect
 func generatePrivateKey(pass string) ([]byte, error) {
 	privateKey, err := rsa.GenerateKey(rand.Reader, 4096)
