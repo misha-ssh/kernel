@@ -1,12 +1,12 @@
 package ssh
 
 import (
-	"github.com/misha-ssh/kernel/internal/storage"
-	"github.com/misha-ssh/kernel/testutil"
-	"github.com/stretchr/testify/require"
 	"testing"
 
+	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
+	"github.com/misha-ssh/kernel/testutil"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConfig_GetConnections(t *testing.T) {
