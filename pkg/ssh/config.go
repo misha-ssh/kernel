@@ -1,7 +1,6 @@
 package ssh
 
 import (
-	"bufio"
 	"github.com/misha-ssh/kernel/configs/envconst"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -26,11 +25,16 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 		return nil, err
 	}
 
-	return parseConnections(bufio.NewScanner(file))
+	return parseConnections(file)
 }
 
 func (c *Config) SaveConnection(connection *connect.Connect) error {
-	return nil
+	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	if err != nil {
+		return err
+	}
+
+	return addConnection(connection, file)
 }
 
 func (c *Config) UpdateConnection(connection *connect.Connect) (*connect.Connect, error) {
