@@ -155,7 +155,6 @@ func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
 
 	for s.Scan() {
 		line := strings.TrimSpace(s.Text())
-		fmt.Println(line)
 
 		switch {
 		case isComment(line):
@@ -175,6 +174,5 @@ func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
 		return nil, err
 	}
 
-	fmt.Println(connections)
 	return connections, nil
 }
