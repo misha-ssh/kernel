@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/pkg/connect"
 )
 
@@ -149,7 +150,16 @@ func isConnectionEmpty(connection *connect.Connect) bool {
 		connection.PrivateKey == ""
 }
 
-func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
+func parseConnections(file *os.File) (*connect.Connections, error) {
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			logger.Error(err.Error())
+		}
+	}()
+
+	s := bufio.NewScanner(file)
+
 	connections := new(connect.Connections)
 	current := new(connect.Connect)
 
@@ -175,4 +185,32 @@ func parseConnections(s *bufio.Scanner) (*connect.Connections, error) {
 	}
 
 	return connections, nil
+}
+
+func prepareConnection(connection *connect.Connect) string {
+	var configConnection string
+
+	configConnection += fmt.Sprintf("\n\nHost %v", connection.Alias)
+	configConnection += fmt.Sprintf("\n\tHostName %v", connection.Address)
+	configConnection += fmt.Sprintf("\n\tUser %v", connection.Login)
+	configConnection += fmt.Sprintf("\n\tPort %v", strconv.Itoa(connection.Port))
+	configConnection += fmt.Sprintf("\n\tIdentityFile %v", connection.PrivateKey)
+
+	return configConnection
+}
+
+func addConnection(connection *connect.Connect, file *os.File) error {
+	defer func() {
+		err := file.Close()
+		if err != nil {
+			logger.Error(err.Error())
+		}
+	}()
+
+	if err := connection.Validate(); err != nil {
+		return err
+	}
+
+	_, err := file.WriteString(prepareConnection(connection))
+	return err
 }
