@@ -1,7 +1,8 @@
-package connect
+package ssh
 
 import (
 	"fmt"
+	"github.com/misha-ssh/kernel/pkg/connect"
 	"net"
 	"os"
 
@@ -10,12 +11,18 @@ import (
 	"golang.org/x/term"
 )
 
-type Ssh struct {
-	Connection *Connect
+type SSH struct {
+	Connection *connect.Connect
+}
+
+func NewSSH(connection *connect.Connect) *SSH {
+	return &SSH{
+		Connection: connection,
+	}
 }
 
 // Session establishes a new SSH session with the remote server
-func (s *Ssh) Session() (*ssh.Session, error) {
+func (s *SSH) Session() (*ssh.Session, error) {
 	client, err := s.Client()
 	if err != nil {
 		return nil, err
@@ -51,7 +58,7 @@ func (s *Ssh) Session() (*ssh.Session, error) {
 }
 
 // Connect starts an interactive shell session using the established SSH connection
-func (s *Ssh) Connect(session *ssh.Session) error {
+func (s *SSH) Connect(session *ssh.Session) error {
 	defer func() {
 		if err := session.Close(); err != nil {
 			logger.Error(err.Error())
@@ -87,7 +94,7 @@ func (s *Ssh) Connect(session *ssh.Session) error {
 }
 
 // Client create ssh client from config and Auth
-func (s *Ssh) Client() (*ssh.Client, error) {
+func (s *SSH) Client() (*ssh.Client, error) {
 	sshAuth, err := s.Auth()
 	if err != nil {
 		return nil, err
@@ -102,25 +109,22 @@ func (s *Ssh) Client() (*ssh.Client, error) {
 
 	hostWithPort := net.JoinHostPort(
 		s.Connection.Address,
-		fmt.Sprint(s.Connection.SshOptions.Port),
+		fmt.Sprint(s.Connection.Port),
 	)
 
 	return ssh.Dial("tcp", hostWithPort, config)
 }
 
 // Auth automate defines method auth from Connect
-func (s *Ssh) Auth() ([]ssh.AuthMethod, error) {
+func (s *SSH) Auth() ([]ssh.AuthMethod, error) {
 	var authMethod []ssh.AuthMethod
 
 	if len(s.Connection.Password) > 0 {
 		authMethod = append(authMethod, ssh.Password(s.Connection.Password))
 	}
 
-	if len(s.Connection.SshOptions.PrivateKey) > 0 {
-		key, err := parsePrivateKey(
-			s.Connection.SshOptions.PrivateKey,
-			s.Connection.SshOptions.Passphrase,
-		)
+	if len(s.Connection.PrivateKey) > 0 {
+		key, err := s.parsePrivateKey()
 		if err != nil {
 			return nil, err
 		}

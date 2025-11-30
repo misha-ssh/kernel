@@ -4,6 +4,7 @@ package kernel
 
 import (
 	"context"
+	ssh2 "github.com/misha-ssh/kernel/pkg/ssh"
 	"os/exec"
 	"testing"
 	"time"
@@ -59,7 +60,7 @@ func TestIntegrationDefaultConnect(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{
+		sshConnector := &ssh2.Ssh{
 			Connection: connection,
 		}
 
@@ -127,7 +128,7 @@ func TestIntegrationPrivateKeyConnect(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{
+		sshConnector := &ssh2.Ssh{
 			Connection: connection,
 		}
 		session, err := sshConnector.Session()
@@ -193,7 +194,7 @@ func TestIntegrationPrivateKeyConnectWithPassphrase(t *testing.T) {
 			},
 		}
 
-		sshConnector := &connect.Ssh{
+		sshConnector := &ssh2.Ssh{
 			Connection: connection,
 		}
 		session, err := sshConnector.Session()

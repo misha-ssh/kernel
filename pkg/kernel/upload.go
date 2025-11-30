@@ -1,6 +1,7 @@
 package kernel
 
 import (
+	sftp2 "github.com/misha-ssh/kernel/pkg/sftp"
 	"io"
 	"os"
 
@@ -14,7 +15,7 @@ import (
 func Upload(connection *connect.Connect, uploadLocalFile string, uploadRemoteFile string) error {
 	setup.Init()
 
-	sp := connect.Sftp{
+	sp := sftp2.Sftp{
 		Connection: connection,
 	}
 
