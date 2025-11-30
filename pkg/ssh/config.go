@@ -20,7 +20,7 @@ func NewConfig() *Config {
 }
 
 func (c *Config) GetConnections() (*connect.Connections, error) {
-	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_RDWR)
+	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_RDONLY)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (c *Config) GetConnections() (*connect.Connections, error) {
 }
 
 func (c *Config) SaveConnection(connection *connect.Connect) error {
-	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	file, err := c.LocalStorage.GetOpenFile(envconst.FilenameConfigSSH, os.O_RDWR)
 	if err != nil {
 		return err
 	}
