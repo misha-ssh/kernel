@@ -1,15 +1,11 @@
 package store
 
 import (
-	"encoding/pem"
 	"errors"
-	"reflect"
-	"strings"
-
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/storage"
 	"github.com/misha-ssh/kernel/pkg/connect"
-	"golang.org/x/crypto/ssh"
+	"reflect"
 )
 
 var (
@@ -17,28 +13,8 @@ var (
 
 	ErrWriteToFilePrivateKey = errors.New("err write to file private key")
 	ErrCreateFilePrivateKey  = errors.New("err create file private key")
-	ErrNotValidPrivateKey    = errors.New("private key is not valid")
 	ErrGetDataPrivateKey     = errors.New("private key get data error")
 )
-
-func validatePrivateKey(privateKey string, passphrase string) error {
-	block, _ := pem.Decode([]byte(privateKey))
-	if block == nil {
-		return ErrNotValidPrivateKey
-	}
-
-	_, err := ssh.ParseRawPrivateKey([]byte(privateKey))
-	if err != nil {
-		if !strings.Contains(err.Error(), "passphrase") {
-			logger.Error(err.Error())
-			return err
-		}
-
-		_, err = ssh.ParsePrivateKeyWithPassphrase([]byte(privateKey), []byte(passphrase))
-	}
-
-	return err
-}
 
 // SavePrivateKey create private key for connection in spec dir
 func SavePrivateKey(connection *connect.Connect) (string, error) {
@@ -47,12 +23,6 @@ func SavePrivateKey(connection *connect.Connect) (string, error) {
 	if err != nil {
 		logger.Error(err.Error())
 		return "", ErrGetDataPrivateKey
-	}
-
-	err = validatePrivateKey(dataPrivateKey, connection.SshOptions.Passphrase)
-	if err != nil {
-		logger.Error(err.Error())
-		return "", err
 	}
 
 	filenamePrivateKey := connection.Alias
@@ -105,12 +75,6 @@ func UpdatePrivateKey(connection *connect.Connect) (string, error) {
 	if err != nil {
 		logger.Error(err.Error())
 		return "", ErrGetDataPrivateKey
-	}
-
-	err = validatePrivateKey(dataPrivateKey, connection.SshOptions.Passphrase)
-	if err != nil {
-		logger.Error(err.Error())
-		return "", err
 	}
 
 	if !reflect.DeepEqual(existDataPrivateKey, dataPrivateKey) {

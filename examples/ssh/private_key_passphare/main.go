@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/misha-ssh/kernel/pkg/ssh"
 	"time"
 
 	"github.com/misha-ssh/kernel/pkg/connect"
@@ -8,7 +9,7 @@ import (
 
 // main for success connect start make command: up-ssh-key-pass
 func main() {
-	ssh := &connect.Ssh{
+	ssh := &ssh.Ssh{
 		Connection: &connect.Connect{
 			Alias:     "test",
 			Login:     "root",
