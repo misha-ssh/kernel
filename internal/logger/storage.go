@@ -11,25 +11,27 @@ import (
 	"github.com/misha-ssh/kernel/internal/storage"
 )
 
-const FileName = envconst.FilenameLogger
+const Filename = envconst.FilenameLogger
 
 var (
-	DirectionApp = storage.GetAppDir()
-
 	ErrGetStorageInfo = errors.New("err get info use log - storage")
 	ErrCreateStorage  = errors.New("err at created log file")
 	ErrGetOpenFile    = errors.New("err get open log file")
 )
 
-type StorageLogger struct{}
-
-func NewStorageLogger() *StorageLogger {
-	return &StorageLogger{}
+type StorageLogger struct {
+	storage *storage.Local
 }
 
-func (sl *StorageLogger) createLogFile() error {
-	if !storage.Exists(DirectionApp, FileName) {
-		err := storage.Create(DirectionApp, FileName)
+func NewStorageLogger() *StorageLogger {
+	return &StorageLogger{
+		storage: storage.NewLocal(),
+	}
+}
+
+func (s *StorageLogger) createLogFile() error {
+	if !s.storage.Exists(Filename) {
+		err := s.storage.Create(Filename)
 		if err != nil {
 			return err
 		}
@@ -38,8 +40,8 @@ func (sl *StorageLogger) createLogFile() error {
 	return nil
 }
 
-func (sl *StorageLogger) log(value any, status StatusLog) error {
-	err := sl.createLogFile()
+func (s *StorageLogger) log(value any, status StatusLog) error {
+	err := s.createLogFile()
 	if err != nil {
 		return ErrCreateStorage
 	}
@@ -51,7 +53,7 @@ func (sl *StorageLogger) log(value any, status StatusLog) error {
 
 	logInfo := fmt.Sprintf("|%v| file: %s, line: %v, message: %#v", status, calledFile, line, value)
 
-	openLogFile, err := storage.GetOpenFile(DirectionApp, FileName, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
+	openLogFile, err := s.storage.GetOpenFile(Filename, os.O_WRONLY|os.O_APPEND|os.O_CREATE)
 	defer func(openLogFile *os.File) {
 		err = openLogFile.Close()
 	}(openLogFile)
@@ -65,29 +67,29 @@ func (sl *StorageLogger) log(value any, status StatusLog) error {
 	return nil
 }
 
-func (sl *StorageLogger) Error(value any) {
-	err := sl.log(value, ErrorStatus)
+func (s *StorageLogger) Error(value any) {
+	err := s.log(value, ErrorStatus)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (sl *StorageLogger) Debug(value any) {
-	err := sl.log(value, DebugStatus)
+func (s *StorageLogger) Debug(value any) {
+	err := s.log(value, DebugStatus)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (sl *StorageLogger) Info(value any) {
-	err := sl.log(value, InfoStatus)
+func (s *StorageLogger) Info(value any) {
+	err := s.log(value, InfoStatus)
 	if err != nil {
 		panic(err)
 	}
 }
 
-func (sl *StorageLogger) Warn(value any) {
-	err := sl.log(value, WarnStatus)
+func (s *StorageLogger) Warn(value any) {
+	err := s.log(value, WarnStatus)
 	if err != nil {
 		panic(err)
 	}

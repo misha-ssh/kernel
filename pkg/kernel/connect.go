@@ -2,6 +2,7 @@ package kernel
 
 import (
 	"errors"
+	"github.com/misha-ssh/kernel/pkg/ssh"
 
 	"github.com/misha-ssh/kernel/internal/logger"
 	"github.com/misha-ssh/kernel/internal/setup"
@@ -20,7 +21,7 @@ func Connect(connection *connect.Connect) error {
 
 	switch connection.Type {
 	case connect.TypeSSH:
-		ssh := &connect.Ssh{
+		ssh := &ssh.Ssh{
 			Connection: connection,
 		}
 

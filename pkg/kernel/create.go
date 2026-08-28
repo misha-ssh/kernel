@@ -12,7 +12,6 @@ import (
 var (
 	ErrConnectionByAliasExistsAtCreate = errors.New("connection by alias exists")
 	ErrDeletePrivateKeyAtCreate        = errors.New("err delete private key")
-	ErrSavePrivateKeyAtCreate          = errors.New("err save private key")
 	ErrGetConnectionAtCreate           = errors.New("err get connection")
 	ErrSetConnectionAtCreate           = errors.New("err set connection")
 )
